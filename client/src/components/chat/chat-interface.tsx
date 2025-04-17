@@ -19,6 +19,7 @@ interface ChatbotPublicInfo {
   name: string;
   description: string;
   model: string;
+  suggestedQuestions?: string[];
 }
 
 interface ChatResponse {
@@ -30,6 +31,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   const [sessionId, setSessionId] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get chatbot information
@@ -129,6 +131,8 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   useEffect(() => {
     if (previousMessages && previousMessages.length > 0) {
       setMessages(previousMessages);
+      // If there are previous messages, don't show suggestions
+      setShowSuggestions(false);
     }
   }, [previousMessages]);
 
@@ -169,12 +173,20 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     setMessages(prev => [...prev, userMessage]);
     setInputDisabled(true);
     
+    // Hide suggestions after the first message is sent
+    setShowSuggestions(false);
+    
     try {
       const response = await messageMutation.mutateAsync(message);
       setMessages(prev => [...prev, response.message]);
     } catch (error) {
       // Error is handled in the mutation
     }
+  };
+  
+  const handleSuggestedQuestionClick = (question: string) => {
+    if (inputDisabled) return;
+    handleSendMessage(question);
   };
 
   if (!isPreview && isLoadingChatbot) {
@@ -234,6 +246,54 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       
       {/* Chat Input */}
       <div className="p-4 border-t border-neutral-800">
+        {/* Suggested Questions */}
+        {showSuggestions && 
+          (!isPreview ? 
+            (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
+            isPreview) && (
+          <div className="mb-4">
+            <p className="text-sm font-medium text-neutral-400 mb-2">
+              Suggested questions:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {isPreview ? (
+                // Show sample suggested questions in preview mode
+                <>
+                  <button 
+                    onClick={() => handleSuggestedQuestionClick("What services do you offer?")}
+                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                  >
+                    What services do you offer?
+                  </button>
+                  <button 
+                    onClick={() => handleSuggestedQuestionClick("How do I get started?")}
+                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                  >
+                    How do I get started?
+                  </button>
+                  <button 
+                    onClick={() => handleSuggestedQuestionClick("Can you help me with my account?")}
+                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                  >
+                    Can you help me with my account?
+                  </button>
+                </>
+              ) : (
+                // Show actual suggested questions from the chatbot
+                chatbotInfo?.suggestedQuestions?.map((question, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => handleSuggestedQuestionClick(question)}
+                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                  >
+                    {question}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+        
         <ChatInput 
           onSendMessage={handleSendMessage} 
           disabled={inputDisabled} 

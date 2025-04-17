@@ -250,6 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       name: chatbot.name,
       description: chatbot.description,
       model: chatbot.model,
+      suggestedQuestions: chatbot.suggestedQuestions || [],
     });
   });
 
