@@ -80,6 +80,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/knowledge-base">
+                  <a className={`flex items-center p-2 rounded-lg ${isActive("/knowledge-base")}`}>
+                    <Database className="h-5 w-5" />
+                    <span className="ml-3 hidden md:block">Knowledge Base</span>
+                  </a>
+                </Link>
+              </li>
+              <li>
                 <Link href="/settings">
                   <a className={`flex items-center p-2 rounded-lg ${isActive("/settings")}`}>
                     <Settings className="h-5 w-5" />

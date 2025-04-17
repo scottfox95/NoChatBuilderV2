@@ -145,10 +145,10 @@ export default function KnowledgeBasePage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center">
-                      {getFileTypeIcon(document.fileName)}
+                      {getFileTypeIcon(document.name)}
                       <div className="ml-2">
                         <CardTitle className="text-lg text-white truncate max-w-[200px]">
-                          {document.fileName}
+                          {document.name}
                         </CardTitle>
                       </div>
                     </div>
@@ -183,7 +183,7 @@ export default function KnowledgeBasePage() {
                       onClick={() => {
                         toast({
                           title: "Document details",
-                          description: `Filename: ${document.fileName}, Size: ${document.fileSize} bytes`,
+                          description: `Filename: ${document.name}, Size: ${document.size} bytes`,
                         });
                       }}
                     >
