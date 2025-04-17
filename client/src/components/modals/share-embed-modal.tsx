@@ -15,10 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 interface ShareEmbedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  chatbotSlug: string;
+  careAidSlug: string;
 }
 
-export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareEmbedModalProps) {
+export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotSlug }: ShareEmbedModalProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState<string | null>(null);
   const [directLinkValue, setDirectLinkValue] = useState("");
@@ -39,7 +39,7 @@ export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareE
       setEmbedLinkValue(embedLink);
       
       // Set the widget script code
-      const widgetScript = `<script src="${hostname}/widget.js" data-chatbot-id="${chatbotSlug}"></script>`;
+      const widgetScript = `<script src="${hostname}/widget.js" data-care-aid-id="${chatbotSlug}"></script>`;
       setWidgetScriptValue(widgetScript);
     } else {
       setCopied(null);

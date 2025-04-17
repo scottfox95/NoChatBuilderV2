@@ -2,10 +2,10 @@
 (function() {
   // Get the current script tag
   const currentScript = document.currentScript;
-  const chatbotId = currentScript.getAttribute('data-chatbot-id');
+  const chatbotId = currentScript.getAttribute('data-care-aid-id');
   
   if (!chatbotId) {
-    console.error('Chatbot Widget Error: No chatbot-id provided');
+    console.error('Care Aid Widget Error: No care-aid-id provided');
     return;
   }
   
@@ -24,7 +24,7 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background-color: #3b82f6;
+      background-color: #EA19FF;
       color: white;
       display: flex;
       align-items: center;

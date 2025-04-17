@@ -1,7 +1,7 @@
 import { useParams } from "wouter";
 import ChatInterface from "@/components/chat/chat-interface";
 
-export default function ChatbotEmbedPage() {
+export default function CareAidEmbedPage() {
   const params = useParams<{ slug?: string }>();
   const slug = params.slug || "";
   

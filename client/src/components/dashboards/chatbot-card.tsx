@@ -168,7 +168,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
       <ShareEmbedModal 
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
-        chatbotSlug={chatbot.slug}
+        careAidSlug={chatbot.slug}
       />
     </>
   );
