@@ -108,7 +108,7 @@ export default function AuthPage() {
             </CardHeader>
             
             <CardContent>
-              <TabsContent value="login" className="mt-0">
+              <div className={activeTab === "login" ? "block" : "hidden"}>
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <FormField
@@ -164,9 +164,9 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-              </TabsContent>
+              </div>
               
-              <TabsContent value="register" className="mt-0">
+              <div className={activeTab === "register" ? "block" : "hidden"}>
                 <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                     <FormField
@@ -222,7 +222,7 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-              </TabsContent>
+              </div>
             </CardContent>
             
             <CardFooter className="flex justify-center border-t border-neutral-800 pt-4">

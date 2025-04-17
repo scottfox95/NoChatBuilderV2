@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,7 +12,9 @@ import ChatbotPage from "@/pages/chatbot-page";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={() => <DashboardPage />} />
+      <Route path="/" exact>
+        <Redirect to="/auth" />
+      </Route>
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/chatbots" component={DashboardPage} />
