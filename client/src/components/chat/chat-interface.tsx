@@ -142,42 +142,64 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   useEffect(() => {
     if (messages.length === 0) {
       if (isPreview) {
-        // Default preview welcome message
-        setMessages([
-          {
-            id: 0,
-            chatbotId: 0,
-            sessionId: "preview",
-            isUser: false,
-            content: "Hello! I'm your chatbot assistant. How can I help you today?",
-            timestamp: new Date(),
-          }
-        ]);
+        // Default preview welcome messages (multiple in sequence)
+        const previewMessages = [
+          "Hello! I'm your chatbot assistant.",
+          "I can help answer questions about your topic.",
+          "Feel free to ask me anything!"
+        ];
+        
+        const welcomeMessages = previewMessages.map((message, index) => ({
+          id: index,
+          chatbotId: 0,
+          sessionId: "preview",
+          isUser: false,
+          content: message,
+          timestamp: new Date(Date.now() + index * 100), // Slight timestamp difference to maintain order
+        }));
+        
+        setMessages(welcomeMessages);
       } else {
-        // Use chatbot's custom welcome message if available
-        let welcomeContent = "Hello! How can I assist you today?";
-        
-        // Check if we have welcomeMessages array
+        // Use all welcome messages in sequence
         if (chatbotInfo?.welcomeMessages && chatbotInfo.welcomeMessages.length > 0) {
-          // Pick a random welcome message from the array
-          const randomIndex = Math.floor(Math.random() * chatbotInfo.welcomeMessages.length);
-          welcomeContent = chatbotInfo.welcomeMessages[randomIndex];
-        } 
-        // Fall back to single welcomeMessage if available but welcomeMessages isn't
-        else if (chatbotInfo?.welcomeMessage) {
-          welcomeContent = chatbotInfo.welcomeMessage;
-        }
-        
-        setMessages([
-          {
-            id: 0,
+          // Create an array of welcome messages
+          const welcomeMessages = chatbotInfo.welcomeMessages.map((message, index) => ({
+            id: index,
             chatbotId: chatbotInfo?.id || 0,
             sessionId: sessionId || "initial",
             isUser: false,
-            content: welcomeContent,
-            timestamp: new Date(),
-          }
-        ]);
+            content: message,
+            timestamp: new Date(Date.now() + index * 100), // Slight timestamp difference to maintain order
+          }));
+          
+          setMessages(welcomeMessages);
+        } 
+        // Fall back to single welcomeMessage if welcomeMessages isn't available
+        else if (chatbotInfo?.welcomeMessage) {
+          setMessages([
+            {
+              id: 0,
+              chatbotId: chatbotInfo?.id || 0,
+              sessionId: sessionId || "initial",
+              isUser: false,
+              content: chatbotInfo.welcomeMessage,
+              timestamp: new Date(),
+            }
+          ]);
+        } 
+        // Default fallback
+        else {
+          setMessages([
+            {
+              id: 0,
+              chatbotId: chatbotInfo?.id || 0,
+              sessionId: sessionId || "initial",
+              isUser: false,
+              content: "Hello! How can I assist you today?",
+              timestamp: new Date(),
+            }
+          ]);
+        }
       }
     }
   }, [isPreview, messages.length, chatbotInfo, sessionId]);
