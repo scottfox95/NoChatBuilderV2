@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Loader2, TrendingUp, MessageSquare, Settings, LogOut, FileText } from "lucide-react";
+import { Loader2, TrendingUp, MessageSquare, Settings, LogOut, FileText, Database } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -150,6 +150,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/logs" ? "text-primary" : "text-neutral-400"}`}>
               <FileText className="h-5 w-5" />
               <span className="text-xs mt-1">Logs</span>
+            </a>
+          </Link>
+          <Link href="/knowledge-base">
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/knowledge-base" ? "text-primary" : "text-neutral-400"}`}>
+              <Database className="h-5 w-5" />
+              <span className="text-xs mt-1">Knowledge</span>
             </a>
           </Link>
           <Link href="/settings">
