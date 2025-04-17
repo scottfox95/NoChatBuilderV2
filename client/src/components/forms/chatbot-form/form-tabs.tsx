@@ -30,7 +30,9 @@ export default function FormTabs({ onSubmit, isSubmitting }: FormTabsProps) {
     if (!isLastTab) {
       setActiveTab(tabs[currentTabIndex + 1].id);
     } else {
+      // Call form submission
       onSubmit();
+      console.log("Submitting form on last tab");
     }
   };
 
@@ -84,23 +86,30 @@ export default function FormTabs({ onSubmit, isSubmitting }: FormTabsProps) {
           Previous
         </Button>
         
-        <Button
-          type={isLastTab ? "submit" : "button"}
-          onClick={handleNext}
-          disabled={isSubmitting}
-          className="bg-primary hover:bg-primary-dark text-white"
-        >
-          {isSubmitting ? (
-            "Saving..."
-          ) : isLastTab ? (
-            "Save Chatbot"
-          ) : (
-            <>
-              Continue
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
+        {isLastTab ? (
+          <Button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              console.log("Save button clicked");
+              onSubmit();
+            }}
+            disabled={isSubmitting}
+            className="bg-primary hover:bg-primary-dark text-white"
+          >
+            {isSubmitting ? "Saving..." : "Save Chatbot"}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={handleNext}
+            disabled={isSubmitting}
+            className="bg-primary hover:bg-primary-dark text-white"
+          >
+            Continue
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
     </Tabs>
   );

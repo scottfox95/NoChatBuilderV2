@@ -135,11 +135,21 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
     );
   }
 
+  // Directly handle submit without nesting handlers
+  const handleFormSubmit = () => {
+    console.log("Form submit triggered");
+    form.handleSubmit(onSubmit)();
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={(e) => { 
+        e.preventDefault();
+        console.log("Form onSubmit triggered"); 
+        form.handleSubmit(onSubmit)(e);
+      }} className="space-y-4">
         <FormTabs 
-          onSubmit={form.handleSubmit(onSubmit)} 
+          onSubmit={handleFormSubmit} 
           isSubmitting={createMutation.isPending || updateMutation.isPending}
         />
       </form>
