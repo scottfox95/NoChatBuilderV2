@@ -418,6 +418,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     res.json(messages);
   });
+  
+  // Chat logs with filtering
+  app.get("/api/logs", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 20;
+      const chatbotId = req.query.chatbotId as string;
+      const search = req.query.search as string;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+      
+      // Get all chatbots owned by the user to ensure they only see messages from their chatbots
+      const userChatbots = await storage.getChatbots(req.user.id);
+      const userChatbotIds = userChatbots.map(c => c.id);
+      
+      // Create filter object for the query
+      const filter: any = {
+        userId: req.user.id,
+        chatbotIds: userChatbotIds
+      };
+      
+      // Add optional filters
+      if (chatbotId && chatbotId !== "all") {
+        // Make sure user owns this chatbot
+        const chatbotIdNum = parseInt(chatbotId);
+        if (userChatbotIds.includes(chatbotIdNum)) {
+          filter.chatbotId = chatbotIdNum;
+        }
+      }
+      
+      if (search) {
+        filter.search = search;
+      }
+      
+      if (startDate) {
+        filter.startDate = new Date(startDate);
+      }
+      
+      if (endDate) {
+        // Add one day to make the end date inclusive
+        const endDateObj = new Date(endDate);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        filter.endDate = endDateObj;
+      }
+      
+      // Get messages with pagination
+      const { logs, totalCount } = await storage.getChatLogs(filter, page, pageSize);
+      
+      // Enhance logs with chatbot name
+      const enhancedLogs = await Promise.all(logs.map(async (log) => {
+        const chatbot = userChatbots.find(c => c.id === log.chatbotId);
+        return {
+          ...log,
+          chatbotName: chatbot ? chatbot.name : "Unknown Chatbot"
+        };
+      }));
+      
+      res.json({ 
+        logs: enhancedLogs, 
+        totalCount,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize)
+      });
+    } catch (error) {
+      console.error("Error fetching chat logs:", error);
+      res.status(500).json({ message: "Failed to fetch chat logs" });
+    }
+  });
 
   // Preview mode response generation endpoint
   app.post("/api/preview/generate-response", async (req, res) => {

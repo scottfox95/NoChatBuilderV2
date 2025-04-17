@@ -15,7 +15,7 @@ import {
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray, like, gte, lte, desc, count } from "drizzle-orm";
 import { pool } from "./db";
 import createMemoryStore from "memorystore";
 
@@ -45,6 +45,7 @@ export interface IStorage {
   // Message operations
   getMessagesBySession(chatbotId: number, sessionId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+  getChatLogs(filter: any, page: number, pageSize: number): Promise<{logs: Message[], totalCount: number}>;
 
   // Session store
   sessionStore: any;
@@ -165,6 +166,56 @@ export class DatabaseStorage implements IStorage {
       timestamp: new Date()
     }).returning();
     return message;
+  }
+  
+  async getChatLogs(filter: any, page: number, pageSize: number): Promise<{logs: Message[], totalCount: number}> {
+    let query = db.select().from(messages);
+    let countQuery = db.select({ count: count() }).from(messages);
+    
+    // Apply filters
+    // Filter by specific chatbot
+    if (filter.chatbotId) {
+      query = query.where(eq(messages.chatbotId, filter.chatbotId));
+      countQuery = countQuery.where(eq(messages.chatbotId, filter.chatbotId));
+    } 
+    // Filter by list of user's chatbots
+    else if (filter.chatbotIds && filter.chatbotIds.length > 0) {
+      query = query.where(inArray(messages.chatbotId, filter.chatbotIds));
+      countQuery = countQuery.where(inArray(messages.chatbotId, filter.chatbotIds));
+    }
+    
+    // Filter by text search
+    if (filter.search) {
+      query = query.where(like(messages.content, `%${filter.search}%`));
+      countQuery = countQuery.where(like(messages.content, `%${filter.search}%`));
+    }
+    
+    // Filter by date range
+    if (filter.startDate) {
+      query = query.where(gte(messages.timestamp, filter.startDate));
+      countQuery = countQuery.where(gte(messages.timestamp, filter.startDate));
+    }
+    
+    if (filter.endDate) {
+      query = query.where(lte(messages.timestamp, filter.endDate));
+      countQuery = countQuery.where(lte(messages.timestamp, filter.endDate));
+    }
+    
+    // Get total count
+    const [countResult] = await countQuery;
+    const totalCount = Number(countResult?.count || 0);
+    
+    // Apply pagination
+    const offset = (page - 1) * pageSize;
+    query = query.limit(pageSize).offset(offset);
+    
+    // Order by timestamp descending (newest first)
+    query = query.orderBy(desc(messages.timestamp));
+    
+    // Execute query
+    const logs = await query;
+    
+    return { logs, totalCount };
   }
 }
 
