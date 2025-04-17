@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import ChatbotPage from "@/pages/chatbot-page";
+import ChatbotEmbedPage from "@/pages/chatbot-embed-page";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/chatbots" component={DashboardPage} />
       <Route path="/chatbot/:slug/:view?" component={ChatbotPage} />
+      <Route path="/embed/:slug" component={ChatbotEmbedPage} />
       <Route component={NotFound} />
     </Switch>
   );

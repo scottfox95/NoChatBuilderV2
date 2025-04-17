@@ -1,8 +1,15 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { X, Download, Copy, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Copy, Check, Code } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ShareEmbedModalProps {
@@ -14,149 +21,181 @@ interface ShareEmbedModalProps {
 export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareEmbedModalProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState<string | null>(null);
-  
-  const baseUrl = typeof window !== 'undefined' 
-    ? `${window.location.protocol}//${window.location.host}`
-    : 'https://yourdomain.com';
-  
-  const chatbotUrl = `${baseUrl}/chatbot/${chatbotSlug}`;
-  const iframeCode = `<iframe src="${chatbotUrl}/embed" 
-  width="100%" height="600px" frameborder="0"></iframe>`;
-  const widgetCode = `<script src="${baseUrl}/widget.js" 
-  data-chatbot-id="${chatbotSlug}"></script>`;
+  const [directLinkValue, setDirectLinkValue] = useState("");
+  const [embedLinkValue, setEmbedLinkValue] = useState("");
+  const [widgetScriptValue, setWidgetScriptValue] = useState("");
 
-  const copyToClipboard = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(type);
-      toast({
-        title: "Copied!",
-        description: `${type} copied to clipboard`,
-      });
+  useEffect(() => {
+    if (isOpen) {
+      // Get the hostname from the window location
+      const hostname = window.location.origin;
       
-      setTimeout(() => {
-        setCopied(null);
-      }, 2000);
-    } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again or copy manually",
-        variant: "destructive",
-      });
+      // Set the direct link
+      const directLink = `${hostname}/chatbot/${chatbotSlug}`;
+      setDirectLinkValue(directLink);
+      
+      // Set the embed iframe code
+      const embedLink = `<iframe src="${hostname}/embed/${chatbotSlug}" width="100%" height="600px" style="border:none;border-radius:8px;" allow="microphone"></iframe>`;
+      setEmbedLinkValue(embedLink);
+      
+      // Set the widget script code
+      const widgetScript = `<script src="${hostname}/widget.js" data-chatbot-id="${chatbotSlug}"></script>`;
+      setWidgetScriptValue(widgetScript);
+    } else {
+      setCopied(null);
     }
-  };
+  }, [isOpen, chatbotSlug]);
   
-  const generateQRCode = async () => {
-    // In a real implementation, we would generate a QR code here
-    // For now, we'll just show a toast notification
-    toast({
-      title: "QR Code Generation",
-      description: "QR Code generation would be implemented in production",
-    });
+  const handleCopyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopied(type);
+        setTimeout(() => setCopied(null), 2000);
+        toast({
+          title: "Copied to clipboard",
+          description: `${type} has been copied to your clipboard.`,
+        });
+      })
+      .catch((error) => {
+        console.error("Copy failed:", error);
+        toast({
+          title: "Copy failed",
+          description: "Failed to copy to clipboard. Please try again.",
+          variant: "destructive",
+        });
+      });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl bg-background-light border-neutral-800">
-        <DialogHeader className="p-6 border-b border-neutral-800">
-          <div className="flex justify-between items-center">
-            <DialogTitle className="text-xl font-semibold text-white">
-              Share Your Chatbot
-            </DialogTitle>
-            <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogClose>
-          </div>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">Share Chatbot</DialogTitle>
         </DialogHeader>
         
-        <div className="p-6 space-y-6">
-          {/* Public Link */}
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-2">Public Link</h3>
-            <div className="flex">
-              <Input
-                value={chatbotUrl}
-                readOnly
-                className="flex-1 bg-neutral-800 border-neutral-700 text-white rounded-r-none"
-              />
-              <Button
-                onClick={() => copyToClipboard(chatbotUrl, "Public Link")}
-                className="bg-neutral-700 hover:bg-neutral-600 text-white rounded-l-none"
-              >
-                {copied === "Public Link" ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <p className="mt-1 text-xs text-neutral-500">Share this link directly with your users.</p>
-          </div>
+        <Tabs defaultValue="link" className="w-full mt-4">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="link">Direct Link</TabsTrigger>
+            <TabsTrigger value="embed">Embed</TabsTrigger>
+            <TabsTrigger value="widget">Widget</TabsTrigger>
+          </TabsList>
           
-          {/* Embed Code */}
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-2">Embed on Your Website</h3>
-            <div className="bg-neutral-900 p-4 rounded-lg relative">
-              <pre className="text-neutral-300 text-xs overflow-x-auto whitespace-pre-wrap">{iframeCode}</pre>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="absolute top-2 right-2 text-neutral-400 hover:text-white"
-                onClick={() => copyToClipboard(iframeCode, "Embed Code")}
-              >
-                {copied === "Embed Code" ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <p className="mt-1 text-xs text-neutral-500">Add this code to your website to embed the chatbot.</p>
-          </div>
-          
-          {/* Chat Widget */}
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-2">Chat Widget (Pop-up)</h3>
-            <div className="bg-neutral-900 p-4 rounded-lg relative">
-              <pre className="text-neutral-300 text-xs overflow-x-auto whitespace-pre-wrap">{widgetCode}</pre>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="absolute top-2 right-2 text-neutral-400 hover:text-white"
-                onClick={() => copyToClipboard(widgetCode, "Widget Code")}
-              >
-                {copied === "Widget Code" ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <p className="mt-1 text-xs text-neutral-500">Add this script to show a chat bubble in the corner of your website.</p>
-          </div>
-          
-          {/* QR Code */}
-          <div>
-            <h3 className="text-sm font-medium text-neutral-300 mb-2">QR Code</h3>
-            <div className="flex items-center">
-              <div className="bg-white p-4 rounded-lg inline-block">
-                <div className="bg-neutral-100 w-32 h-32 flex items-center justify-center">
-                  <svg className="w-16 h-16 text-neutral-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                  </svg>
-                </div>
+          <TabsContent value="link" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="direct-link">Share this link with others</Label>
+              <div className="flex">
+                <Input
+                  id="direct-link"
+                  value={directLinkValue}
+                  readOnly
+                  className="flex-1 rounded-r-none"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="rounded-l-none"
+                  onClick={() => handleCopyToClipboard(directLinkValue, 'Direct link')}
+                >
+                  {copied === 'Direct link' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
               </div>
-              <Button 
-                onClick={generateQRCode} 
-                className="ml-4 bg-neutral-700 hover:bg-neutral-600 text-white"
-              >
-                <Download className="mr-2 h-4 w-4" /> Download
-              </Button>
+              <p className="text-sm text-muted-foreground">
+                Anyone with this link can view and interact with your chatbot.
+              </p>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+          
+          <TabsContent value="embed" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="embed-code">Embed code for your website</Label>
+              <div className="flex">
+                <Input
+                  id="embed-code"
+                  value={embedLinkValue}
+                  readOnly
+                  className="flex-1 rounded-r-none"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="rounded-l-none"
+                  onClick={() => handleCopyToClipboard(embedLinkValue, 'Embed code')}
+                >
+                  {copied === 'Embed code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Add this code to embed the chatbot directly in your website.
+              </p>
+            </div>
+            
+            <div className="border rounded-md p-4 bg-neutral-900 relative">
+              <div className="absolute top-3 right-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => handleCopyToClipboard(embedLinkValue, 'Embed code')}
+                >
+                  {copied === 'Embed code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <div className="font-mono text-sm text-neutral-400 whitespace-pre-wrap break-all">
+                {embedLinkValue}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="widget" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="widget-code">Add a chat widget to your website</Label>
+              <div className="flex">
+                <Input
+                  id="widget-code"
+                  value={widgetScriptValue}
+                  readOnly
+                  className="flex-1 rounded-r-none"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="rounded-l-none"
+                  onClick={() => handleCopyToClipboard(widgetScriptValue, 'Widget code')}
+                >
+                  {copied === 'Widget code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Add this code to your website to create a chat widget that visitors can open and close.
+              </p>
+            </div>
+            
+            <div className="border rounded-md p-4 bg-neutral-900 relative">
+              <div className="absolute top-3 right-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => handleCopyToClipboard(widgetScriptValue, 'Widget code')}
+                >
+                  {copied === 'Widget code' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <div className="font-mono text-sm text-neutral-400 whitespace-pre-wrap break-all">
+                {widgetScriptValue}
+              </div>
+            </div>
+            
+            <div className="flex items-center p-3 bg-primary/10 border border-primary/20 rounded-md">
+              <Code className="h-5 w-5 mr-2 text-primary" />
+              <p className="text-sm">
+                Place this script at the end of your {'<body>'} tag for best performance.
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
