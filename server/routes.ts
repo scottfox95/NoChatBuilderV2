@@ -210,6 +210,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Document routes
+  app.get("/api/documents", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const documents = await storage.getAllDocuments(req.user.id);
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching all documents:", error);
+      res.status(500).json({ message: "Failed to fetch documents" });
+    }
+  });
+
   app.get("/api/chatbots/:id/documents", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 

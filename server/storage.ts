@@ -38,6 +38,7 @@ export interface IStorage {
   incrementChatbotViews(id: number): Promise<void>;
 
   // Document operations
+  getAllDocuments(userId: number): Promise<Document[]>;
   getDocumentsByChatbotId(chatbotId: number): Promise<Document[]>;
   createDocument(document: InsertDocument): Promise<Document>;
   deleteDocument(id: number): Promise<boolean>;
@@ -133,6 +134,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Document operations
+  async getAllDocuments(userId: number): Promise<Document[]> {
+    // First get all chatbots owned by this user
+    const userChatbots = await this.getChatbots(userId);
+    const chatbotIds = userChatbots.map(c => c.id);
+    
+    // Then get all documents from those chatbots
+    if (chatbotIds.length > 0) {
+      return await db.select().from(documents)
+        .where(inArray(documents.chatbotId, chatbotIds))
+        .orderBy(desc(documents.createdAt));
+    }
+    return [];
+  }
+  
   async getDocumentsByChatbotId(chatbotId: number): Promise<Document[]> {
     return await db.select().from(documents).where(eq(documents.chatbotId, chatbotId));
   }
