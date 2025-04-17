@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Select, 
@@ -86,63 +86,6 @@ export default function ChatLogsPage() {
   const totalCount = logsData?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
   
-  const handleExportCSV = useCallback(() => {
-    if (logs.length === 0) return;
-    
-    try {
-      // CSV Header
-      const headers = ["Timestamp", "Chatbot", "Session ID", "Speaker", "Message"];
-      
-      // Format messages as CSV rows
-      const csvRows = [
-        headers.join(","), // header row
-        ...logs.map(log => {
-          // Escape commas and quotes in content
-          const content = log.content.replace(/"/g, '""');
-          const speaker = log.isUser ? "User" : "Bot";
-          
-          return [
-            new Date(log.timestamp).toISOString(),
-            `"${log.chatbotName}"`,
-            log.sessionId,
-            speaker,
-            `"${content}"`
-          ].join(",");
-        })
-      ];
-      
-      // Join rows with newlines
-      const csvContent = csvRows.join("\n");
-      
-      // Create blob and download
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      
-      // Set up download attributes
-      const currentDate = new Date().toISOString().split("T")[0];
-      link.setAttribute("href", url);
-      link.setAttribute("download", `chat-logs-${currentDate}.csv`);
-      
-      // Trigger download and clean up
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast({
-        title: "CSV Export Complete",
-        description: `${logs.length} messages exported successfully.`,
-      });
-    } catch (error) {
-      console.error("Error exporting CSV:", error);
-      toast({
-        title: "Export Failed",
-        description: "There was an error exporting the CSV file. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [logs, toast]);
-  
   // Group messages by session and create conversation pairs
   const processLogsIntoPairs = () => {
     // Group messages by session ID
@@ -202,6 +145,94 @@ export default function ChatLogsPage() {
   };
   
   const { sessionMap, conversationsBySession } = processLogsIntoPairs();
+  
+  // Handle export to CSV
+  const handleExportCSV = () => {
+    if (logs.length === 0) return;
+    
+    try {
+      // Process logs to pair user questions with bot responses
+      // Get conversation pairs just like in the display
+      const { sessionMap, conversationsBySession } = processLogsIntoPairs();
+      const allPairs: {
+        timestamp: string;
+        chatbotName: string;
+        sessionId: string;
+        userMessage: string;
+        botResponse: string;
+      }[] = [];
+      
+      // Format all conversation pairs for CSV
+      Object.keys(sessionMap).forEach(sessionId => {
+        const pairs = conversationsBySession[sessionId];
+        
+        pairs.forEach(pair => {
+          // Skip welcome messages that aren't part of a user-bot exchange
+          if (!pair.userMessage.isUser && !pair.botResponse) return;
+          
+          // For user messages, capture the pair
+          allPairs.push({
+            timestamp: new Date(pair.userMessage.timestamp).toISOString(),
+            chatbotName: pair.userMessage.chatbotName,
+            sessionId: pair.userMessage.sessionId,
+            userMessage: pair.userMessage.isUser ? pair.userMessage.content : "", // User question
+            botResponse: pair.botResponse ? pair.botResponse.content : ""         // Bot answer
+          });
+        });
+      });
+      
+      // CSV Header
+      const headers = ["Timestamp", "Chatbot", "Session ID", "User Question", "Bot Response"];
+      
+      // Format as CSV rows
+      const csvRows = [
+        headers.join(","), // header row
+        ...allPairs.map(pair => {
+          // Escape commas and quotes in content
+          const userMessage = pair.userMessage.replace(/"/g, '""');
+          const botResponse = pair.botResponse.replace(/"/g, '""');
+          
+          return [
+            pair.timestamp,
+            `"${pair.chatbotName}"`,
+            pair.sessionId,
+            `"${userMessage}"`,
+            `"${botResponse}"`
+          ].join(",");
+        })
+      ];
+      
+      // Join rows with newlines
+      const csvContent = csvRows.join("\n");
+      
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      // Set up download attributes
+      const currentDate = new Date().toISOString().split("T")[0];
+      link.setAttribute("href", url);
+      link.setAttribute("download", `chat-logs-${currentDate}.csv`);
+      
+      // Trigger download and clean up
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "CSV Export Complete",
+        description: `${allPairs.length} conversation pairs exported successfully.`,
+      });
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the CSV file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
   
   // Sort sessions by latest message timestamp (newest first)
   const sortedSessions = Object.keys(sessionMap).sort((a, b) => {
