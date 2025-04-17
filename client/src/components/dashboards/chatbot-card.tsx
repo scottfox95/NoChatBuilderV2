@@ -134,9 +134,9 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
               <Button 
                 variant="link" 
                 className="text-primary hover:text-primary-light text-sm font-medium p-0"
-                onClick={() => navigate(`/chatbot/${chatbot.slug}`)}
+                onClick={() => navigate(`/care-aid/${chatbot.slug}`)}
               >
-                View chatbot <ExternalLink className="ml-1 h-3 w-3" />
+                View Care Aid <ExternalLink className="ml-1 h-3 w-3" />
               </Button>
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the chatbot
+              This action cannot be undone. This will permanently delete the Care Aid
               "{chatbot.name}" and all associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
