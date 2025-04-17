@@ -1,0 +1,65 @@
+# Project Name
+No-Code Responses API Chatbot Builder
+
+## Project Description
+A no-code web application that allows the admin (you) to quickly build, customize, and manage multiple chatbots powered by OpenAI’s Responses API. These chatbots can use uploaded files and Retrieval-Augmented Generation (RAG) to answer questions contextually. Each chatbot can be shared via a unique public link or embedded in a website. The application is built using Replit’s coding agent and must support all available OpenAI models, including the latest releases.
+
+## Target Audience
+- Admin user (you), who creates and manages all chatbots
+- Public users (anyone with the link), who chat with bots but don’t build them
+
+## Desired Features
+
+### Core Functionality
+- [x] Admin can create a new chatbot
+  - [x] Set chatbot name, description, and custom URL slug
+  - [x] Define the system prompt (instructions for the bot)
+  - [x] Choose from **any** OpenAI model available (e.g. GPT-3.5, GPT-4.1, nano)
+  - [x] Upload documents (PDF, DOCX, TXT) to serve as knowledge base
+  - [x] Enable Retrieval-Augmented Generation (RAG) or vector search per bot
+  - [x] Configure parameters: temperature, max tokens, etc.
+  - [x] Define message behavior rules (e.g., "If user swears, say X")
+  - [x] Define fallback response when no answer is found
+
+- [x] Admin can manage bots
+  - [x] View list of all chatbots
+  - [x] Edit/delete/update chatbots
+  - [x] View usage stats (basic counter per bot)
+  - [ ] Clone or duplicate existing chatbots (future enhancement)
+
+### UI Builder
+- [x] Clean and intuitive builder UI inspired by ElevenLabs
+- [x] Form-style builder for setup/config
+- [x] Live preview of chatbot during build
+- [x] Option to test chatbot before publishing
+
+### Chatbot Hosting & Sharing
+- [x] Each chatbot is hosted at a unique public link with customizable slug
+- [x] Option to generate embed code (iframe or HTML snippet)
+- [x] End-users do not need to log in to chat
+
+### Chat Experience for End-User
+- [x] Session-based short-term memory (remembers context only while session is active)
+- [x] No persistent memory
+- [x] No tools (e.g., browsing, file upload, code interpreter)
+- [x] Clean UI with chat window, bot name, and a footer disclaimer
+
+### Admin Dashboard
+- [x] Login-protected admin dashboard
+  - [x] Create/edit/delete all bots
+  - [x] Update chatbot settings and instructions
+  - [x] Upload new documents to existing bots
+  - [x] See basic bot usage (views or session count)
+  - [ ] Optional: View recent chat logs for debugging (future setting)
+
+## Design Requests
+- [x] Clean, modern interface modeled after ElevenLabs
+  - [x] Black, white, and neutral earth tones
+  - [x] Minimalist and elegant layout
+  - [x] Large, readable text and simple flows
+
+## Other Notes
+- Uses OpenAI's **Responses API only**
+- Optimized for **Replit's coding agent**
+- No login or account system for public users
+- No monetization or billing integration at this time
