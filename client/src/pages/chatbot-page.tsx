@@ -15,7 +15,7 @@ export default function ChatbotPage() {
   const [isEmbedView, setIsEmbedView] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
-  const [match, params] = useRoute("/chatbot/:slug/:view?");
+  const [match, params] = useRoute("/care-aid/:slug/:view?");
   const { user } = useAuth();
   
   const slug = params?.slug || "";
@@ -39,7 +39,7 @@ export default function ChatbotPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <Loader size="lg" variant="primary" withText text="Loading chatbot..." />
+        <Loader size="lg" variant="primary" withText text="Loading Care Aid..." />
       </div>
     );
   }
@@ -48,9 +48,9 @@ export default function ChatbotPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
         <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Chatbot Not Found</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">Care Aid Not Found</h1>
           <p className="text-neutral-400 mb-6">
-            The chatbot you're looking for doesn't exist or has been removed.
+            The Care Aid you're looking for doesn't exist or has been removed.
           </p>
           <Button onClick={() => navigate("/")} className="bg-primary hover:bg-primary-dark">
             <ArrowLeft className="mr-2 h-4 w-4" /> Return Home
@@ -125,7 +125,7 @@ export default function ChatbotPage() {
       {/* Footer */}
       <footer className="border-t border-neutral-800 py-4 text-center text-sm text-neutral-500">
         <div className="container mx-auto px-4">
-          <p>Powered by RAG Builder | Built with OpenAI's Responses API</p>
+          <p>Powered by Aidify | Built with OpenAI's Responses API</p>
         </div>
       </footer>
       
