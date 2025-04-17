@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, XCircle } from "lucide-react";
+import { PlusCircle, XCircle, X, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function BasicSetup() {
@@ -136,7 +136,7 @@ export default function BasicSetup() {
           <FormItem>
             <FormLabel className="text-neutral-300">Suggested Questions</FormLabel>
             <div className="space-y-2">
-              {field.value.map((question, index) => (
+              {field.value.map((question: string, index: number) => (
                 <div key={index} className="flex items-center space-x-2">
                   <Input
                     value={question}
@@ -158,7 +158,7 @@ export default function BasicSetup() {
                     }}
                     className="h-8 w-8 text-neutral-400 hover:text-red-500"
                   >
-                    <X className="h-4 w-4" />
+                    <XCircle className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
@@ -171,7 +171,7 @@ export default function BasicSetup() {
                 }}
                 className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
               >
-                <Plus className="mr-1 h-3 w-3" /> Add Question
+                <PlusCircle className="mr-1 h-3 w-3" /> Add Question
               </Button>
             </div>
             <FormDescription className="text-neutral-500 text-xs">

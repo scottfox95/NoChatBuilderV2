@@ -19,6 +19,7 @@ interface ChatbotPublicInfo {
   name: string;
   description: string;
   model: string;
+  welcomeMessage?: string;
   suggestedQuestions?: string[];
 }
 
@@ -136,21 +137,36 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     }
   }, [previousMessages]);
 
-  // Add welcome message for preview mode
+  // Add welcome message
   useEffect(() => {
-    if (isPreview && messages.length === 0) {
-      setMessages([
-        {
-          id: 0,
-          chatbotId: 0,
-          sessionId: "preview",
-          isUser: false,
-          content: "Hello! I'm your chatbot assistant. How can I help you today?",
-          timestamp: new Date(),
-        }
-      ]);
+    if (messages.length === 0) {
+      if (isPreview) {
+        // Default preview welcome message
+        setMessages([
+          {
+            id: 0,
+            chatbotId: 0,
+            sessionId: "preview",
+            isUser: false,
+            content: "Hello! I'm your chatbot assistant. How can I help you today?",
+            timestamp: new Date(),
+          }
+        ]);
+      } else if (chatbotInfo?.welcomeMessage) {
+        // Use chatbot's custom welcome message if available
+        setMessages([
+          {
+            id: 0,
+            chatbotId: chatbotInfo.id,
+            sessionId: sessionId || "initial",
+            isUser: false,
+            content: chatbotInfo.welcomeMessage,
+            timestamp: new Date(),
+          }
+        ]);
+      }
     }
-  }, [isPreview, messages.length]);
+  }, [isPreview, messages.length, chatbotInfo, sessionId]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
