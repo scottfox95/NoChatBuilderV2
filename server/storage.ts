@@ -51,7 +51,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  readonly sessionStore: session.SessionStore;
+  readonly sessionStore: any;
 
   constructor() {
     // Create PostgreSQL session store
@@ -118,8 +118,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteChatbot(id: number): Promise<boolean> {
-    const result = await db.delete(chatbots).where(eq(chatbots.id, id));
-    return result.count > 0;
+    const deleted = await db.delete(chatbots).where(eq(chatbots.id, id)).returning();
+    return deleted.length > 0;
   }
 
   async incrementChatbotViews(id: number): Promise<void> {
@@ -145,8 +145,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDocument(id: number): Promise<boolean> {
-    const result = await db.delete(documents).where(eq(documents.id, id));
-    return result.count > 0;
+    const deleted = await db.delete(documents).where(eq(documents.id, id)).returning();
+    return deleted.length > 0;
   }
 
   // Message operations
