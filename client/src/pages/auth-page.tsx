@@ -162,6 +162,35 @@ export default function AuthPage() {
                         "Login"
                       )}
                     </Button>
+                    
+                    <div className="mt-4 pt-4 border-t border-neutral-800">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                        onClick={async () => {
+                          const devUser = {
+                            username: "dev",
+                            password: "password"
+                          };
+                          
+                          // Try to register first in case user doesn't exist
+                          try {
+                            await registerMutation.mutateAsync(devUser);
+                          } catch (error) {
+                            // If user already exists, just log in
+                            try {
+                              await loginMutation.mutateAsync(devUser);
+                            } catch (innerError) {
+                              // Both failed, handle error
+                              console.error("Dev login failed", innerError);
+                            }
+                          }
+                        }}
+                      >
+                        Quick Dev Login (username: dev)
+                      </Button>
+                    </div>
                   </form>
                 </Form>
               </div>
@@ -220,6 +249,35 @@ export default function AuthPage() {
                         "Create Account"
                       )}
                     </Button>
+
+                    <div className="mt-4 pt-4 border-t border-neutral-800">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                        onClick={async () => {
+                          const devUser = {
+                            username: "dev",
+                            password: "password"
+                          };
+                          
+                          // Try to register first in case user doesn't exist
+                          try {
+                            await registerMutation.mutateAsync(devUser);
+                          } catch (error) {
+                            // If user already exists, just log in
+                            try {
+                              await loginMutation.mutateAsync(devUser);
+                            } catch (innerError) {
+                              // Both failed, handle error
+                              console.error("Dev login failed", innerError);
+                            }
+                          }
+                        }}
+                      >
+                        Quick Dev Login (username: dev)
+                      </Button>
+                    </div>
                   </form>
                 </Form>
               </div>
