@@ -64,8 +64,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/chatbots">
-                  <a className={`flex items-center p-2 rounded-lg ${isActive("/chatbots")}`}>
+                <Link href="/care-aids">
+                  <a className={`flex items-center p-2 rounded-lg ${isActive("/care-aids")}`}>
                     <MessageSquare className="h-5 w-5" />
                     <span className="ml-3 hidden md:block">Care Aids</span>
                   </a>
@@ -132,8 +132,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <span className="text-xs mt-1">Dashboard</span>
             </a>
           </Link>
-          <Link href="/chatbots">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/chatbots" ? "text-primary" : "text-neutral-400"}`}>
+          <Link href="/care-aids">
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/care-aids" ? "text-primary" : "text-neutral-400"}`}>
               <MessageSquare className="h-5 w-5" />
               <span className="text-xs mt-1">Care Aids</span>
             </a>

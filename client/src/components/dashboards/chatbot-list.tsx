@@ -66,10 +66,10 @@ export default function ChatbotList() {
 
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-bold text-white mb-4 sm:mb-0">My Chatbots</h1>
+          <h1 className="text-2xl font-bold text-white mb-4 sm:mb-0">My Care Aids</h1>
           <Button className="bg-primary hover:bg-primary-dark text-white" onClick={handleOpenCreateModal}>
             <Plus className="mr-2 h-4 w-4" />
-            Create New Chatbot
+            Create New Care Aid
           </Button>
         </div>
         
@@ -87,13 +87,13 @@ export default function ChatbotList() {
         ) : (
           <div className="bg-background-light border border-neutral-800 rounded-lg p-8 text-center">
             <div className="max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-white mb-2">No Chatbots Yet</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">No Care Aids Yet</h3>
               <p className="text-neutral-400 mb-6">
-                Create your first chatbot to start building conversational AI with document-based knowledge.
+                Create your first Care Aid to start building conversational AI with document-based knowledge.
               </p>
               <Button className="bg-primary hover:bg-primary-dark text-white" onClick={handleOpenCreateModal}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Your First Chatbot
+                Create Your First Care Aid
               </Button>
             </div>
           </div>

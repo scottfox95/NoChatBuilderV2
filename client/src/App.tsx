@@ -19,9 +19,9 @@ function Router() {
       </Route>
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
-      <ProtectedRoute path="/chatbots" component={DashboardPage} />
+      <ProtectedRoute path="/care-aids" component={DashboardPage} />
       <ProtectedRoute path="/logs" component={ChatLogsPage} />
-      <Route path="/chatbot/:slug/:view?" component={ChatbotPage} />
+      <Route path="/care-aid/:slug/:view?" component={ChatbotPage} />
       <Route path="/embed/:slug" component={ChatbotEmbedPage} />
       <Route component={NotFound} />
     </Switch>
