@@ -298,7 +298,7 @@ export default function ChatLogsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="chatbot-filter" className="mb-2 block text-sm font-medium text-neutral-300">
-                  Chatbot
+                  Care Aid
                 </Label>
                 <Select
                   value={selectedChatbotId}

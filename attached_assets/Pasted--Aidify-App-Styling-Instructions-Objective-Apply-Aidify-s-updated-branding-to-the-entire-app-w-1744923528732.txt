@@ -1,0 +1,64 @@
+# Aidify App Styling Instructions
+
+## Objective
+Apply Aidify’s updated branding to the entire app, with special focus on chatbot UI readability and clean, modern design.
+
+## 1. Color Palette
+
+### Primary Colors (For backgrounds, buttons, and main UI elements):
+- `--primary-bg`: #00001E (Rich Black)
+- `--primary-accent`: #EA19FF (Phlox)
+- `--secondary-accent`: #9083FF (Violets Are Blue)
+- `--soft-bg`: #AECEE9 (Pale Cornflower Blue)
+- `--text-on-dark`: #FFFFFF (White)
+
+### Secondary Colors (Use sparingly for icons and highlights):
+- `--highlight-blue`: #3BE8FF
+- `--blueberry`: #3E7EFF
+- `--mint`: #11ECB4
+- `--deep-blue`: #020B3F
+- `--black`: #000000
+
+**Usage Notes:**
+- Dark backgrounds should use `--primary-bg` with `--text-on-dark`.
+- Primary actions use `--primary-accent`.
+- Hover/secondary use `--secondary-accent`.
+- Background highlights or callouts can use `--soft-bg`.
+
+## 2. Typography
+
+### Fonts:
+- **Headlines:** MADE Evolve Sans Medium
+- **Body Text:** Edge Display Regular
+
+### Optional Styles:
+- `.small-headline`: Montserrat Medium, 33px
+- `.sub-headline`: Montserrat Bold, 28px
+- `.alt-body`: Montserrat Regular, 10px
+
+## 3. Chatbot UI Requirements
+
+- **Message bubbles** must have **high contrast** between text and background.
+- Use **visually distinct colors** for user and bot messages.
+- Prioritize **legibility**: large enough font size, clear padding, and line spacing.
+- Keep the layout **clean and uncluttered**, with strong visual separation between messages.
+
+## 4. Logo Usage
+
+- Use original logo colors and gradients.
+- Maintain at least 16px of clear space around the logo.
+- Never crop, rotate, recolor, or add effects.
+
+## 5. Layout & Responsiveness
+
+- Use a minimalist layout across all screen sizes.
+- Enforce consistent spacing and alignment.
+- All elements must scale cleanly on desktop, tablet, and mobile.
+
+## Deliverables
+✅ Brand colors applied across all components  
+✅ Fonts assigned based on content type  
+✅ Chatbot UI is easy to read, high contrast, and visually polished  
+✅ Logo displayed correctly  
+✅ Responsive, consistent, and modern interface  
+

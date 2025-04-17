@@ -45,9 +45,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <aside className="w-16 md:w-64 bg-background-light border-r border-neutral-800 hidden md:block">
         <div className="flex flex-col h-full">
           <div className="p-4 border-b border-neutral-800">
-            <div className="hidden md:block text-xl font-semibold text-white">RAG Builder</div>
+            <div className="hidden md:block text-xl font-semibold text-white">
+              <span style={{ color: 'var(--primary-accent)' }}>Aidify</span>
+            </div>
             <div className="block md:hidden text-center">
-              <MessageSquare className="h-5 w-5" />
+              <MessageSquare className="h-5 w-5" style={{ color: 'var(--primary-accent)' }} />
             </div>
           </div>
           
@@ -65,7 +67,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Link href="/chatbots">
                   <a className={`flex items-center p-2 rounded-lg ${isActive("/chatbots")}`}>
                     <MessageSquare className="h-5 w-5" />
-                    <span className="ml-3 hidden md:block">Chatbots</span>
+                    <span className="ml-3 hidden md:block">Care Aids</span>
                   </a>
                 </Link>
               </li>
@@ -109,7 +111,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-background-light border-b border-neutral-800 z-50">
         <div className="flex items-center justify-between p-4">
-          <div className="text-xl font-semibold text-white">RAG Builder</div>
+          <div className="text-xl font-semibold text-white">
+            <span style={{ color: 'var(--primary-accent)' }}>Aidify</span>
+          </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" onClick={handleLogout} disabled={logoutMutation.isPending}>
               {logoutMutation.isPending ? (
@@ -131,7 +135,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Link href="/chatbots">
             <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/chatbots" ? "text-primary" : "text-neutral-400"}`}>
               <MessageSquare className="h-5 w-5" />
-              <span className="text-xs mt-1">Chatbots</span>
+              <span className="text-xs mt-1">Care Aids</span>
             </a>
           </Link>
           <Link href="/logs">

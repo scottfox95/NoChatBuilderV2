@@ -3,11 +3,92 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --primary-bg: #00001E;
+    --primary-accent: #EA19FF;
+    --secondary-accent: #9083FF;
+    --soft-bg: #AECEE9;
+    --text-on-dark: #FFFFFF;
+    
+    --highlight-blue: #3BE8FF;
+    --blueberry: #3E7EFF;
+    --mint: #11ECB4;
+    --deep-blue: #020B3F;
+    --black: #000000;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background-color: var(--primary-bg);
+    color: var(--text-on-dark);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Chatbot UI styling for better readability */
+  .chat-message-user {
+    background-color: var(--deep-blue);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: var(--text-on-dark);
+  }
+
+  .chat-message-bot {
+    background-color: rgba(234, 25, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: var(--text-on-dark);
+    border-left: 4px solid var(--primary-accent);
+  }
+
+  /* Button styling */
+  .btn-primary {
+    background-color: var(--primary-accent);
+    color: var(--text-on-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--secondary-accent);
+  }
+
+  .btn-secondary {
+    background-color: var(--secondary-accent);
+    color: var(--text-on-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .btn-secondary:hover {
+    opacity: 0.9;
+  }
+
+  /* Card styling */
+  .aidify-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  /* Spacing and layout */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
   }
 }
