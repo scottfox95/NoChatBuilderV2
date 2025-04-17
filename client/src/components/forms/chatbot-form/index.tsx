@@ -49,6 +49,8 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
     ragEnabled: true,
     behaviorRules: [],
     fallbackResponse: "I'm sorry, I don't have enough information to answer that question.",
+    welcomeMessage: "Hello! How can I assist you today?",
+    suggestedQuestions: [],
   };
 
   const form = useForm<FormValues>({
@@ -71,6 +73,8 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
         ragEnabled: chatbotData.ragEnabled,
         behaviorRules: chatbotData.behaviorRules as z.infer<typeof behaviorRuleSchema>[],
         fallbackResponse: chatbotData.fallbackResponse || "",
+        welcomeMessage: chatbotData.welcomeMessage || "Hello! How can I assist you today?",
+        suggestedQuestions: chatbotData.suggestedQuestions || [],
       });
     }
   }, [chatbotData, form]);

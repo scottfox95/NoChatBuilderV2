@@ -109,6 +109,81 @@ export default function BasicSetup() {
       
       <FormField
         control={form.control}
+        name="welcomeMessage"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-neutral-300">Welcome Message</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Hello! How can I assist you today?" 
+                className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary resize-none" 
+                rows={2}
+                {...field} 
+              />
+            </FormControl>
+            <FormDescription className="text-neutral-500 text-xs">
+              This message will be displayed when a user first opens the chat.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="suggestedQuestions"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-neutral-300">Suggested Questions</FormLabel>
+            <div className="space-y-2">
+              {field.value.map((question, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Input
+                    value={question}
+                    onChange={(e) => {
+                      const newQuestions = [...field.value];
+                      newQuestions[index] = e.target.value;
+                      field.onChange(newQuestions);
+                    }}
+                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const newQuestions = [...field.value];
+                      newQuestions.splice(index, 1);
+                      field.onChange(newQuestions);
+                    }}
+                    className="h-8 w-8 text-neutral-400 hover:text-red-500"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  field.onChange([...field.value, ""]);
+                }}
+                className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+              >
+                <Plus className="mr-1 h-3 w-3" /> Add Question
+              </Button>
+            </div>
+            <FormDescription className="text-neutral-500 text-xs">
+              Add questions that will be shown as suggestions to users at the start of the chat.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="systemPrompt"
         render={({ field }) => (
           <FormItem>
@@ -164,65 +239,7 @@ export default function BasicSetup() {
         )}
       />
 
-      <div>
-        <FormLabel className="text-neutral-300">Suggested Questions</FormLabel>
-        <div className="mt-2 mb-1">
-          <FormDescription className="text-neutral-500 text-xs">
-            Add suggested questions for users to click on when they first interact with your chatbot.
-          </FormDescription>
-        </div>
-        
-        {/* Input for adding new questions */}
-        <div className="flex gap-2 mb-3">
-          <Input
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            placeholder="Enter a suggested question"
-            className="flex-1 bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addSuggestedQuestion();
-              }
-            }}
-          />
-          <Button 
-            onClick={addSuggestedQuestion}
-            type="button"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
-            <PlusCircle className="w-4 h-4 mr-1" />
-            Add
-          </Button>
-        </div>
-        
-        {/* List of added questions */}
-        {suggestedQuestions.length > 0 ? (
-          <div className="space-y-2 mt-2">
-            {suggestedQuestions.map((question, index) => (
-              <div 
-                key={index} 
-                className="flex items-center justify-between p-3 rounded-md bg-neutral-800 border border-neutral-700 group"
-              >
-                <span className="text-sm text-white">{question}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeSuggestedQuestion(index)}
-                  className="opacity-70 hover:opacity-100 hover:bg-transparent text-white hover:text-red-500"
-                  type="button"
-                >
-                  <XCircle className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center p-4 border border-dashed border-neutral-700 rounded-md">
-            <p className="text-neutral-400 text-sm">No suggested questions added yet.</p>
-          </div>
-        )}
-      </div>
+
     </div>
   );
 }
