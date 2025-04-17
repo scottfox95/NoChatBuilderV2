@@ -151,6 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const timestamp = Date.now().toString().slice(-4);
       
       // Create a new chatbot with copied properties
+      // Make sure to properly handle the JSON fields
       const createdChatbot = await storage.createChatbot({
         userId: req.user.id,
         name: `${sourceChatbot.name} (Copy)`,
@@ -162,23 +163,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxTokens: sourceChatbot.maxTokens,
         ragEnabled: sourceChatbot.ragEnabled,
         fallbackResponse: sourceChatbot.fallbackResponse,
-        behaviorRules: sourceChatbot.behaviorRules,
+        // Make sure behaviorRules is a proper JSON array
+        behaviorRules: Array.isArray(sourceChatbot.behaviorRules) ? sourceChatbot.behaviorRules : [],
         welcomeMessage: sourceChatbot.welcomeMessage,
-        welcomeMessages: sourceChatbot.welcomeMessages,
-        suggestedQuestions: sourceChatbot.suggestedQuestions
+        // Make sure welcomeMessages is a proper JSON array
+        welcomeMessages: Array.isArray(sourceChatbot.welcomeMessages) ? sourceChatbot.welcomeMessages : 
+          [sourceChatbot.welcomeMessage || "Hello! How can I assist you today?"],
+        // Make sure suggestedQuestions is a proper array
+        suggestedQuestions: Array.isArray(sourceChatbot.suggestedQuestions) ? sourceChatbot.suggestedQuestions : []
       });
       
-      // Duplicate documents if any
-      const documents = await storage.getDocumentsByChatbotId(sourceChatbotId);
-      for (const doc of documents) {
-        await storage.createDocument({
-          chatbotId: createdChatbot.id,
-          name: doc.name,
-          type: doc.type,
-          content: doc.content,
-          size: doc.size
-        });
-      }
+      // As per the requirement, we don't duplicate the documents in the knowledge base
+      // The new chatbot will start with an empty knowledge base
       
       res.status(201).json(createdChatbot);
     } catch (error) {
