@@ -50,6 +50,7 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
     behaviorRules: [],
     fallbackResponse: "I'm sorry, I don't have enough information to answer that question.",
     welcomeMessage: "Hello! How can I assist you today?",
+    welcomeMessages: ["Hello! How can I assist you today?"],
     suggestedQuestions: [],
   };
 
