@@ -12,7 +12,7 @@ import ChatbotPage from "@/pages/chatbot-page";
 function Router() {
   return (
     <Switch>
-      <Route path="/" exact>
+      <Route path="/">
         <Redirect to="/auth" />
       </Route>
       <Route path="/auth" component={AuthPage} />
