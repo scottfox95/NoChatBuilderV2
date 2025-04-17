@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Loader2, TrendingUp, MessageSquare, Settings, LogOut } from "lucide-react";
+import { Loader2, TrendingUp, MessageSquare, Settings, LogOut, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/logs">
+                  <a className={`flex items-center p-2 rounded-lg ${isActive("/logs")}`}>
+                    <FileText className="h-5 w-5" />
+                    <span className="ml-3 hidden md:block">Chat Logs</span>
+                  </a>
+                </Link>
+              </li>
+              <li>
                 <Link href="/settings">
                   <a className={`flex items-center p-2 rounded-lg ${isActive("/settings")}`}>
                     <Settings className="h-5 w-5" />
@@ -124,6 +132,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/chatbots" ? "text-primary" : "text-neutral-400"}`}>
               <MessageSquare className="h-5 w-5" />
               <span className="text-xs mt-1">Chatbots</span>
+            </a>
+          </Link>
+          <Link href="/logs">
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/logs" ? "text-primary" : "text-neutral-400"}`}>
+              <FileText className="h-5 w-5" />
+              <span className="text-xs mt-1">Logs</span>
             </a>
           </Link>
           <Link href="/settings">
