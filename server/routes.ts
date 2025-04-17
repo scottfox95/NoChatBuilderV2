@@ -353,6 +353,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(messages);
   });
 
+  // Preview mode response generation endpoint
+  app.post("/api/preview/generate-response", async (req, res) => {
+    try {
+      const { message, systemPrompt } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      // Generate response using OpenAI
+      const response = await generateCompletion({
+        model: "gpt35turbo", // Use default model for preview
+        systemPrompt: systemPrompt || "You are a helpful AI assistant.",
+        userMessage: message,
+        previousMessages: [], // No history in preview mode
+        temperature: 0.7,
+        maxTokens: 500,
+        documents: [], // No documents in preview mode
+      });
+
+      res.json({ response });
+    } catch (error) {
+      console.error("Preview response error:", error);
+      res.status(500).json({ message: "Failed to generate preview response" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

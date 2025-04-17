@@ -62,6 +62,10 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
               <ChatInterface 
                 chatbotSlug="preview" 
                 isPreview={true}
+                previewSystemPrompt={
+                  form?.getValues("systemPrompt") || 
+                  "You are a helpful AI assistant that responds to users in a friendly and informative way."
+                }
               />
             </div>
           </div>
