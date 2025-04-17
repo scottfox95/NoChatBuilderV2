@@ -1,4 +1,4 @@
-import { Edit, Trash2, ExternalLink, Eye, Copy } from "lucide-react";
+import { Edit, Trash2, ExternalLink, Eye, Copy, Share2 } from "lucide-react";
 import { Chatbot } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useDuplicateChatbot } from "@/hooks/use-chatbots";
+import ShareEmbedModal from "@/components/modals/share-embed-modal";
 
 interface ChatbotCardProps {
   chatbot: Chatbot;
@@ -20,6 +21,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const duplicateMutation = useDuplicateChatbot();
 
@@ -67,6 +69,15 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-white">{chatbot.name}</h2>
             <div className="flex space-x-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowShareModal(true)} 
+                className="text-neutral-400 hover:text-green-500"
+                title="Share chatbot"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -153,6 +164,12 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ShareEmbedModal 
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        chatbotSlug={chatbot.slug}
+      />
     </>
   );
 }
