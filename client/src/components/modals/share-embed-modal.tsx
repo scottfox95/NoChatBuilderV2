@@ -31,7 +31,7 @@ export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareE
       const hostname = window.location.origin;
       
       // Set the direct link
-      const directLink = `${hostname}/chatbot/${chatbotSlug}`;
+      const directLink = `${hostname}/care-aid/${chatbotSlug}`;
       setDirectLinkValue(directLink);
       
       // Set the embed iframe code
@@ -70,7 +70,7 @@ export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareE
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Share Chatbot</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Share Care Aid</DialogTitle>
         </DialogHeader>
         
         <Tabs defaultValue="link" className="w-full mt-4">
@@ -100,7 +100,7 @@ export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareE
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Anyone with this link can view and interact with your chatbot.
+                Anyone with this link can view and interact with your Care Aid.
               </p>
             </div>
           </TabsContent>
@@ -125,7 +125,7 @@ export default function ShareEmbedModal({ isOpen, onClose, chatbotSlug }: ShareE
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Add this code to embed the chatbot directly in your website.
+                Add this code to embed the Care Aid directly in your website.
               </p>
             </div>
             
