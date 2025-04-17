@@ -75,6 +75,7 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
         behaviorRules: chatbotData.behaviorRules as z.infer<typeof behaviorRuleSchema>[],
         fallbackResponse: chatbotData.fallbackResponse || "",
         welcomeMessage: chatbotData.welcomeMessage || "Hello! How can I assist you today?",
+        welcomeMessages: chatbotData.welcomeMessages || [chatbotData.welcomeMessage || "Hello! How can I assist you today?"],
         suggestedQuestions: chatbotData.suggestedQuestions || [],
       });
     }
