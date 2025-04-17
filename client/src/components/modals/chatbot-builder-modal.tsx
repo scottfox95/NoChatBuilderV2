@@ -39,7 +39,10 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
           {/* Builder Form Section */}
           <div className="w-full md:w-1/2 overflow-y-auto custom-scrollbar">
             <div className="p-6">
-              <ChatbotForm chatbotId={chatbotId} onSuccess={onClose} />
+              <ChatbotForm 
+                chatbotId={chatbotId} 
+                onSuccess={onClose}
+              />
             </div>
           </div>
           
@@ -62,10 +65,7 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
               <ChatInterface 
                 chatbotSlug="preview" 
                 isPreview={true}
-                previewSystemPrompt={
-                  form?.getValues("systemPrompt") || 
-                  "You are a helpful AI assistant that responds to users in a friendly and informative way."
-                }
+                previewSystemPrompt="You are a helpful AI assistant that responds to users in a friendly and informative way."
               />
             </div>
           </div>
