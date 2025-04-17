@@ -110,3 +110,30 @@ export function useDeleteChatbot() {
 
   return deleteMutation;
 }
+
+export function useDuplicateChatbot() {
+  const { toast } = useToast();
+
+  const duplicateMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("POST", `/api/chatbots/${id}/duplicate`);
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Chatbot duplicated",
+        description: "The chatbot has been duplicated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbots"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to duplicate chatbot: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  return duplicateMutation;
+}

@@ -132,6 +132,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/chatbots/:id/duplicate", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const sourceChatbotId = Number(req.params.id);
+      const sourceChatbot = await storage.getChatbot(sourceChatbotId);
+      
+      if (!sourceChatbot) {
+        return res.status(404).json({ message: "Chatbot not found" });
+      }
+      
+      if (sourceChatbot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to duplicate this chatbot" });
+      }
+      
+      // Create a copy with a new slug and name
+      const timestamp = Date.now().toString().slice(-4);
+      
+      // Create a new chatbot with copied properties
+      const createdChatbot = await storage.createChatbot({
+        userId: req.user.id,
+        name: `${sourceChatbot.name} (Copy)`,
+        slug: `${sourceChatbot.slug}-copy-${timestamp}`,
+        description: sourceChatbot.description,
+        systemPrompt: sourceChatbot.systemPrompt,
+        model: sourceChatbot.model,
+        temperature: sourceChatbot.temperature,
+        maxTokens: sourceChatbot.maxTokens,
+        ragEnabled: sourceChatbot.ragEnabled,
+        fallbackResponse: sourceChatbot.fallbackResponse,
+        behaviorRules: sourceChatbot.behaviorRules,
+        welcomeMessage: sourceChatbot.welcomeMessage,
+        welcomeMessages: sourceChatbot.welcomeMessages,
+        suggestedQuestions: sourceChatbot.suggestedQuestions
+      });
+      
+      // Duplicate documents if any
+      const documents = await storage.getDocumentsByChatbotId(sourceChatbotId);
+      for (const doc of documents) {
+        await storage.createDocument({
+          chatbotId: createdChatbot.id,
+          name: doc.name,
+          type: doc.type,
+          content: doc.content,
+          size: doc.size
+        });
+      }
+      
+      res.status(201).json(createdChatbot);
+    } catch (error) {
+      console.error("Error duplicating chatbot:", error);
+      res.status(500).json({ message: "Failed to duplicate chatbot" });
+    }
+  });
+
   app.delete("/api/chatbots/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 

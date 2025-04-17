@@ -1,4 +1,4 @@
-import { Edit, Trash2, ExternalLink, Eye } from "lucide-react";
+import { Edit, Trash2, ExternalLink, Eye, Copy } from "lucide-react";
 import { Chatbot } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
+import { useDuplicateChatbot } from "@/hooks/use-chatbots";
 
 interface ChatbotCardProps {
   chatbot: Chatbot;
@@ -19,6 +20,16 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const duplicateMutation = useDuplicateChatbot();
+
+  const handleDuplicate = async () => {
+    try {
+      await duplicateMutation.mutateAsync(chatbot.id);
+    } catch (error) {
+      // Error is handled in the mutation
+    }
+  };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -56,10 +67,32 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-white">{chatbot.name}</h2>
             <div className="flex space-x-2">
-              <Button variant="ghost" size="icon" onClick={() => onEdit(chatbot.id)} className="text-neutral-400 hover:text-white">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleDuplicate} 
+                className="text-neutral-400 hover:text-primary"
+                disabled={duplicateMutation.isPending}
+                title="Duplicate chatbot"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => onEdit(chatbot.id)} 
+                className="text-neutral-400 hover:text-white"
+                title="Edit chatbot"
+              >
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setShowDeleteConfirm(true)} className="text-neutral-400 hover:text-red-500">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowDeleteConfirm(true)} 
+                className="text-neutral-400 hover:text-red-500"
+                title="Delete chatbot"
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
