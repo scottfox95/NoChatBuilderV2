@@ -44,10 +44,15 @@ export function getInitials(name: string): string {
 
 export function getModelDisplayName(modelId: string): string {
   const modelMap: Record<string, string> = {
+    "gpt4o": "GPT-4o",
     "gpt4-1": "GPT-4.1",
     "gpt4": "GPT-4",
+    "gpt4o-mini": "GPT-4o Mini",
+    "gpt4-mini": "GPT-4.1 Mini",
+    "gpt4-1-nano": "GPT-4.1 Nano",
     "gpt35turbo": "GPT-3.5 Turbo",
-    "nano": "Nano"
+    "gpt3-mini": "GPT-3 Mini",
+    "nano": "Nano (Legacy)"
   };
   
   return modelMap[modelId] || modelId;

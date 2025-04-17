@@ -111,10 +111,20 @@ export default function BasicSetup() {
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 {...field}
               >
-                <option value="gpt4-1">GPT-4.1 (Most capable)</option>
-                <option value="gpt4">GPT-4</option>
-                <option value="gpt35turbo">GPT-3.5 Turbo (Recommended)</option>
-                <option value="nano">Nano (Fastest)</option>
+                <optgroup label="Latest Models">
+                  <option value="gpt4o">GPT-4o (Latest & Most Capable)</option>
+                  <option value="gpt4-1">GPT-4.1 (Very Capable)</option>
+                  <option value="gpt4o-mini">GPT-4o Mini (Fast & Efficient)</option>
+                </optgroup>
+                <optgroup label="GPT-4 Family">
+                  <option value="gpt4">GPT-4 (Stable)</option>
+                  <option value="gpt4-1-nano">GPT-4.1 Nano (Compact)</option>
+                  <option value="gpt4-mini">GPT-4.1 Mini (Balanced)</option>
+                </optgroup>
+                <optgroup label="GPT-3 Family">
+                  <option value="gpt35turbo">GPT-3.5 Turbo (Recommended)</option>
+                  <option value="gpt3-mini">GPT-3 Mini (Fastest)</option>
+                </optgroup>
               </select>
             </FormControl>
             <FormDescription className="text-neutral-500 text-xs">

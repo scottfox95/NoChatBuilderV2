@@ -53,10 +53,14 @@ export async function generateCompletion({
 
     // Map internal model names to actual OpenAI model IDs
     const modelMap: Record<string, string> = {
-      "gpt4-1": "gpt-4o",
+      "gpt4-1": "gpt-4-1106-preview", // GPT-4.1 Turbo (similar naming convention)
+      "gpt4o": "gpt-4o", // GPT-4o (latest model as of May 2024)
       "gpt4": "gpt-4",
+      "gpt4-mini": "gpt-4-mini", // GPT-4 Mini
       "gpt35turbo": "gpt-3.5-turbo",
-      "nano": "gpt-3.5-turbo-16k",
+      "gpt3-mini": "gpt-3.5-turbo-instruct", // GPT-3.5 Turbo Instruct (more like GPT-3 Mini)
+      "gpt4-1-nano": "gpt-4-0125-preview", // GPT-4.1 Nano (approximation based on parameter count)
+      "gpt4o-mini": "gpt-4o-mini", // GPT-4o Mini
     };
 
     const actualModel = modelMap[model] || "gpt-3.5-turbo";
