@@ -26,8 +26,10 @@ export default function BasicSetup() {
       form.setValue('suggestedQuestions', []);
     }
     
-    if (!form.getValues().welcomeMessages) {
-      form.setValue('welcomeMessages', [form.getValues().welcomeMessage || "Hello! How can I assist you today?"]);
+    // Initialize welcomeMessages if it doesn't exist or isn't an array
+    if (!form.getValues().welcomeMessages || !Array.isArray(form.getValues().welcomeMessages)) {
+      const defaultMessage = form.getValues().welcomeMessage || "Hello! How can I assist you today?";
+      form.setValue('welcomeMessages', [defaultMessage]);
     }
   }, [form]);
   
@@ -118,12 +120,13 @@ export default function BasicSetup() {
           <FormItem>
             <FormLabel className="text-neutral-300">Welcome Messages</FormLabel>
             <div className="space-y-2">
-              {(field.value || []).map((message: string, index: number) => (
+              {(Array.isArray(field.value) ? field.value : []).map((message: string, index: number) => (
                 <div key={index} className="flex items-center space-x-2">
                   <Textarea
                     value={message}
                     onChange={(e) => {
-                      const newMessages = [...field.value];
+                      const messages = Array.isArray(field.value) ? field.value : [];
+                      const newMessages = [...messages];
                       newMessages[index] = e.target.value;
                       field.onChange(newMessages);
                     }}
@@ -137,14 +140,15 @@ export default function BasicSetup() {
                     size="icon"
                     onClick={() => {
                       // Don't allow removing the last message
-                      if (field.value.length <= 1) return;
+                      const messages = Array.isArray(field.value) ? field.value : [];
+                      if (messages.length <= 1) return;
                       
-                      const newMessages = [...field.value];
+                      const newMessages = [...messages];
                       newMessages.splice(index, 1);
                       field.onChange(newMessages);
                     }}
                     className="h-8 w-8 text-neutral-400 hover:text-red-500"
-                    disabled={field.value.length <= 1}
+                    disabled={(Array.isArray(field.value) ? field.value.length : 0) <= 1}
                   >
                     <XCircle className="h-4 w-4" />
                   </Button>
@@ -155,7 +159,8 @@ export default function BasicSetup() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  field.onChange([...field.value, "Hello! How can I assist you today?"]);
+                  const currentMessages = Array.isArray(field.value) ? field.value : [];
+                  field.onChange([...currentMessages, "Hello! How can I assist you today?"]);
                 }}
                 className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
               >
