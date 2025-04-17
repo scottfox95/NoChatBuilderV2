@@ -55,7 +55,7 @@ export default function ChatbotList() {
           <div className="border-b border-neutral-800">
             <nav className="flex -mb-px space-x-8">
               <a href="#" className="border-b-2 border-primary py-4 px-1 text-sm font-medium text-primary whitespace-nowrap">
-                My Chatbots
+                My Care Aids
               </a>
               <a href="#" className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-neutral-400 hover:text-neutral-300 whitespace-nowrap" onClick={handleOpenCreateModal}>
                 Create New

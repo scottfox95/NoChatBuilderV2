@@ -305,10 +305,10 @@ export default function ChatLogsPage() {
                   onValueChange={(value) => setSelectedChatbotId(value)}
                 >
                   <SelectTrigger id="chatbot-filter" className="w-full bg-background border-neutral-700">
-                    <SelectValue placeholder="All Chatbots" />
+                    <SelectValue placeholder="All Care Aids" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Chatbots</SelectItem>
+                    <SelectItem value="all">All Care Aids</SelectItem>
                     {chatbots?.map((chatbot) => (
                       <SelectItem key={chatbot.id} value={chatbot.id.toString()}>
                         {chatbot.name}
@@ -414,7 +414,7 @@ export default function ChatLogsPage() {
                             <div className="flex-1">
                               <div className="flex justify-between items-center mb-1">
                                 <div className="font-medium text-white">
-                                  {pair.userMessage.isUser ? "User" : "Bot"}
+                                  {pair.userMessage.isUser ? "User" : "Care Aid"}
                                 </div>
                                 <div className="text-xs text-neutral-500">
                                   {formatDate(pair.userMessage.timestamp)}
@@ -434,7 +434,7 @@ export default function ChatLogsPage() {
                               </div>
                               <div className="flex-1">
                                 <div className="flex justify-between items-center mb-1">
-                                  <div className="font-medium text-white">Bot</div>
+                                  <div className="font-medium text-white">Care Aid</div>
                                   <div className="text-xs text-neutral-500">
                                     {formatDate(pair.botResponse.timestamp)}
                                   </div>
