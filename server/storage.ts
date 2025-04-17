@@ -1,5 +1,22 @@
-import { users, type User, type InsertUser, type Chatbot, type InsertChatbot, type Document, type InsertDocument, type Message, type InsertMessage } from "@shared/schema";
+import { 
+  users, 
+  chatbots, 
+  documents, 
+  messages, 
+  type User, 
+  type InsertUser, 
+  type Chatbot, 
+  type InsertChatbot, 
+  type Document, 
+  type InsertDocument, 
+  type Message, 
+  type InsertMessage 
+} from "@shared/schema";
 import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
+import { pool } from "./db";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
@@ -30,150 +47,125 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
 
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private chatbots: Map<number, Chatbot>;
-  private documents: Map<number, Document>;
-  private messages: Map<number, Message>;
-  private userIdCounter: number;
-  private chatbotIdCounter: number;
-  private documentIdCounter: number;
-  private messageIdCounter: number;
+export class DatabaseStorage implements IStorage {
   readonly sessionStore: session.SessionStore;
 
   constructor() {
-    this.users = new Map();
-    this.chatbots = new Map();
-    this.documents = new Map();
-    this.messages = new Map();
-    this.userIdCounter = 1;
-    this.chatbotIdCounter = 1;
-    this.documentIdCounter = 1;
-    this.messageIdCounter = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
+    // Create PostgreSQL session store
+    const PgStore = connectPg(session);
+    this.sessionStore = new PgStore({
+      pool,
+      tableName: 'sessions',
+      createTableIfMissing: true
     });
   }
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   // Chatbot operations
   async getChatbots(userId: number): Promise<Chatbot[]> {
-    return Array.from(this.chatbots.values()).filter(
-      (chatbot) => chatbot.userId === userId,
-    );
+    return await db.select().from(chatbots).where(eq(chatbots.userId, userId));
   }
 
   async getChatbot(id: number): Promise<Chatbot | undefined> {
-    return this.chatbots.get(id);
+    const [chatbot] = await db.select().from(chatbots).where(eq(chatbots.id, id));
+    return chatbot;
   }
 
   async getChatbotBySlug(slug: string): Promise<Chatbot | undefined> {
-    return Array.from(this.chatbots.values()).find(
-      (chatbot) => chatbot.slug === slug,
-    );
+    const [chatbot] = await db.select().from(chatbots).where(eq(chatbots.slug, slug));
+    return chatbot;
   }
 
   async createChatbot(insertChatbot: InsertChatbot): Promise<Chatbot> {
-    const id = this.chatbotIdCounter++;
     const now = new Date();
-    const chatbot: Chatbot = {
+    const [chatbot] = await db.insert(chatbots).values({
       ...insertChatbot,
-      id,
       views: 0,
       createdAt: now,
-      updatedAt: now,
-    };
-    this.chatbots.set(id, chatbot);
+      updatedAt: now
+    }).returning();
     return chatbot;
   }
 
   async updateChatbot(id: number, partialChatbot: Partial<InsertChatbot>): Promise<Chatbot | undefined> {
-    const chatbot = this.chatbots.get(id);
-    if (!chatbot) return undefined;
-
-    const updatedChatbot: Chatbot = {
-      ...chatbot,
-      ...partialChatbot,
-      updatedAt: new Date(),
-    };
-
-    this.chatbots.set(id, updatedChatbot);
+    const [updatedChatbot] = await db.update(chatbots)
+      .set({
+        ...partialChatbot,
+        updatedAt: new Date()
+      })
+      .where(eq(chatbots.id, id))
+      .returning();
+    
     return updatedChatbot;
   }
 
   async deleteChatbot(id: number): Promise<boolean> {
-    return this.chatbots.delete(id);
+    const result = await db.delete(chatbots).where(eq(chatbots.id, id));
+    return result.count > 0;
   }
 
   async incrementChatbotViews(id: number): Promise<void> {
-    const chatbot = this.chatbots.get(id);
+    const chatbot = await this.getChatbot(id);
     if (chatbot) {
-      chatbot.views++;
-      this.chatbots.set(id, chatbot);
+      await db.update(chatbots)
+        .set({ views: chatbot.views + 1 })
+        .where(eq(chatbots.id, id));
     }
   }
 
   // Document operations
   async getDocumentsByChatbotId(chatbotId: number): Promise<Document[]> {
-    return Array.from(this.documents.values()).filter(
-      (document) => document.chatbotId === chatbotId,
-    );
+    return await db.select().from(documents).where(eq(documents.chatbotId, chatbotId));
   }
 
   async createDocument(insertDocument: InsertDocument): Promise<Document> {
-    const id = this.documentIdCounter++;
-    const document: Document = {
+    const [document] = await db.insert(documents).values({
       ...insertDocument,
-      id,
-      createdAt: new Date(),
-    };
-    this.documents.set(id, document);
+      createdAt: new Date()
+    }).returning();
     return document;
   }
 
   async deleteDocument(id: number): Promise<boolean> {
-    return this.documents.delete(id);
+    const result = await db.delete(documents).where(eq(documents.id, id));
+    return result.count > 0;
   }
 
   // Message operations
   async getMessagesBySession(chatbotId: number, sessionId: string): Promise<Message[]> {
-    return Array.from(this.messages.values())
-      .filter(
-        (message) => message.chatbotId === chatbotId && message.sessionId === sessionId,
-      )
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    return await db.select().from(messages)
+      .where(and(
+        eq(messages.chatbotId, chatbotId),
+        eq(messages.sessionId, sessionId)
+      ))
+      .orderBy(messages.timestamp);
   }
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const id = this.messageIdCounter++;
-    const message: Message = {
+    const [message] = await db.insert(messages).values({
       ...insertMessage,
-      id,
-      timestamp: new Date(),
-    };
-    this.messages.set(id, message);
+      timestamp: new Date()
+    }).returning();
     return message;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
