@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Document } from "@shared/schema";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Trash2, FileText, FileArchive, File } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
+import { cn } from "@/lib/utils";
 
 export default function Knowledge() {
   const form = useFormContext();
@@ -14,6 +15,7 @@ export default function Knowledge() {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: [`/api/chatbots/${chatbotId}/documents`],
@@ -132,29 +134,66 @@ export default function Knowledge() {
 
   return (
     <div className="space-y-6">
-      <div className="border-2 border-dashed border-neutral-700 rounded-lg p-8 text-center bg-neutral-900">
+      <div 
+        className={cn(
+          "border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200",
+          isDragging 
+            ? "border-primary bg-primary/10" 
+            : "border-neutral-700 bg-neutral-900 hover:border-neutral-600"
+        )}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(true);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!isDragging) setIsDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            setSelectedFile(e.dataTransfer.files[0]);
+          }
+        }}
+      >
         <div className="space-y-4">
-          <Upload className="h-10 w-10 mx-auto text-neutral-500" />
-          <h3 className="text-lg font-medium text-white">Drag files here or click to upload</h3>
+          <Upload className={cn(
+            "h-10 w-10 mx-auto transition-colors duration-200",
+            isDragging ? "text-primary animate-pulse" : "text-neutral-500"
+          )} />
+          <h3 className={cn(
+            "text-lg font-medium",
+            isDragging ? "text-primary" : "text-white"
+          )}>
+            {isDragging ? "Drop your file here" : "Drag files here or click to upload"}
+          </h3>
           <p className="text-neutral-400 text-sm">Supports PDF, DOCX, and TXT files (max 10MB per file)</p>
           <div className="flex justify-center space-x-4">
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <Button 
-                disabled={uploading} 
-                variant="outline" 
-                className="bg-transparent border-neutral-700 hover:bg-neutral-800 text-white"
-              >
-                Choose File
-              </Button>
-              <input
-                id="file-upload"
-                type="file"
-                className="hidden"
-                accept=".pdf,.docx,.txt"
-                onChange={handleFileChange}
-                disabled={uploading}
-              />
-            </label>
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              accept=".pdf,.docx,.txt"
+              onChange={handleFileChange}
+              disabled={uploading}
+            />
+            <Button 
+              disabled={uploading} 
+              variant="outline" 
+              className="bg-transparent border-neutral-700 hover:bg-neutral-800 text-white"
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
+              Choose File
+            </Button>
             {selectedFile && (
               <Button
                 onClick={handleUpload}
