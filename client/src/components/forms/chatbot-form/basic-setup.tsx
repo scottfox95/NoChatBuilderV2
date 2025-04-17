@@ -20,10 +20,14 @@ export default function BasicSetup() {
     form.getValues().suggestedQuestions || []
   );
   
-  // Initialize form value if it doesn't exist
+  // Initialize form values if they don't exist
   useEffect(() => {
     if (!form.getValues().suggestedQuestions) {
       form.setValue('suggestedQuestions', []);
+    }
+    
+    if (!form.getValues().welcomeMessages) {
+      form.setValue('welcomeMessages', [form.getValues().welcomeMessage || "Hello! How can I assist you today?"]);
     }
   }, [form]);
   
@@ -109,20 +113,58 @@ export default function BasicSetup() {
       
       <FormField
         control={form.control}
-        name="welcomeMessage"
+        name="welcomeMessages"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-neutral-300">Welcome Message</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Hello! How can I assist you today?" 
-                className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary resize-none" 
-                rows={2}
-                {...field} 
-              />
-            </FormControl>
+            <FormLabel className="text-neutral-300">Welcome Messages</FormLabel>
+            <div className="space-y-2">
+              {(field.value || []).map((message: string, index: number) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Textarea
+                    value={message}
+                    onChange={(e) => {
+                      const newMessages = [...field.value];
+                      newMessages[index] = e.target.value;
+                      field.onChange(newMessages);
+                    }}
+                    placeholder="Enter a welcome message"
+                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary resize-none"
+                    rows={2}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      // Don't allow removing the last message
+                      if (field.value.length <= 1) return;
+                      
+                      const newMessages = [...field.value];
+                      newMessages.splice(index, 1);
+                      field.onChange(newMessages);
+                    }}
+                    className="h-8 w-8 text-neutral-400 hover:text-red-500"
+                    disabled={field.value.length <= 1}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  field.onChange([...field.value, "Hello! How can I assist you today?"]);
+                }}
+                className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
+              >
+                <PlusCircle className="mr-1 h-3 w-3" /> Add Welcome Message
+              </Button>
+            </div>
             <FormDescription className="text-neutral-500 text-xs">
-              This message will be displayed when a user first opens the chat.
+              Add welcome messages that will be randomly shown when a user first opens the chat. 
+              Having multiple messages adds variety for returning users.
             </FormDescription>
             <FormMessage />
           </FormItem>

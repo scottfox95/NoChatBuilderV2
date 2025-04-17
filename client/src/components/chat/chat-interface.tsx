@@ -20,6 +20,7 @@ interface ChatbotPublicInfo {
   description: string;
   model: string;
   welcomeMessage?: string;
+  welcomeMessages?: string[];
   suggestedQuestions?: string[];
 }
 
@@ -152,15 +153,28 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
             timestamp: new Date(),
           }
         ]);
-      } else if (chatbotInfo?.welcomeMessage) {
+      } else {
         // Use chatbot's custom welcome message if available
+        let welcomeContent = "Hello! How can I assist you today?";
+        
+        // Check if we have welcomeMessages array
+        if (chatbotInfo?.welcomeMessages && chatbotInfo.welcomeMessages.length > 0) {
+          // Pick a random welcome message from the array
+          const randomIndex = Math.floor(Math.random() * chatbotInfo.welcomeMessages.length);
+          welcomeContent = chatbotInfo.welcomeMessages[randomIndex];
+        } 
+        // Fall back to single welcomeMessage if available but welcomeMessages isn't
+        else if (chatbotInfo?.welcomeMessage) {
+          welcomeContent = chatbotInfo.welcomeMessage;
+        }
+        
         setMessages([
           {
             id: 0,
-            chatbotId: chatbotInfo.id,
+            chatbotId: chatbotInfo?.id || 0,
             sessionId: sessionId || "initial",
             isUser: false,
-            content: chatbotInfo.welcomeMessage,
+            content: welcomeContent,
             timestamp: new Date(),
           }
         ]);
