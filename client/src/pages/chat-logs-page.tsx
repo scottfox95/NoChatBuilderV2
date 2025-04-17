@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Select, 
@@ -23,8 +23,9 @@ import { Chatbot, Message } from "@shared/schema";
 import { Loader } from "@/components/ui/loader";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { formatDate } from "@/lib/utils";
-import { SearchIcon, UserCircle, BotIcon, Filter } from "lucide-react";
+import { SearchIcon, UserCircle, BotIcon, Filter, Download } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatLog extends Message {
   chatbotName: string;
@@ -43,6 +44,7 @@ export default function ChatLogsPage() {
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<{start?: string, end?: string}>({});
   const pageSize = 20;
+  const { toast } = useToast();
   
   // Get all chatbots for the filter dropdown
   const { data: chatbots, isLoading: loadingChatbots } = useQuery<Chatbot[]>({
@@ -83,6 +85,63 @@ export default function ChatLogsPage() {
   const logs = logsData?.logs || [];
   const totalCount = logsData?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
+  
+  const handleExportCSV = useCallback(() => {
+    if (logs.length === 0) return;
+    
+    try {
+      // CSV Header
+      const headers = ["Timestamp", "Chatbot", "Session ID", "Speaker", "Message"];
+      
+      // Format messages as CSV rows
+      const csvRows = [
+        headers.join(","), // header row
+        ...logs.map(log => {
+          // Escape commas and quotes in content
+          const content = log.content.replace(/"/g, '""');
+          const speaker = log.isUser ? "User" : "Bot";
+          
+          return [
+            new Date(log.timestamp).toISOString(),
+            `"${log.chatbotName}"`,
+            log.sessionId,
+            speaker,
+            `"${content}"`
+          ].join(",");
+        })
+      ];
+      
+      // Join rows with newlines
+      const csvContent = csvRows.join("\n");
+      
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      // Set up download attributes
+      const currentDate = new Date().toISOString().split("T")[0];
+      link.setAttribute("href", url);
+      link.setAttribute("download", `chat-logs-${currentDate}.csv`);
+      
+      // Trigger download and clean up
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "CSV Export Complete",
+        description: `${logs.length} messages exported successfully.`,
+      });
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the CSV file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [logs, toast]);
   
   // Group messages by session and create conversation pairs
   const processLogsIntoPairs = () => {
@@ -190,6 +249,14 @@ export default function ChatLogsPage() {
               className="text-sm h-9"
             >
               Reset Filters
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleExportCSV}
+              className="text-sm h-9 bg-primary/10 hover:bg-primary/20 border-primary/30"
+              disabled={loadingLogs || logs.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" /> Export CSV
             </Button>
           </div>
         </div>
