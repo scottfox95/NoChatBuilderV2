@@ -9,9 +9,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, XCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function BasicSetup() {
   const form = useFormContext();
+  const [newQuestion, setNewQuestion] = useState('');
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
+    form.getValues().suggestedQuestions || []
+  );
+  
+  // Initialize form value if it doesn't exist
+  useEffect(() => {
+    if (!form.getValues().suggestedQuestions) {
+      form.setValue('suggestedQuestions', []);
+    }
+  }, [form]);
+  
+  const addSuggestedQuestion = () => {
+    if (!newQuestion.trim()) return;
+    
+    const updatedQuestions = [...suggestedQuestions, newQuestion.trim()];
+    setSuggestedQuestions(updatedQuestions);
+    form.setValue('suggestedQuestions', updatedQuestions);
+    setNewQuestion('');
+  };
+
+  const removeSuggestedQuestion = (index: number) => {
+    const updatedQuestions = suggestedQuestions.filter((_, i) => i !== index);
+    setSuggestedQuestions(updatedQuestions);
+    form.setValue('suggestedQuestions', updatedQuestions);
+  };
 
   return (
     <div className="space-y-6">
@@ -134,6 +163,66 @@ export default function BasicSetup() {
           </FormItem>
         )}
       />
+
+      <div>
+        <FormLabel className="text-neutral-300">Suggested Questions</FormLabel>
+        <div className="mt-2 mb-1">
+          <FormDescription className="text-neutral-500 text-xs">
+            Add suggested questions for users to click on when they first interact with your chatbot.
+          </FormDescription>
+        </div>
+        
+        {/* Input for adding new questions */}
+        <div className="flex gap-2 mb-3">
+          <Input
+            value={newQuestion}
+            onChange={(e) => setNewQuestion(e.target.value)}
+            placeholder="Enter a suggested question"
+            className="flex-1 bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addSuggestedQuestion();
+              }
+            }}
+          />
+          <Button 
+            onClick={addSuggestedQuestion}
+            type="button"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            <PlusCircle className="w-4 h-4 mr-1" />
+            Add
+          </Button>
+        </div>
+        
+        {/* List of added questions */}
+        {suggestedQuestions.length > 0 ? (
+          <div className="space-y-2 mt-2">
+            {suggestedQuestions.map((question, index) => (
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-3 rounded-md bg-neutral-800 border border-neutral-700 group"
+              >
+                <span className="text-sm text-white">{question}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeSuggestedQuestion(index)}
+                  className="opacity-70 hover:opacity-100 hover:bg-transparent text-white hover:text-red-500"
+                  type="button"
+                >
+                  <XCircle className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-4 border border-dashed border-neutral-700 rounded-md">
+            <p className="text-neutral-400 text-sm">No suggested questions added yet.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

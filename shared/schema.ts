@@ -37,6 +37,7 @@ export const chatbots = pgTable("chatbots", {
   ragEnabled: boolean("rag_enabled").notNull().default(true),
   behaviorRules: jsonb("behavior_rules").notNull().default([]),
   fallbackResponse: text("fallback_response"),
+  suggestedQuestions: text("suggested_questions").array().default([]),
   views: integer("views").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
