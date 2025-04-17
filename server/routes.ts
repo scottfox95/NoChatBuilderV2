@@ -251,6 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       description: chatbot.description,
       model: chatbot.model,
       welcomeMessage: chatbot.welcomeMessage || "Hello! How can I assist you today?",
+      welcomeMessages: chatbot.welcomeMessages || [chatbot.welcomeMessage || "Hello! How can I assist you today?"],
       suggestedQuestions: chatbot.suggestedQuestions || [],
     });
   });
