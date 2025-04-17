@@ -91,7 +91,8 @@ export default function FormTabs({ onSubmit, isSubmitting }: FormTabsProps) {
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              console.log("Save button clicked");
+              console.log("Save button clicked - direct submission");
+              // Call onSubmit directly - this is the key fix
               onSubmit();
             }}
             disabled={isSubmitting}
