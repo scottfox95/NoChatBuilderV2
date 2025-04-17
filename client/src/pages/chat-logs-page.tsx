@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Select, 
@@ -23,12 +23,18 @@ import { Chatbot, Message } from "@shared/schema";
 import { Loader } from "@/components/ui/loader";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { formatDate } from "@/lib/utils";
-import { SearchIcon, CalendarIcon, UserCircle, BotIcon, Filter } from "lucide-react";
+import { SearchIcon, UserCircle, BotIcon, Filter } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface ChatLog extends Message {
   chatbotName: string;
-  timestamp: Date; // Using the timestamp field from the Message schema instead of createdAt
+  timestamp: Date;
+}
+
+interface ConversationPair {
+  id: string;
+  userMessage: ChatLog;
+  botResponse?: ChatLog;
 }
 
 export default function ChatLogsPage() {
@@ -78,8 +84,79 @@ export default function ChatLogsPage() {
   const totalCount = logsData?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
   
+  // Group messages by session and create conversation pairs
+  const processLogsIntoPairs = () => {
+    // Group messages by session ID
+    const sessionMap: Record<string, ChatLog[]> = {};
+    logs.forEach(log => {
+      if (!sessionMap[log.sessionId]) {
+        sessionMap[log.sessionId] = [];
+      }
+      sessionMap[log.sessionId].push(log);
+    });
+    
+    // Sort each session by timestamp
+    Object.keys(sessionMap).forEach(sessionId => {
+      sessionMap[sessionId].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+    });
+    
+    // Create conversation pairs (user question + bot response)
+    const conversationsBySession: Record<string, ConversationPair[]> = {};
+    
+    Object.keys(sessionMap).forEach(sessionId => {
+      const messages = sessionMap[sessionId];
+      const pairs: ConversationPair[] = [];
+      
+      for (let i = 0; i < messages.length; i++) {
+        const current = messages[i];
+        
+        if (current.isUser) {
+          // Find next bot response if available
+          const nextMessage = i + 1 < messages.length ? messages[i + 1] : undefined;
+          
+          pairs.push({
+            id: `${current.id}-${nextMessage?.id || 'none'}`,
+            userMessage: current,
+            botResponse: nextMessage && !nextMessage.isUser ? nextMessage : undefined
+          });
+          
+          // Skip the bot response since we've included it
+          if (nextMessage && !nextMessage.isUser) {
+            i++;
+          }
+        } else if (i === 0 || messages[i - 1].isUser) {
+          // Bot message without a user query (welcome message)
+          pairs.push({
+            id: `bot-only-${current.id}`,
+            userMessage: current,
+            botResponse: undefined
+          });
+        }
+      }
+      
+      conversationsBySession[sessionId] = pairs;
+    });
+    
+    return { sessionMap, conversationsBySession };
+  };
+  
+  const { sessionMap, conversationsBySession } = processLogsIntoPairs();
+  
+  // Sort sessions by latest message timestamp (newest first)
+  const sortedSessions = Object.keys(sessionMap).sort((a, b) => {
+    const aMessages = sessionMap[a];
+    const bMessages = sessionMap[b];
+    
+    const aLatest = new Date(aMessages[aMessages.length - 1].timestamp).getTime();
+    const bLatest = new Date(bMessages[bMessages.length - 1].timestamp).getTime();
+    
+    return bLatest - aLatest;
+  });
+  
   const handleSearch = () => {
-    setPage(1); // Reset to first page
+    setPage(1);
     refetchLogs();
   };
   
@@ -190,7 +267,7 @@ export default function ChatLogsPage() {
           </CardContent>
         </Card>
         
-        {/* Logs Table */}
+        {/* Logs Display */}
         {loadingLogs ? (
           <div className="flex justify-center items-center h-96">
             <Loader size="lg" variant="primary" />
@@ -201,114 +278,143 @@ export default function ChatLogsPage() {
             <p className="text-sm mt-2">Try adjusting your filters or search terms</p>
           </div>
         ) : (
-          <>
-            <div className="space-y-4 mb-6">
-              {logs.map((log) => (
-                <Card key={log.id} className="bg-background-light border-neutral-800 overflow-hidden">
+          <div className="space-y-6 mb-6">
+            {sortedSessions.map(sessionId => {
+              const pairs = conversationsBySession[sessionId];
+              const firstMessage = sessionMap[sessionId][0];
+              const latestMessage = sessionMap[sessionId][sessionMap[sessionId].length - 1];
+              
+              return (
+                <Card key={sessionId} className="bg-background-light border-neutral-800 overflow-hidden">
                   <CardContent className="p-0">
+                    {/* Session Header */}
                     <div className="border-b border-neutral-800 bg-background-darker px-4 py-3 flex justify-between items-center flex-wrap gap-2">
                       <div className="flex items-center">
                         <span className="bg-neutral-800 text-xs text-neutral-400 px-2 py-1 rounded mr-3">
-                          {formatDate(log.timestamp)}
+                          {formatDate(latestMessage.timestamp)}
                         </span>
                         <span className="text-primary text-sm font-medium">
-                          {log.chatbotName}
+                          {firstMessage.chatbotName}
                         </span>
                       </div>
                       <div className="flex items-center">
                         <span className="text-xs text-neutral-500">
-                          Session: {log.sessionId.substring(0, 8)}...
+                          Session: {sessionId.substring(0, 8)}...
                         </span>
                       </div>
                     </div>
-                    <div className="p-4 flex flex-col gap-3">
-                      {log.isUser ? (
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center">
-                            <UserCircle className="h-5 w-5 text-neutral-400" />
+                    
+                    {/* Conversation Pairs */}
+                    <div className="p-4 flex flex-col gap-4">
+                      {pairs.map(pair => (
+                        <div key={pair.id} className="border border-neutral-800 rounded-lg overflow-hidden">
+                          {/* User Message */}
+                          <div className="flex items-start gap-3 p-4 border-b border-neutral-800 bg-background-darker/30">
+                            <div className="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center">
+                              <UserCircle className="h-5 w-5 text-neutral-400" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex justify-between items-center mb-1">
+                                <div className="font-medium text-white">
+                                  {pair.userMessage.isUser ? "User" : "Bot"}
+                                </div>
+                                <div className="text-xs text-neutral-500">
+                                  {formatDate(pair.userMessage.timestamp)}
+                                </div>
+                              </div>
+                              <div className="text-neutral-300 text-sm whitespace-pre-wrap">
+                                {pair.userMessage.content}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-white mb-1">User</div>
-                            <div className="text-neutral-300 text-sm whitespace-pre-wrap">{log.content}</div>
-                          </div>
+                          
+                          {/* Bot Response (if available) */}
+                          {pair.botResponse && (
+                            <div className="flex items-start gap-3 p-4 bg-background-dark/40">
+                              <div className="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0 flex items-center justify-center">
+                                <BotIcon className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center mb-1">
+                                  <div className="font-medium text-white">Bot</div>
+                                  <div className="text-xs text-neutral-500">
+                                    {formatDate(pair.botResponse.timestamp)}
+                                  </div>
+                                </div>
+                                <div className="text-neutral-300 text-sm whitespace-pre-wrap">
+                                  {pair.botResponse.content}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0 flex items-center justify-center">
-                            <BotIcon className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-white mb-1">Bot</div>
-                            <div className="text-neutral-300 text-sm whitespace-pre-wrap">{log.content}</div>
-                          </div>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination className="my-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page > 1) setPage(page - 1);
-                      }}
-                      className={page <= 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    // For simplicity, show at most 5 page links
-                    let pageToShow = i + 1;
-                    if (totalPages > 5) {
-                      if (page > 3) {
-                        pageToShow = page - 3 + i;
-                      }
-                      if (page > totalPages - 2) {
-                        pageToShow = totalPages - 4 + i;
-                      }
-                    }
-                    
-                    if (pageToShow <= totalPages) {
-                      return (
-                        <PaginationItem key={pageToShow}>
-                          <PaginationLink 
-                            href="#" 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setPage(pageToShow);
-                            }}
-                            isActive={page === pageToShow}
-                          >
-                            {pageToShow}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page < totalPages) setPage(page + 1);
-                      }}
-                      className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Pagination className="my-8">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page > 1) setPage(page - 1);
+                  }}
+                  className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                // Show at most 5 page links
+                let pageToShow = i + 1;
+                if (totalPages > 5) {
+                  if (page > 3) {
+                    pageToShow = page - 3 + i;
+                  }
+                  if (page > totalPages - 2) {
+                    pageToShow = totalPages - 4 + i;
+                  }
+                }
+                
+                if (pageToShow <= totalPages) {
+                  return (
+                    <PaginationItem key={pageToShow}>
+                      <PaginationLink 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(pageToShow);
+                        }}
+                        isActive={page === pageToShow}
+                      >
+                        {pageToShow}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+                return null;
+              })}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page < totalPages) setPage(page + 1);
+                  }}
+                  className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         )}
       </div>
     </DashboardLayout>
