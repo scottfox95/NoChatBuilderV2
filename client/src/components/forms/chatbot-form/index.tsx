@@ -76,91 +76,81 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
   }, [chatbotData, form]);
 
   // Direct API mutation for more control
-  const handleSaveChatbot = async () => {
-    const formData = form.getValues();
-    console.log("Submitting form with data:", formData);
-    
-    // Validate form data
+  const createMutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      // For create, we don't need to explicitly set the userId in the client
+      // The server will get it from the authenticated session
+      const response = await apiRequest("POST", "/api/chatbots", data);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Chatbot created",
+        description: "Your chatbot has been created successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbots"] });
+      if (onSuccess) onSuccess();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to create chatbot: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      const { id, ...updateData } = data;
+      const response = await apiRequest("PUT", `/api/chatbots/${chatbotId}`, updateData);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Chatbot updated",
+        description: "Your chatbot has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbots"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}`] });
+      if (onSuccess) onSuccess();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: `Failed to update chatbot: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleSaveChatbot = () => {
     try {
-      const validatedData = formSchema.parse(formData);
-      console.log("Data validated:", validatedData);
+      const values = form.getValues();
+      console.log("Submitting form with data:", values);
       
-      try {
-        // Set loading state
-        form.formState.isSubmitting = true;
-        
-        if (isEditMode) {
-          // Update existing chatbot
-          const { id, ...updateData } = validatedData;
-          const response = await fetch(`/api/chatbots/${chatbotId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updateData),
-            credentials: "include"
-          });
-          
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
-            throw new Error(errorData.message || `Error ${response.status}`);
-          }
-          
-          toast({
-            title: "Chatbot updated",
-            description: "Your chatbot has been updated successfully.",
-          });
-        } else {
-          // Create new chatbot
-          console.log("Creating new chatbot with data:", validatedData);
-          const response = await fetch("/api/chatbots", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(validatedData),
-            credentials: "include"
-          });
-          
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
-            throw new Error(errorData.message || `Error ${response.status}`);
-          }
-          
-          toast({
-            title: "Chatbot created",
-            description: "Your chatbot has been created successfully.",
-          });
-        }
-        
-        // Invalidate queries and call onSuccess
-        queryClient.invalidateQueries({ queryKey: ["/api/chatbots"] });
-        if (chatbotId) {
-          queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}`] });
-        }
-        if (onSuccess) onSuccess();
-      } catch (error) {
-        console.error("API error:", error);
-        toast({
-          title: "Error",
-          description: `Failed to save chatbot: ${error.message}`,
-          variant: "destructive",
-        });
-      } finally {
-        form.formState.isSubmitting = false;
-      }
-    } catch (error) {
-      console.error("Validation error:", error);
-      if (error instanceof z.ZodError) {
-        const fieldErrors = error.errors.map(err => `${err.path}: ${err.message}`).join(", ");
+      if (form.formState.errors && Object.keys(form.formState.errors).length > 0) {
+        console.error("Form validation errors:", form.formState.errors);
         toast({
           title: "Validation Error",
-          description: `Please check the form: ${fieldErrors}`,
+          description: "Please fill out all required fields correctly",
           variant: "destructive",
         });
-      } else {
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
+        return;
       }
+      
+      if (isEditMode) {
+        updateMutation.mutate(values);
+      } else {
+        createMutation.mutate(values);
+      }
+    } catch (error: any) {
+      console.error("Form submission error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
     }
   };
 
@@ -177,7 +167,7 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
       <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
         <FormTabs 
           onSubmit={handleSaveChatbot} 
-          isSubmitting={form.formState.isSubmitting}
+          isSubmitting={createMutation.isPending || updateMutation.isPending}
         />
       </form>
     </Form>

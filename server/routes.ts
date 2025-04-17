@@ -62,6 +62,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     try {
+      // Add the current user's ID to the request data
+      console.log("Creating chatbot with user ID:", req.user.id);
       const data = insertChatbotSchema.parse({
         ...req.body,
         userId: req.user.id,
