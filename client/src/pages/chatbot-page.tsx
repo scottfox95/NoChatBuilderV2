@@ -93,8 +93,8 @@ export default function ChatbotPage() {
             )}
           </div>
           
-          {isOwner && (
-            <div className="flex gap-2 ml-12 md:ml-0">
+          <div className="flex gap-2 ml-12 md:ml-0">
+            {isOwner && (
               <Button 
                 variant="outline" 
                 className="border-neutral-700 text-neutral-200"
@@ -102,14 +102,14 @@ export default function ChatbotPage() {
               >
                 Manage Documents
               </Button>
-              <Button 
-                className="bg-primary hover:bg-primary-dark"
-                onClick={() => setIsShareModalOpen(true)}
-              >
-                <Share2 className="mr-2 h-4 w-4" /> Share
-              </Button>
-            </div>
-          )}
+            )}
+            <Button 
+              className="bg-primary hover:bg-primary-dark"
+              onClick={() => setIsShareModalOpen(true)}
+            >
+              <Share2 className="mr-2 h-4 w-4" /> Share
+            </Button>
+          </div>
         </div>
       </header>
       
@@ -130,20 +130,18 @@ export default function ChatbotPage() {
       </footer>
       
       {/* Modals */}
+      <ShareEmbedModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        chatbotSlug={slug}
+      />
+      
       {isOwner && (
-        <>
-          <ShareEmbedModal 
-            isOpen={isShareModalOpen} 
-            onClose={() => setIsShareModalOpen(false)} 
-            chatbotSlug={slug}
-          />
-          
-          <DocumentUploadModal 
-            isOpen={isDocumentModalOpen} 
-            onClose={() => setIsDocumentModalOpen(false)} 
-            chatbotId={chatbot.id}
-          />
-        </>
+        <DocumentUploadModal 
+          isOpen={isDocumentModalOpen} 
+          onClose={() => setIsDocumentModalOpen(false)} 
+          chatbotId={chatbot.id}
+        />
       )}
     </div>
   );

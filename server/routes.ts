@@ -47,6 +47,16 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve widget.js static file
+  app.get("/widget.js", (req, res) => {
+    const widgetPath = path.join(process.cwd(), "client", "public", "widget.js");
+    if (fs.existsSync(widgetPath)) {
+      res.setHeader("Content-Type", "application/javascript");
+      res.sendFile(widgetPath);
+    } else {
+      res.status(404).send("Widget file not found");
+    }
+  });
   // Set up authentication routes
   setupAuth(app);
 
