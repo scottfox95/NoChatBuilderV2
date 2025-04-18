@@ -100,20 +100,6 @@ export default function AnalyticsPage() {
                 <SelectItem value="month">Last 30 Days</SelectItem>
               </SelectContent>
             </Select>
-
-            <Select value={selectedChatbotId} onValueChange={setSelectedChatbotId}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Care Aid" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Care Aids</SelectItem>
-                {chatbots?.map((chatbot) => (
-                  <SelectItem key={chatbot.id} value={chatbot.id.toString()}>
-                    {chatbot.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -262,38 +248,64 @@ export default function AnalyticsPage() {
         </Tabs>
         
         {/* Care Aid Specific Stats Table */}
-        {selectedChatbotId === "all" && (
-          <Card>
-            <CardHeader>
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div>
               <CardTitle>Care Aid Performance</CardTitle>
               <CardDescription>Detailed performance metrics for each Care Aid</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-neutral-300">
-                      <th className="text-left p-3 text-sm font-medium text-neutral-500">Care Aid</th>
-                      <th className="text-right p-3 text-sm font-medium text-neutral-500">Sessions</th>
-                      <th className="text-right p-3 text-sm font-medium text-neutral-500">Queries</th>
-                      <th className="text-right p-3 text-sm font-medium text-neutral-500">Avg. Queries/Session</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {careAidStats?.map((stat) => (
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <Select value={selectedChatbotId} onValueChange={setSelectedChatbotId}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by Care Aid" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Care Aids</SelectItem>
+                  {chatbots?.map((chatbot) => (
+                    <SelectItem key={chatbot.id} value={chatbot.id.toString()}>
+                      {chatbot.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-neutral-300">
+                    <th className="text-left p-3 text-sm font-medium text-neutral-500">Care Aid</th>
+                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Sessions</th>
+                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Queries</th>
+                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Avg. Queries/Session</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedChatbotId === "all" ? (
+                    careAidStats?.map((stat) => (
                       <tr key={stat.chatbotId} className="border-b border-neutral-300">
                         <td className="text-left p-3">{stat.chatbotName}</td>
                         <td className="text-right p-3">{stat.totalSessions}</td>
                         <td className="text-right p-3">{stat.totalQueries}</td>
                         <td className="text-right p-3">{stat.averageQueriesPerSession.toFixed(1)}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                    ))
+                  ) : (
+                    careAidStats?.filter(stat => stat.chatbotId.toString() === selectedChatbotId).map((stat) => (
+                      <tr key={stat.chatbotId} className="border-b border-neutral-300">
+                        <td className="text-left p-3">{stat.chatbotName}</td>
+                        <td className="text-right p-3">{stat.totalSessions}</td>
+                        <td className="text-right p-3">{stat.totalQueries}</td>
+                        <td className="text-right p-3">{stat.averageQueriesPerSession.toFixed(1)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
