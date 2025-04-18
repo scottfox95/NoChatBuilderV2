@@ -12,7 +12,7 @@
   // Get the base URL from the current script
   const scriptSrc = currentScript.src;
   const baseUrl = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
-  const chatbotUrl = `${baseUrl}/../care-aid/${chatbotId}`;
+  const chatbotUrl = `${baseUrl}/../public/care-aid/${chatbotId}`;
   
   // Create widget styles
   const style = document.createElement('style');

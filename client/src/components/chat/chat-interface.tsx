@@ -353,7 +353,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         
         <div className="mt-3 text-center">
           <p className="text-xs text-neutral-500">
-            Powered by RAG Builder | <a href="#" className="text-primary hover:text-primary-light">Terms of Use</a>
+            Powered by Aidify | AI-powered assistance
           </p>
         </div>
       </div>

@@ -34,8 +34,8 @@ export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotS
       const directLink = `${hostname}/public/care-aid/${chatbotSlug}`;
       setDirectLinkValue(directLink);
       
-      // Set the embed iframe code
-      const embedLink = `<iframe src="${hostname}/embed/${chatbotSlug}" width="100%" height="600px" style="border:none;border-radius:8px;" allow="microphone"></iframe>`;
+      // Set the embed iframe code (using public routes)
+      const embedLink = `<iframe src="${hostname}/public/care-aid/${chatbotSlug}" width="100%" height="600px" style="border:none;border-radius:8px;" allow="microphone"></iframe>`;
       setEmbedLinkValue(embedLink);
       
       // Set the widget script code

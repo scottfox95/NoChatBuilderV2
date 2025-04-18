@@ -28,6 +28,9 @@ function Router() {
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/care-aid/:slug/:view?" component={CareAidPage} />
       <Route path="/public/care-aid/:slug" component={CareAidPublicPage} />
+      <Route path="/care-aid/:slug" component={({ params }) => {
+        return <Redirect to={`/public/care-aid/${params.slug}`} />
+      }} />
       <Route path="/embed/:slug" component={CareAidEmbedPage} />
       <Route component={NotFound} />
     </Switch>

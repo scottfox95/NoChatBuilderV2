@@ -66,7 +66,7 @@ export default function CareAidPublicPage() {
       {/* Footer */}
       <footer className="border-t border-neutral-800 py-4 text-center text-sm text-neutral-500">
         <div className="container mx-auto px-4">
-          <p>Powered by Aidify | Built with OpenAI's Responses API</p>
+          <p>Powered by Aidify | AI-powered assistance</p>
         </div>
       </footer>
     </div>
