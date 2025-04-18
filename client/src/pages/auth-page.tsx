@@ -63,6 +63,25 @@ export default function AuthPage() {
     }
   };
 
+  const handleDevLogin = async () => {
+    const devUser = {
+      username: "dev",
+      password: "password"
+    };
+    
+    // Try to login first (reverses the previous approach)
+    try {
+      await loginMutation.mutateAsync(devUser);
+    } catch (error) {
+      // If login fails, try to register
+      try {
+        await registerMutation.mutateAsync(devUser);
+      } catch (innerError) {
+        console.error("Dev login/register failed", innerError);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -166,30 +185,12 @@ export default function AuthPage() {
                       )}
                     </Button>
                     
-                    <div className="mt-4 pt-4 border-t border-neutral-800">
+                    <div className="mt-4 pt-4 border-t border-neutral-600/20">
                       <Button
                         type="button"
                         variant="outline"
-                        className="w-full border-neutral-700 text-neutral-300 hover:bg-neutral-800"
-                        onClick={async () => {
-                          const devUser = {
-                            username: "dev",
-                            password: "password"
-                          };
-                          
-                          // Try to register first in case user doesn't exist
-                          try {
-                            await registerMutation.mutateAsync(devUser);
-                          } catch (error) {
-                            // If user already exists, just log in
-                            try {
-                              await loginMutation.mutateAsync(devUser);
-                            } catch (innerError) {
-                              // Both failed, handle error
-                              console.error("Dev login failed", innerError);
-                            }
-                          }
-                        }}
+                        className="w-full border-neutral-600/30 text-neutral-300 hover:bg-white/5 transition-colors"
+                        onClick={handleDevLogin}
                       >
                         Quick Dev Login (username: dev)
                       </Button>
@@ -253,30 +254,12 @@ export default function AuthPage() {
                       )}
                     </Button>
 
-                    <div className="mt-4 pt-4 border-t border-neutral-800">
+                    <div className="mt-4 pt-4 border-t border-neutral-600/20">
                       <Button
                         type="button"
                         variant="outline"
-                        className="w-full border-neutral-700 text-neutral-300 hover:bg-neutral-800"
-                        onClick={async () => {
-                          const devUser = {
-                            username: "dev",
-                            password: "password"
-                          };
-                          
-                          // Try to register first in case user doesn't exist
-                          try {
-                            await registerMutation.mutateAsync(devUser);
-                          } catch (error) {
-                            // If user already exists, just log in
-                            try {
-                              await loginMutation.mutateAsync(devUser);
-                            } catch (innerError) {
-                              // Both failed, handle error
-                              console.error("Dev login failed", innerError);
-                            }
-                          }
-                        }}
+                        className="w-full border-neutral-600/30 text-neutral-300 hover:bg-white/5 transition-colors"
+                        onClick={handleDevLogin}
                       >
                         Quick Dev Login (username: dev)
                       </Button>
@@ -286,7 +269,7 @@ export default function AuthPage() {
               </div>
             </CardContent>
             
-            <CardFooter className="flex justify-center border-t border-neutral-800 pt-4">
+            <CardFooter className="flex justify-center border-t border-neutral-600/20 pt-4">
               <p className="text-sm text-neutral-400">
                 {activeTab === "login" ? (
                   <>
@@ -318,7 +301,7 @@ export default function AuthPage() {
       </div>
       
       {/* Right Column - Hero */}
-      <div className="hidden lg:flex flex-1 bg-background-light border-l border-neutral-800">
+      <div className="hidden lg:flex flex-1 bg-white/5 border-l border-neutral-600/20">
         <div className="flex flex-col items-center justify-center p-12 text-center max-w-2xl mx-auto">
           <div className="mb-8">
             <div className="inline-block p-4 bg-primary/10 rounded-full mb-6">
@@ -327,57 +310,57 @@ export default function AuthPage() {
             <h2 className="text-3xl font-bold text-white mb-4">
               Create AI Chatbots with Your Documents
             </h2>
-            <p className="text-neutral-400 text-lg leading-relaxed">
+            <p className="text-neutral-300 text-lg leading-relaxed">
               Build powerful conversational AI assistants powered by OpenAI's models and your own content.
               No coding required.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            <div className="bg-background p-6 rounded-lg border border-neutral-800">
+            <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">Document Powered</h3>
-              <p className="text-neutral-400">
+              <p className="text-neutral-300">
                 Upload PDFs, DOCXs, and TXT files to create chatbots that can answer questions based on your content.
               </p>
             </div>
             
-            <div className="bg-background p-6 rounded-lg border border-neutral-800">
+            <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">OpenAI Models</h3>
-              <p className="text-neutral-400">
+              <p className="text-neutral-300">
                 Choose from various OpenAI models, customize behavior, and fine-tune responses for your specific needs.
               </p>
             </div>
             
-            <div className="bg-background p-6 rounded-lg border border-neutral-800">
+            <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">Easy Sharing</h3>
-              <p className="text-neutral-400">
+              <p className="text-neutral-300">
                 Share your chatbots with a unique link or embed them directly into your website.
               </p>
             </div>
             
-            <div className="bg-background p-6 rounded-lg border border-neutral-800">
+            <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">Customizable</h3>
-              <p className="text-neutral-400">
+              <p className="text-neutral-300">
                 Configure behavior rules, fallback responses, and model parameters to tailor your chatbot's experience.
               </p>
             </div>
