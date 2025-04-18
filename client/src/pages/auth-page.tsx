@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AidifyLogo from "@/assets/aidify-logo.svg";
 
 const loginFormSchema = loginSchema;
 const registerFormSchema = loginSchema;
@@ -97,12 +96,9 @@ export default function AuthPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-2">
-              <img src={AidifyLogo} alt="Aidify Logo" className="h-12" />
+              <img src="/assets/aidify-logo.png" alt="Aidify Logo" className="h-24" />
             </div>
-            <h1 className="text-3xl font-bold text-white">
-              Aidify
-            </h1>
-            <p className="text-neutral-400 mt-2">Create custom AI chatbots powered by your documents</p>
+            <p className="text-neutral-400 mt-4">Create custom AI chatbots powered by your documents</p>
           </div>
 
           <Card className="border border-neutral-200/10 bg-white/5 shadow-lg backdrop-blur-sm">
