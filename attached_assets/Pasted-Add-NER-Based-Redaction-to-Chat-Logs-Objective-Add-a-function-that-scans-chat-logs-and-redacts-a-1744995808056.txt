@@ -1,0 +1,71 @@
+Add NER-Based Redaction to Chat Logs
+📌 Objective:
+Add a function that scans chat logs and redacts any personally identifiable names using Named Entity Recognition (NER). Replace detected names with [REDACTED] before logs are displayed or exported.
+
+🛠️ Step-by-Step Implementation Instructions
+1. Install Required Package
+Add spaCy to the Replit environment:
+
+bash
+Copy
+Edit
+poetry add spacy
+Then download the English model:
+
+bash
+Copy
+Edit
+python -m spacy download en_core_web_sm
+💡 You may also need to add import spacy to your .replit file’s [packages] section if using a config-based setup.
+
+2. Define the Redaction Function
+In your main Python file (or utils.py if you have one), add the following:
+
+python
+Copy
+Edit
+import spacy
+
+# Load spaCy English model (can cache it globally if needed)
+nlp = spacy.load("en_core_web_sm")
+
+def redact_person_names(text: str) -> str:
+    """
+    Redacts all named entities classified as PERSON from a given string.
+    Returns the text with all names replaced by [REDACTED].
+    """
+    doc = nlp(text)
+    redacted_text = text
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            redacted_text = redacted_text.replace(ent.text, "[REDACTED]")
+    return redacted_text
+3. Apply Redaction to Chat Logs Before Display
+In the logic where chat logs are being displayed or exported, run:
+
+python
+Copy
+Edit
+safe_text = redact_person_names(original_chat_log_text)
+Replace original_chat_log_text with your actual variable.
+
+4. Optional: Redact Additional PII
+Extend the function to redact emails, phone numbers, or dates if desired:
+
+python
+Copy
+Edit
+import re
+
+def redact_pii(text: str) -> str:
+    text = redact_person_names(text)
+    text = re.sub(r'[\w\.-]+@[\w\.-]+', '[REDACTED]', text)         # Email
+    text = re.sub(r'\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b', '[REDACTED]', text)  # Phone
+    text = re.sub(r'\b\d{1,2}/\d{1,2}/\d{2,4}\b', '[REDACTED]', text)       # Dates
+    return text
+5. Optional UI Enhancement
+If the logs are shown in a frontend:
+
+Add a toggle for “Redact patient info”
+
+When enabled, apply redact_pii() before rendering
