@@ -116,7 +116,7 @@ export default function CareAidPage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
         <div className="max-w-3xl mx-auto">
-          <div className="h-[75vh] md:h-[70vh]">
+          <div className="h-[90vh] md:h-[85vh]">
             <ChatInterface chatbotSlug={slug} />
           </div>
         </div>

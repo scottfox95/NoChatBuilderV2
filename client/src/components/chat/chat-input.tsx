@@ -26,14 +26,14 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type a message..."
         disabled={disabled}
-        className="w-full bg-white border-gray-300 text-gray-800 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 pr-12 rounded-full shadow-sm"
+        className="w-full bg-white border-gray-300 text-gray-800 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 pr-10 rounded-full shadow-sm h-9 text-sm"
       />
       <Button
         type="submit"
         disabled={disabled || !message.trim()}
-        className="absolute right-1 top-1 bg-pink-500 hover:bg-pink-600 text-white h-8 w-8 p-0 rounded-full"
+        className="absolute right-1 top-1 bg-pink-500 hover:bg-pink-600 text-white h-7 w-7 p-0 rounded-full"
       >
-        <Send className="h-4 w-4" />
+        <Send className="h-3.5 w-3.5" />
       </Button>
     </form>
   );

@@ -39,9 +39,9 @@ export default function CareAidPublicPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-2 md:px-4 py-2 md:py-3">
         <div className="max-w-3xl mx-auto">
-          <div className="h-[85vh] md:h-[80vh]">
+          <div className="h-[92vh] md:h-[90vh]">
             <ChatInterface chatbotSlug={slug} />
           </div>
         </div>

@@ -408,7 +408,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5 custom-scrollbar">
         {messages.map((message) => (
           <ChatMessage 
             key={message.id} 
@@ -432,14 +432,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-gray-900 w-8 h-8 rounded-full flex items-center justify-center">
-              <img src={aidifyIcon} className="animate-pulse w-6 h-6" alt="Aidify" />
+            <div className="flex-shrink-0 bg-gray-900 w-7 h-7 rounded-full flex items-center justify-center">
+              <img src={aidifyIcon} className="animate-pulse w-5 h-5" alt="Aidify" />
             </div>
-            <div className="ml-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-2 px-4">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+            <div className="ml-2 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-1.5 px-3">
+              <div className="flex space-x-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -451,30 +451,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-          <p className="text-sm font-medium text-indigo-600 mb-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+        <div className="px-3 py-2 border-t border-gray-200 bg-gray-50">
+          <p className="text-xs font-medium text-indigo-600 mb-1.5 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             Suggested questions:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -485,7 +485,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
@@ -496,14 +496,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       )}
       
       {/* Chat Input */}
-      <div className="p-4 border-t border-gray-200 bg-white">
+      <div className="px-3 py-2.5 border-t border-gray-200 bg-white">
         <ChatInput 
           onSendMessage={handleSendMessage} 
           disabled={inputDisabled} 
         />
         
-        <div className="mt-3 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="mt-1.5 text-center">
+          <p className="text-[10px] text-gray-500">
             Powered by Aidify | AI-powered assistance
           </p>
         </div>
