@@ -387,22 +387,22 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200">
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-3 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 py-2 px-3 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="bg-gray-950 p-2 rounded-full mr-3 flex items-center justify-center">
-            <img src={aidifyIcon} alt="Aidify" className="w-6 h-6" />
+          <div className="bg-gray-950 p-1.5 rounded-full mr-2 flex items-center justify-center">
+            <img src={aidifyIcon} alt="Aidify" className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-semibold text-gray-800 text-lg">
+            <h2 className="font-semibold text-gray-800 text-base">
               {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
             </h2>
             {!isPreview && chatbotInfo?.description && (
-              <p className="text-sm text-gray-600">{chatbotInfo.description}</p>
+              <p className="text-xs text-gray-600 line-clamp-1">{chatbotInfo.description}</p>
             )}
           </div>
         </div>
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
-          <span className="w-2 h-2 bg-cyan-400 rounded-full mr-1.5"></span>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+          <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-1"></span>
           Online
         </span>
       </div>

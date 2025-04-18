@@ -35,11 +35,11 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
   if (message.isUser) {
     return (
       <div className="flex items-start justify-end">
-        <div className="mr-3 bg-blue-100 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
-          <p className="text-gray-800 whitespace-pre-wrap">{formatMessageContent(message.content)}</p>
+        <div className="mr-3 bg-blue-100 rounded-lg py-1.5 px-3 max-w-[90%] shadow-sm">
+          <p className="text-gray-800 whitespace-pre-wrap text-sm md:text-base">{formatMessageContent(message.content)}</p>
         </div>
-        <div className="flex-shrink-0 bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
-          <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex-shrink-0 bg-blue-500 w-7 h-7 rounded-full flex items-center justify-center shadow-sm">
+          <svg className="w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
@@ -50,16 +50,16 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
   // Bot message
   return (
     <div className="flex items-start">
-      <div className={`flex-shrink-0 ${isStreaming ? 'bg-gray-900' : 'bg-gray-950'} w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300`}>
+      <div className={`flex-shrink-0 ${isStreaming ? 'bg-gray-900' : 'bg-gray-950'} w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300`}>
         <img 
           src={aidifyIcon} 
-          className={`w-6 h-6 ${isStreaming ? 'animate-pulse' : ''}`} 
+          className={`w-5 h-5 ${isStreaming ? 'animate-pulse' : ''}`} 
           alt="Aidify Bot"
         />
       </div>
-      <div className="ml-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
+      <div className="ml-2 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-1.5 px-3 max-w-[92%] shadow-sm">
         <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
-          <p className="text-gray-800 whitespace-pre-wrap">
+          <p className="text-gray-800 whitespace-pre-wrap text-sm md:text-base">
             {formatMessageContent(message.content)}
             {isStreaming && (
               <span className="inline-block w-1.5 h-4 bg-indigo-500 ml-0.5 animate-blink"></span>
@@ -67,7 +67,7 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
           </p>
         </div>
         {!message.isUser && chatbotName && (
-          <p className="text-xs text-indigo-600 mt-1 text-right font-medium">
+          <p className="text-xs text-indigo-600 mt-0.5 text-right font-medium">
             {chatbotName} {isStreaming && (
               <span className="inline-flex items-center ml-1">
                 <span className="text-xs mr-1">typing</span>
