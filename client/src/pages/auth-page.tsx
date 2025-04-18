@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Brain } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AidifyLogo from "@/assets/aidify-logo.svg";
 
 const loginFormSchema = loginSchema;
 const registerFormSchema = loginSchema;
@@ -76,31 +77,33 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white flex items-center justify-center">
-              <MessageSquare className="mr-2 h-8 w-8 text-primary" />
-              RAG Builder
+            <div className="flex items-center justify-center mb-2">
+              <img src={AidifyLogo} alt="Aidify Logo" className="h-12" />
+            </div>
+            <h1 className="text-3xl font-bold text-white">
+              Aidify
             </h1>
             <p className="text-neutral-400 mt-2">Create custom AI chatbots powered by your documents</p>
           </div>
 
-          <Card className="border-neutral-800 bg-background-light">
+          <Card className="border border-neutral-200/10 bg-white/5 shadow-lg backdrop-blur-sm">
             <CardHeader>
               <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid grid-cols-2 bg-neutral-900">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsList className="grid grid-cols-2 bg-black/20">
+                  <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">Login</TabsTrigger>
+                  <TabsTrigger value="register" className="data-[state=active]:bg-primary data-[state=active]:text-white">Register</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
                   <CardTitle className="text-xl text-white">Welcome back</CardTitle>
-                  <CardDescription className="text-neutral-400">
+                  <CardDescription className="text-neutral-300">
                     Login to access your chatbots
                   </CardDescription>
                 </TabsContent>
                 
                 <TabsContent value="register">
                   <CardTitle className="text-xl text-white">Create an account</CardTitle>
-                  <CardDescription className="text-neutral-400">
+                  <CardDescription className="text-neutral-300">
                     Sign up to start building AI chatbots
                   </CardDescription>
                 </TabsContent>
@@ -120,7 +123,7 @@ export default function AuthPage() {
                           <FormControl>
                             <Input
                               placeholder="Enter your username"
-                              className="bg-neutral-800 border-neutral-700 text-white"
+                              className="bg-white/10 border-neutral-600/30 text-white placeholder:text-neutral-400"
                               {...field}
                             />
                           </FormControl>
@@ -139,7 +142,7 @@ export default function AuthPage() {
                             <Input
                               type="password"
                               placeholder="Enter your password"
-                              className="bg-neutral-800 border-neutral-700 text-white"
+                              className="bg-white/10 border-neutral-600/30 text-white placeholder:text-neutral-400"
                               {...field}
                             />
                           </FormControl>
