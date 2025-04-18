@@ -45,12 +45,12 @@ export default function ChatLogsPage() {
   const [dateRange, setDateRange] = useState<{start?: string, end?: string}>({});
   const pageSize = 20;
   const { toast } = useToast();
-  
+
   // Get all chatbots for the filter dropdown
   const { data: chatbots, isLoading: loadingChatbots } = useQuery<Chatbot[]>({
     queryKey: ["/api/chatbots"],
   });
-  
+
   // Get chat logs with filters
   const { 
     data: logsData, 
@@ -74,18 +74,18 @@ export default function ChatLogsPage() {
       }
       params.append("page", page.toString());
       params.append("pageSize", pageSize.toString());
-      
+
       const queryString = params.toString();
       const url = `/api/logs${queryString ? `?${queryString}` : ''}`;
       const response = await apiRequest("GET", url);
       return await response.json();
     },
   });
-  
+
   const logs = logsData?.logs || [];
   const totalCount = logsData?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
-  
+
   // Group messages by session and create conversation pairs
   const processLogsIntoPairs = () => {
     // Group messages by session ID
@@ -96,34 +96,34 @@ export default function ChatLogsPage() {
       }
       sessionMap[log.sessionId].push(log);
     });
-    
+
     // Sort each session by timestamp
     Object.keys(sessionMap).forEach(sessionId => {
       sessionMap[sessionId].sort((a, b) => 
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
     });
-    
+
     // Create conversation pairs (user question + bot response)
     const conversationsBySession: Record<string, ConversationPair[]> = {};
-    
+
     Object.keys(sessionMap).forEach(sessionId => {
       const messages = sessionMap[sessionId];
       const pairs: ConversationPair[] = [];
-      
+
       for (let i = 0; i < messages.length; i++) {
         const current = messages[i];
-        
+
         if (current.isUser) {
           // Find next bot response if available
           const nextMessage = i + 1 < messages.length ? messages[i + 1] : undefined;
-          
+
           pairs.push({
             id: `${current.id}-${nextMessage?.id || 'none'}`,
             userMessage: current,
             botResponse: nextMessage && !nextMessage.isUser ? nextMessage : undefined
           });
-          
+
           // Skip the bot response since we've included it
           if (nextMessage && !nextMessage.isUser) {
             i++;
@@ -137,19 +137,19 @@ export default function ChatLogsPage() {
           });
         }
       }
-      
+
       conversationsBySession[sessionId] = pairs;
     });
-    
+
     return { sessionMap, conversationsBySession };
   };
-  
+
   const { sessionMap, conversationsBySession } = processLogsIntoPairs();
-  
+
   // Handle export to CSV
   const handleExportCSV = () => {
     if (logs.length === 0) return;
-    
+
     try {
       // Process logs to pair user questions with bot responses
       // Get conversation pairs just like in the display
@@ -161,15 +161,15 @@ export default function ChatLogsPage() {
         userMessage: string;
         botResponse: string;
       }[] = [];
-      
+
       // Format all conversation pairs for CSV
       Object.keys(sessionMap).forEach(sessionId => {
         const pairs = conversationsBySession[sessionId];
-        
+
         pairs.forEach(pair => {
           // Skip welcome messages that aren't part of a user-bot exchange
           if (!pair.userMessage.isUser && !pair.botResponse) return;
-          
+
           // For user messages, capture the pair
           allPairs.push({
             timestamp: new Date(pair.userMessage.timestamp).toISOString(),
@@ -180,10 +180,10 @@ export default function ChatLogsPage() {
           });
         });
       });
-      
+
       // CSV Header
       const headers = ["Timestamp", "Chatbot", "Session ID", "User Question", "Bot Response"];
-      
+
       // Format as CSV rows
       const csvRows = [
         headers.join(","), // header row
@@ -191,7 +191,7 @@ export default function ChatLogsPage() {
           // Escape commas and quotes in content
           const userMessage = pair.userMessage.replace(/"/g, '""');
           const botResponse = pair.botResponse.replace(/"/g, '""');
-          
+
           return [
             pair.timestamp,
             `"${pair.chatbotName}"`,
@@ -201,25 +201,25 @@ export default function ChatLogsPage() {
           ].join(",");
         })
       ];
-      
+
       // Join rows with newlines
       const csvContent = csvRows.join("\n");
-      
+
       // Create blob and download
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      
+
       // Set up download attributes
       const currentDate = new Date().toISOString().split("T")[0];
       link.setAttribute("href", url);
       link.setAttribute("download", `chat-logs-${currentDate}.csv`);
-      
+
       // Trigger download and clean up
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       toast({
         title: "CSV Export Complete",
         description: `${allPairs.length} conversation pairs exported successfully.`,
@@ -233,23 +233,23 @@ export default function ChatLogsPage() {
       });
     }
   };
-  
+
   // Sort sessions by latest message timestamp (newest first)
   const sortedSessions = Object.keys(sessionMap).sort((a, b) => {
     const aMessages = sessionMap[a];
     const bMessages = sessionMap[b];
-    
+
     const aLatest = new Date(aMessages[aMessages.length - 1].timestamp).getTime();
     const bLatest = new Date(bMessages[bMessages.length - 1].timestamp).getTime();
-    
+
     return bLatest - aLatest;
   });
-  
+
   const handleSearch = () => {
     setPage(1);
     refetchLogs();
   };
-  
+
   const handleReset = () => {
     setSelectedChatbotId("all");
     setSearchTerm("");
@@ -257,7 +257,7 @@ export default function ChatLogsPage() {
     setPage(1);
     refetchLogs();
   };
-  
+
   if (loadingChatbots) {
     return (
       <DashboardLayout>
@@ -267,7 +267,7 @@ export default function ChatLogsPage() {
       </DashboardLayout>
     );
   }
-  
+
   return (
     <DashboardLayout>
       <div className="container mx-auto p-6">
@@ -291,7 +291,7 @@ export default function ChatLogsPage() {
             </Button>
           </div>
         </div>
-        
+
         {/* Filters */}
         <Card className="mb-6 bg-white border border-gray-200 shadow-sm">
           <CardContent className="p-4 space-y-4">
@@ -304,7 +304,7 @@ export default function ChatLogsPage() {
                   value={selectedChatbotId}
                   onValueChange={(value) => setSelectedChatbotId(value)}
                 >
-                  <SelectTrigger id="chatbot-filter" className="w-full bg-white border-gray-300">
+                  <SelectTrigger id="chatbot-filter" className="w-full bg-white border-gray-300 text-gray-900">
                     <SelectValue placeholder="All Care Aids" />
                   </SelectTrigger>
                   <SelectContent>
@@ -317,7 +317,7 @@ export default function ChatLogsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <Label htmlFor="date-start" className="mb-2 block text-sm font-medium text-gray-900">
                   Start Date
@@ -330,7 +330,7 @@ export default function ChatLogsPage() {
                   onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="date-end" className="mb-2 block text-sm font-medium text-gray-900">
                   End Date
@@ -344,7 +344,7 @@ export default function ChatLogsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -364,7 +364,7 @@ export default function ChatLogsPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Logs Display */}
         {loadingLogs ? (
           <div className="flex justify-center items-center h-96">
@@ -381,7 +381,7 @@ export default function ChatLogsPage() {
               const pairs = conversationsBySession[sessionId];
               const firstMessage = sessionMap[sessionId][0];
               const latestMessage = sessionMap[sessionId][sessionMap[sessionId].length - 1];
-              
+
               return (
                 <Card key={sessionId} className="bg-white border border-gray-200 shadow-sm overflow-hidden">
                   <CardContent className="p-0">
@@ -401,7 +401,7 @@ export default function ChatLogsPage() {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Conversation Pairs */}
                     <div className="p-4 flex flex-col gap-4">
                       {pairs.map(pair => (
@@ -425,7 +425,7 @@ export default function ChatLogsPage() {
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Bot Response (if available) */}
                           {pair.botResponse && (
                             <div className="flex items-start gap-3 p-4 bg-white">
@@ -454,7 +454,7 @@ export default function ChatLogsPage() {
             })}
           </div>
         )}
-        
+
         {/* Pagination */}
         {totalPages > 1 && (
           <Pagination className="my-8">
@@ -469,7 +469,7 @@ export default function ChatLogsPage() {
                   className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
-              
+
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 // Show at most 5 page links
                 let pageToShow = i + 1;
@@ -481,7 +481,7 @@ export default function ChatLogsPage() {
                     pageToShow = totalPages - 4 + i;
                   }
                 }
-                
+
                 if (pageToShow <= totalPages) {
                   return (
                     <PaginationItem key={pageToShow}>
@@ -500,7 +500,7 @@ export default function ChatLogsPage() {
                 }
                 return null;
               })}
-              
+
               <PaginationItem>
                 <PaginationNext 
                   href="#" 
