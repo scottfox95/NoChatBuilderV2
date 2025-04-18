@@ -66,7 +66,7 @@ export default function ChatbotList() {
 
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-bold text-white mb-4 sm:mb-0">My Care Aids</h1>
+          <h1 className="text-2xl font-bold text-primary mb-4 sm:mb-0">My Care Aids</h1>
           <Button className="bg-primary hover:bg-primary-dark text-white" onClick={handleOpenCreateModal}>
             <Plus className="mr-2 h-4 w-4" />
             Create New Care Aid
