@@ -11,6 +11,7 @@ import CareAidPage from "@/pages/care-aid-page";
 import CareAidEmbedPage from "@/pages/care-aid-embed-page";
 import ChatLogsPage from "@/pages/chat-logs-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
+import SettingsPage from "@/pages/settings-page";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <ProtectedRoute path="/care-aids" component={DashboardPage} />
       <ProtectedRoute path="/logs" component={ChatLogsPage} />
       <ProtectedRoute path="/knowledge-base" component={KnowledgeBasePage} />
+      <ProtectedRoute path="/settings" component={SettingsPage} />
       <Route path="/care-aid/:slug/:view?" component={CareAidPage} />
       <Route path="/embed/:slug" component={CareAidEmbedPage} />
       <Route component={NotFound} />

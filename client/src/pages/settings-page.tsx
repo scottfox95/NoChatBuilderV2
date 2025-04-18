@@ -10,6 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getQueryFn } from "@/lib/queryClient";
 
+// Type for OpenAI API key status response
+interface ApiKeyStatus {
+  valid: boolean;
+  message: string;
+  models?: string[];
+}
+
 export default function SettingsPage() {
   const { toast } = useToast();
   
@@ -20,7 +27,7 @@ export default function SettingsPage() {
     isError: isApiKeyError,
     refetch: refetchApiKey,
     isRefetching: isRefetchingApiKey
-  } = useQuery({
+  } = useQuery<ApiKeyStatus>({
     queryKey: ["/api/settings/openai"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
@@ -41,7 +48,7 @@ export default function SettingsPage() {
               <CardTitle className="flex items-center">
                 <span>OpenAI API Key</span>
                 {apiKeyStatus?.valid && (
-                  <Badge variant="success" className="ml-2 bg-green-500/20 text-green-500 hover:bg-green-500/30 border-green-500/30">
+                  <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-500 hover:bg-green-500/30 border-green-500/30">
                     Active
                   </Badge>
                 )}
@@ -89,7 +96,7 @@ export default function SettingsPage() {
                     <div className="mt-4">
                       <h4 className="text-sm font-medium mb-2">Available Models</h4>
                       <div className="flex flex-wrap gap-2">
-                        {apiKeyStatus.models.map((model) => (
+                        {apiKeyStatus.models.map((model: string) => (
                           <Badge key={model} variant="outline" className="text-xs">
                             {model}
                           </Badge>
