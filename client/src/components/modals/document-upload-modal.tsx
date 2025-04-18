@@ -15,8 +15,9 @@ interface DocumentUploadModalProps {
 }
 
 export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: DocumentUploadModalProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -45,7 +46,6 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
       return await response.json();
     },
     onSuccess: () => {
-      setSelectedFile(null);
       queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}/documents`] });
       toast({
         title: "Document uploaded",
@@ -85,15 +85,30 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+    if (event.target.files && event.target.files.length > 0) {
+      const filesArray = Array.from(event.target.files);
+      setSelectedFiles(filesArray);
     }
   };
 
   const handleUpload = async () => {
-    if (selectedFile) {
+    if (selectedFiles.length > 0) {
       try {
-        await uploadMutation.mutateAsync(selectedFile);
+        setUploadProgress(0);
+        
+        // Upload files one by one
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          await uploadMutation.mutateAsync(file);
+          
+          // Update progress
+          setUploadProgress(Math.round(((i + 1) / selectedFiles.length) * 100));
+        }
+        
+        // Clear selection after all uploads complete
+        setSelectedFiles([]);
+        setUploadProgress(0);
+        
       } catch (error) {
         // Error is handled in the mutation
       }
@@ -153,8 +168,14 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
-              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                setSelectedFile(e.dataTransfer.files[0]);
+              if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                // Filter for supported file types
+                const validFileTypes = [".pdf", ".docx", ".txt", ".rtf"];
+                const filesArray = Array.from(e.dataTransfer.files).filter(file => {
+                  const ext = "." + file.name.split('.').pop()?.toLowerCase();
+                  return validFileTypes.includes(ext);
+                });
+                setSelectedFiles(filesArray);
               }
             }}
           >
@@ -173,13 +194,14 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
                   <input
                     ref={fileInputRef}
                     type="file"
+                    multiple
                     className="hidden"
                     accept=".pdf,.docx,.txt,.rtf,application/rtf,text/rtf"
                     onChange={handleFileChange}
                     disabled={uploading}
                   />
                 </Button>
-                {selectedFile && (
+                {selectedFiles.length > 0 && (
                   <Button
                     onClick={handleUpload}
                     disabled={uploading}
@@ -188,19 +210,44 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
                     {uploading ? (
                       <>
                         <Loader size="sm" className="mr-2" />
-                        Uploading...
+                        Uploading... {uploadProgress > 0 && `(${uploadProgress}%)`}
                       </>
                     ) : (
                       <>
                         <Upload className="mr-2 h-4 w-4" />
-                        Upload
+                        Upload {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}
                       </>
                     )}
                   </Button>
                 )}
               </div>
-              {selectedFile && (
-                <p className="text-sm text-neutral-300">Selected: {selectedFile.name}</p>
+              {selectedFiles.length > 0 && (
+                <div className="mt-3 max-h-40 overflow-y-auto bg-neutral-800 rounded-md p-2">
+                  <div className="space-y-1">
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm text-neutral-300 p-1 hover:bg-neutral-700 rounded">
+                        <div className="flex items-center space-x-2">
+                          <span>{getFileIcon(file.name.split('.').pop() || '')}</span>
+                          <span className="truncate max-w-xs">{file.name}</span>
+                          <span className="text-xs text-neutral-500">{formatFileSize(file.size)}</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 text-neutral-400 hover:text-neutral-200"
+                          onClick={() => {
+                            const newFiles = [...selectedFiles];
+                            newFiles.splice(index, 1);
+                            setSelectedFiles(newFiles);
+                          }}
+                          disabled={uploading}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           </div>
