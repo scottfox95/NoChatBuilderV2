@@ -36,8 +36,8 @@ export default function SettingsPage() {
     <DashboardLayout>
       <div className="container py-6 space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Settings</h1>
-          <p className="text-neutral-400">Manage your Aidify settings and API integrations</p>
+          <h1 className="text-3xl font-bold mb-2 text-black">Settings</h1>
+          <p className="text-neutral-600">Manage your Aidify settings and API integrations</p>
         </div>
         
         <Separator />

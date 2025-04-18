@@ -36,16 +36,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   const isActive = (path: string) => {
-    return location === path ? "bg-primary/20 hover:bg-primary/30 text-primary" : "hover:bg-neutral-800 text-neutral-100";
+    return location === path ? "bg-primary/20 hover:bg-primary/30 text-primary" : "hover:bg-white/50 text-black";
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#AECEE9' }}>
       {/* Sidebar Navigation */}
-      <aside className="w-16 md:w-64 bg-background-light border-r border-neutral-800 hidden md:block">
+      <aside className="w-16 md:w-64 border-r border-neutral-300 hidden md:block" style={{ backgroundColor: '#AECEE9' }}>
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b border-neutral-800">
-            <div className="hidden md:block text-xl font-semibold text-white">
+          <div className="p-4 border-b border-neutral-300">
+            <div className="hidden md:block text-xl font-semibold text-black">
               <span style={{ color: 'var(--primary-accent)' }}>Aidify</span>
             </div>
             <div className="block md:hidden text-center">
@@ -98,10 +98,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </ul>
           </nav>
           
-          <div className="p-4 border-t border-neutral-800">
+          <div className="p-4 border-t border-neutral-300">
             <Button 
               variant="ghost" 
-              className="w-full justify-start p-2 text-neutral-100"
+              className="w-full justify-start p-2 text-black"
               onClick={handleLogout}
               disabled={logoutMutation.isPending}
             >
@@ -117,9 +117,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-background-light border-b border-neutral-800 z-50">
+      <div className="md:hidden fixed top-0 left-0 right-0 border-b border-neutral-300 z-50" style={{ backgroundColor: '#AECEE9' }}>
         <div className="flex items-center justify-between p-4">
-          <div className="text-xl font-semibold text-white">
+          <div className="text-xl font-semibold text-black">
             <span style={{ color: 'var(--primary-accent)' }}>Aidify</span>
           </div>
           <div className="flex items-center space-x-4">
@@ -127,39 +127,39 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               {logoutMutation.isPending ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-5 w-5 text-black" />
               )}
             </Button>
           </div>
         </div>
-        <Separator />
+        <Separator className="bg-neutral-300" />
         <nav className="flex justify-around p-1">
           <Link href="/dashboard">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/dashboard" ? "text-primary" : "text-neutral-400"}`}>
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/dashboard" ? "text-primary" : "text-black"}`}>
               <TrendingUp className="h-5 w-5" />
               <span className="text-xs mt-1">Dashboard</span>
             </a>
           </Link>
           <Link href="/care-aids">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/care-aids" ? "text-primary" : "text-neutral-400"}`}>
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/care-aids" ? "text-primary" : "text-black"}`}>
               <MessageSquare className="h-5 w-5" />
               <span className="text-xs mt-1">Care Aids</span>
             </a>
           </Link>
           <Link href="/logs">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/logs" ? "text-primary" : "text-neutral-400"}`}>
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/logs" ? "text-primary" : "text-black"}`}>
               <FileText className="h-5 w-5" />
               <span className="text-xs mt-1">Logs</span>
             </a>
           </Link>
           <Link href="/knowledge-base">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/knowledge-base" ? "text-primary" : "text-neutral-400"}`}>
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/knowledge-base" ? "text-primary" : "text-black"}`}>
               <Database className="h-5 w-5" />
               <span className="text-xs mt-1">Knowledge</span>
             </a>
           </Link>
           <Link href="/settings">
-            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/settings" ? "text-primary" : "text-neutral-400"}`}>
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/settings" ? "text-primary" : "text-black"}`}>
               <Settings className="h-5 w-5" />
               <span className="text-xs mt-1">Settings</span>
             </a>
@@ -168,7 +168,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-background pt-0 md:pt-0 mt-24 md:mt-0">
+      <main className="flex-1 overflow-y-auto pt-0 md:pt-0 mt-24 md:mt-0" style={{ backgroundColor: '#AECEE9' }}>
         {children}
       </main>
     </div>
