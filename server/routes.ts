@@ -5,6 +5,7 @@ import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema } from "@shared/schema";
 import { generateCompletion, processDocumentText, verifyApiKey } from "./openai";
+import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
