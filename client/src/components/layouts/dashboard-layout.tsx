@@ -40,9 +40,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#AECEE9' }}>
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#F4F4F4' }}>
       {/* Sidebar Navigation */}
-      <aside className="w-16 md:w-64 border-r border-neutral-300 hidden md:block" style={{ backgroundColor: '#AECEE9' }}>
+      <aside className="w-16 md:w-64 border-r border-neutral-300 hidden md:block" style={{ backgroundColor: '#F4F4F4' }}>
         <div className="flex flex-col h-full">
           <div className="p-4 border-b border-neutral-300">
             <div className="hidden md:block text-xl font-semibold text-black">
@@ -117,7 +117,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 border-b border-neutral-300 z-50" style={{ backgroundColor: '#AECEE9' }}>
+      <div className="md:hidden fixed top-0 left-0 right-0 border-b border-neutral-300 z-50" style={{ backgroundColor: '#F4F4F4' }}>
         <div className="flex items-center justify-between p-4">
           <div className="text-xl font-semibold text-black">
             <span style={{ color: 'var(--primary-accent)' }}>Aidify</span>
@@ -168,7 +168,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pt-0 md:pt-0 mt-24 md:mt-0" style={{ backgroundColor: '#AECEE9' }}>
+      <main className="flex-1 overflow-y-auto pt-0 md:pt-0 mt-24 md:mt-0" style={{ backgroundColor: '#F4F4F4' }}>
         {children}
       </main>
     </div>
