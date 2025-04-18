@@ -3,6 +3,61 @@ import OpenAI from "openai";
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
 
+// Function to verify if the OpenAI API key is valid
+export async function verifyApiKey(): Promise<{
+  valid: boolean;
+  message: string;
+  models?: string[];
+}> {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      return {
+        valid: false,
+        message: "OpenAI API key is not set."
+      };
+    }
+    
+    // Make a simple request to the models endpoint to check if the key is valid
+    const response = await openai.models.list();
+    
+    // Extract the model IDs we care about (GPT models)
+    const gptModels = response.data
+      .filter(model => 
+        model.id.includes("gpt") || 
+        model.id.includes("GPT") ||
+        model.id.includes("text-davinci")
+      )
+      .map(model => model.id)
+      .sort();
+    
+    return {
+      valid: true,
+      message: "API key is valid and functioning correctly.",
+      models: gptModels
+    };
+  } catch (error: any) {
+    console.error("API key verification error:", error);
+    
+    // Check for specific error messages from OpenAI
+    if (error.status === 401) {
+      return {
+        valid: false,
+        message: "Invalid API key. Please check your OpenAI API key and try again."
+      };
+    } else if (error.status === 429) {
+      return {
+        valid: false,
+        message: "Rate limit exceeded. Your API key is valid but has reached its usage limit."
+      };
+    } else {
+      return {
+        valid: false,
+        message: `API error: ${error.message || "Unknown error occurred."}`
+      };
+    }
+  }
+}
+
 type Message = {
   role: "system" | "user" | "assistant";
   content: string;

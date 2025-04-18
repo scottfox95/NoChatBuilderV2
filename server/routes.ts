@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema } from "@shared/schema";
-import { generateCompletion, processDocumentText } from "./openai";
+import { generateCompletion, processDocumentText, verifyApiKey } from "./openai";
 import multer from "multer";
 import { nanoid } from "nanoid";
 import fs from "fs";
@@ -526,6 +526,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Preview response error:", error);
       res.status(500).json({ message: "Failed to generate preview response" });
+    }
+  });
+  
+  // Settings routes
+  app.get("/api/settings/openai", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const apiKeyStatus = await verifyApiKey();
+      res.json(apiKeyStatus);
+    } catch (error) {
+      console.error("Error checking OpenAI API key:", error);
+      res.status(500).json({ 
+        valid: false, 
+        message: "Error checking API key status"
+      });
     }
   });
 
