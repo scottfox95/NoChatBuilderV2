@@ -147,7 +147,7 @@ export default function KnowledgeBasePage() {
                     <div className="flex items-center">
                       {getFileTypeIcon(document.name)}
                       <div className="ml-2">
-                        <CardTitle className="text-lg text-white truncate max-w-[200px]">
+                        <CardTitle className="text-lg font-bold text-white truncate max-w-[200px]">
                           {document.name}
                         </CardTitle>
                       </div>
@@ -196,7 +196,7 @@ export default function KnowledgeBasePage() {
           </div>
         ) : (
           <div className="bg-background-light border border-neutral-800 rounded-lg p-8 text-center">
-            <FileText className="h-12 w-12 text-neutral-500 mx-auto mb-4" />
+            <FileText className="h-12 w-12 text-neutral-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">No documents found</h3>
             <p className="text-neutral-300 mb-4">
               {searchQuery || selectedCareAid !== "all"
