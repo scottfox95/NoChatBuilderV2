@@ -1,5 +1,4 @@
 import { Message } from "@shared/schema";
-import { useEffect, useState } from "react";
 
 interface ChatMessageProps {
   message: Message;
@@ -8,19 +7,6 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, chatbotName, isStreaming = false }: ChatMessageProps) {
-  // State to control blinking cursor for streaming effect
-  const [showCursor, setShowCursor] = useState(true);
-  
-  // Blink the cursor during streaming
-  useEffect(() => {
-    if (!isStreaming) return;
-    
-    const interval = setInterval(() => {
-      setShowCursor(prev => !prev);
-    }, 500);
-    
-    return () => clearInterval(interval);
-  }, [isStreaming]);
   
   // User message
   if (message.isUser) {
@@ -53,13 +39,26 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
         </svg>
       </div>
       <div className="ml-3 bg-pink-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
-        <p className="text-gray-800 whitespace-pre-wrap">
-          {message.content}
-          {isStreaming && showCursor && <span className="inline-block w-2 h-4 bg-gray-400 ml-0.5 animate-blink"></span>}
-        </p>
+        <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
+          <p className="text-gray-800 whitespace-pre-wrap">
+            {message.content}
+            {isStreaming && (
+              <span className="inline-block w-1.5 h-4 bg-pink-500 ml-0.5 animate-blink"></span>
+            )}
+          </p>
+        </div>
         {!message.isUser && chatbotName && (
           <p className="text-xs text-pink-500 mt-1 text-right font-medium">
-            {chatbotName} {isStreaming && <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse ml-1"></span>}
+            {chatbotName} {isStreaming && (
+              <span className="inline-flex items-center ml-1">
+                <span className="text-xs mr-1">typing</span>
+                <span className="flex space-x-1">
+                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                </span>
+              </span>
+            )}
           </p>
         )}
       </div>

@@ -80,14 +80,24 @@ export default {
           },
         },
         "blink": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0" },
+          "0%, 49%": { opacity: "1" },
+          "50%, 100%": { opacity: "0" },
+        },
+        "text-fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "typing": {
+          "0%": { width: "0" },
+          "100%": { width: "100%" },
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "blink": "blink 1s ease-in-out infinite",
+        "blink": "blink 0.8s ease-in-out infinite",
+        "text-fade-in": "text-fade-in 0.15s ease-out",
+        "typing": "typing 1.5s steps(30, end)",
       },
     },
   },

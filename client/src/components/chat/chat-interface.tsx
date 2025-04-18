@@ -352,8 +352,10 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     setShowSuggestions(false);
     
     try {
-      const response = await messageMutation.mutateAsync(message);
-      setMessages(prev => [...prev, response.message]);
+      await messageMutation.mutateAsync(message);
+      // Note: We're not adding the message to the state here anymore
+      // because the streaming message will become the final message
+      // This avoids duplicate messages
     } catch (error) {
       // Error is handled in the mutation
     }
