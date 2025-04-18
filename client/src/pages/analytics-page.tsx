@@ -256,13 +256,39 @@ export default function AnalyticsPage() {
             </div>
             <div className="mt-4 sm:mt-0">
               <Select value={selectedChatbotId} onValueChange={setSelectedChatbotId}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[220px]">
                   <SelectValue placeholder="Filter by Care Aid" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Care Aids</SelectItem>
+                <SelectContent className="max-h-[300px]">
+                  <div className="px-3 py-2">
+                    <input 
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Search care aids..."
+                      onChange={(e) => {
+                        const searchInput = document.getElementById('care-aid-search-input');
+                        if (searchInput) {
+                          searchInput.focus();
+                        }
+                        
+                        // Hide/show items based on search
+                        const value = e.target.value.toLowerCase();
+                        const items = document.querySelectorAll('[data-care-aid-search-item]');
+                        items.forEach((item) => {
+                          const text = item.textContent?.toLowerCase() || '';
+                          if (text.includes(value)) {
+                            (item as HTMLElement).style.display = '';
+                          } else {
+                            (item as HTMLElement).style.display = 'none';
+                          }
+                        });
+                      }}
+                      id="care-aid-search-input"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  <SelectItem value="all" data-care-aid-search-item>All Care Aids</SelectItem>
                   {chatbots?.map((chatbot) => (
-                    <SelectItem key={chatbot.id} value={chatbot.id.toString()}>
+                    <SelectItem key={chatbot.id} value={chatbot.id.toString()} data-care-aid-search-item>
                       {chatbot.name}
                     </SelectItem>
                   ))}
