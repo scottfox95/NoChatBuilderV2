@@ -426,10 +426,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Chatbot not found" });
     }
 
-    const messages = await storage.getMessagesBySession(
+    // Check if redaction is requested
+    const redact = req.query.redact === 'true';
+
+    let messages = await storage.getMessagesBySession(
       chatbot.id,
       req.params.sessionId
     );
+    
+    // Apply redaction if requested
+    if (redact) {
+      messages = messages.map(message => ({
+        ...message,
+        content: redactPII(message.content)
+      }));
+    }
     
     res.json(messages);
   });
@@ -445,6 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const search = req.query.search as string;
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
+      const redact = req.query.redact === 'true'; // Get redaction preference from query parameter
       
       // Get all chatbots owned by the user to ensure they only see messages from their chatbots
       const userChatbots = await storage.getChatbots(req.user.id);
@@ -483,8 +495,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get messages with pagination
       const { logs, totalCount } = await storage.getChatLogs(filter, page, pageSize);
       
-      // Enhance logs with chatbot name
-      const enhancedLogs = await Promise.all(logs.map(async (log) => {
+      // Process logs - first add chatbot name, then apply redaction if enabled
+      let processedLogs = await Promise.all(logs.map(async (log) => {
         const chatbot = userChatbots.find(c => c.id === log.chatbotId);
         return {
           ...log,
@@ -492,12 +504,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }));
       
+      // Apply redaction if enabled
+      if (redact) {
+        processedLogs = processedLogs.map(log => ({
+          ...log,
+          content: redactPII(log.content)
+        }));
+      }
+      
       res.json({ 
-        logs: enhancedLogs, 
+        logs: processedLogs, 
         totalCount,
         page,
         pageSize,
-        totalPages: Math.ceil(totalCount / pageSize)
+        totalPages: Math.ceil(totalCount / pageSize),
+        redactionEnabled: redact
       });
     } catch (error) {
       console.error("Error fetching chat logs:", error);

@@ -23,9 +23,10 @@ import { Chatbot, Message } from "@shared/schema";
 import { Loader } from "@/components/ui/loader";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { formatDate } from "@/lib/utils";
-import { SearchIcon, UserCircle, BotIcon, Filter, Download } from "lucide-react";
+import { SearchIcon, UserCircle, BotIcon, Filter, Download, ShieldAlert } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 interface ChatLog extends Message {
   chatbotName: string;
@@ -43,6 +44,7 @@ export default function ChatLogsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<{start?: string, end?: string}>({});
+  const [redactPII, setRedactPII] = useState<boolean>(false);
   const pageSize = 20;
   const { toast } = useToast();
 
@@ -56,8 +58,8 @@ export default function ChatLogsPage() {
     data: logsData, 
     isLoading: loadingLogs,
     refetch: refetchLogs
-  } = useQuery<{logs: ChatLog[], totalCount: number}>({
-    queryKey: ["/api/logs", selectedChatbotId, page, pageSize, searchTerm, dateRange],
+  } = useQuery<{logs: ChatLog[], totalCount: number, redactionEnabled?: boolean}>({
+    queryKey: ["/api/logs", selectedChatbotId, page, pageSize, searchTerm, dateRange, redactPII],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (selectedChatbotId !== "all") {
@@ -74,6 +76,7 @@ export default function ChatLogsPage() {
       }
       params.append("page", page.toString());
       params.append("pageSize", pageSize.toString());
+      params.append("redact", redactPII.toString());
 
       const queryString = params.toString();
       const url = `/api/logs${queryString ? `?${queryString}` : ''}`;
