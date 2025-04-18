@@ -67,7 +67,7 @@ export default function AuthPage() {
       username: "dev",
       password: "password"
     };
-    
+
     // Try to login first (reverses the previous approach)
     try {
       await loginMutation.mutateAsync(devUser);
@@ -98,7 +98,6 @@ export default function AuthPage() {
             <div className="flex items-center justify-center mb-2">
               <img src="/assets/aidify-logo.png" alt="Aidify Logo" className="h-24" />
             </div>
-            <p className="text-neutral-400 mt-4">Create custom AI chatbots powered by your documents</p>
           </div>
 
           <Card className="border border-neutral-200/10 bg-white/5 shadow-lg backdrop-blur-sm">
@@ -108,14 +107,14 @@ export default function AuthPage() {
                   <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">Login</TabsTrigger>
                   <TabsTrigger value="register" className="data-[state=active]:bg-primary data-[state=active]:text-white">Register</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="login">
                   <CardTitle className="text-xl text-white">Welcome back</CardTitle>
                   <CardDescription className="text-neutral-300">
                     Login to access your chatbots
                   </CardDescription>
                 </TabsContent>
-                
+
                 <TabsContent value="register">
                   <CardTitle className="text-xl text-white">Create an account</CardTitle>
                   <CardDescription className="text-neutral-300">
@@ -124,7 +123,7 @@ export default function AuthPage() {
                 </TabsContent>
               </Tabs>
             </CardHeader>
-            
+
             <CardContent>
               <div className={activeTab === "login" ? "block" : "hidden"}>
                 <Form {...loginForm}>
@@ -146,7 +145,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={loginForm.control}
                       name="password"
@@ -165,7 +164,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <Button
                       type="submit"
                       className="w-full bg-primary hover:opacity-90 text-white shadow-md"
@@ -180,7 +179,7 @@ export default function AuthPage() {
                         "Login"
                       )}
                     </Button>
-                    
+
                     <div className="mt-4 pt-4 border-t border-neutral-600/20">
                       <Button
                         type="button"
@@ -194,7 +193,7 @@ export default function AuthPage() {
                   </form>
                 </Form>
               </div>
-              
+
               <div className={activeTab === "register" ? "block" : "hidden"}>
                 <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
@@ -215,7 +214,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={registerForm.control}
                       name="password"
@@ -234,7 +233,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <Button
                       type="submit"
                       className="w-full bg-primary hover:opacity-90 text-white shadow-md"
@@ -264,7 +263,7 @@ export default function AuthPage() {
                 </Form>
               </div>
             </CardContent>
-            
+
             <CardFooter className="flex justify-center border-t border-neutral-600/20 pt-4">
               <p className="text-sm text-neutral-400">
                 {activeTab === "login" ? (
@@ -295,7 +294,7 @@ export default function AuthPage() {
           </Card>
         </div>
       </div>
-      
+
       {/* Right Column - Hero */}
       <div className="hidden lg:flex flex-1 bg-white/5 border-l border-neutral-600/20">
         <div className="flex flex-col items-center justify-center p-12 text-center max-w-2xl mx-auto">
@@ -311,7 +310,7 @@ export default function AuthPage() {
               No coding required.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
@@ -324,7 +323,7 @@ export default function AuthPage() {
                 Upload PDFs, DOCXs, and TXT files to create chatbots that can answer questions based on your content.
               </p>
             </div>
-            
+
             <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -336,7 +335,7 @@ export default function AuthPage() {
                 Choose from various OpenAI models, customize behavior, and fine-tune responses for your specific needs.
               </p>
             </div>
-            
+
             <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -348,7 +347,7 @@ export default function AuthPage() {
                 Share your chatbots with a unique link or embed them directly into your website.
               </p>
             </div>
-            
+
             <div className="bg-white/5 p-6 rounded-lg border border-neutral-600/20">
               <div className="bg-primary/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
