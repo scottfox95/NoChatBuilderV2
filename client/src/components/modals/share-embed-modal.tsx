@@ -75,9 +75,9 @@ export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotS
         
         <Tabs defaultValue="link" className="w-full mt-4">
           <TabsList className="grid grid-cols-3 mb-4 bg-gray-100">
-            <TabsTrigger value="link" className="data-[state=active]:bg-white data-[state=active]:text-pink-500">Direct Link</TabsTrigger>
-            <TabsTrigger value="embed" className="data-[state=active]:bg-white data-[state=active]:text-pink-500">Embed</TabsTrigger>
-            <TabsTrigger value="widget" className="data-[state=active]:bg-white data-[state=active]:text-pink-500">Widget</TabsTrigger>
+            <TabsTrigger value="link" className="text-gray-700 data-[state=active]:bg-white data-[state=active]:text-pink-500">Direct Link</TabsTrigger>
+            <TabsTrigger value="embed" className="text-gray-700 data-[state=active]:bg-white data-[state=active]:text-pink-500">Embed</TabsTrigger>
+            <TabsTrigger value="widget" className="text-gray-700 data-[state=active]:bg-white data-[state=active]:text-pink-500">Widget</TabsTrigger>
           </TabsList>
           
           <TabsContent value="link" className="space-y-4">
