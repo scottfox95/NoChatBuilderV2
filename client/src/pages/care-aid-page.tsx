@@ -80,14 +80,14 @@ export default function CareAidPage() {
                 variant="ghost" 
                 size="icon" 
                 onClick={() => navigate("/")}
-                className="md:mr-2"
+                className="md:mr-2 text-gray-700 hover:bg-gray-100"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-xl font-bold text-white">{chatbot.name}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{chatbot.name}</h1>
             </div>
             {chatbot.description && (
-              <p className="text-sm text-neutral-400 mt-1 ml-12 md:ml-10">
+              <p className="text-sm text-gray-600 mt-1 ml-12 md:ml-10">
                 {chatbot.description}
               </p>
             )}
