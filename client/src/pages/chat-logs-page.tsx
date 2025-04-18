@@ -347,10 +347,10 @@ export default function ChatLogsPage() {
 
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   placeholder="Search messages..."
-                  className="pl-10 bg-white border-gray-300 text-gray-900"
+                  className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-600"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => {
