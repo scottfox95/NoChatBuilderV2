@@ -297,7 +297,7 @@ export default function ChatLogsPage() {
           <CardContent className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="chatbot-filter" className="mb-2 block text-sm font-medium text-black">
+                <Label htmlFor="chatbot-filter" className="mb-2 block text-sm font-medium text-gray-900">
                   Care Aid
                 </Label>
                 <Select
@@ -319,7 +319,7 @@ export default function ChatLogsPage() {
               </div>
               
               <div>
-                <Label htmlFor="date-start" className="mb-2 block text-sm font-medium text-black">
+                <Label htmlFor="date-start" className="mb-2 block text-sm font-medium text-gray-900">
                   Start Date
                 </Label>
                 <Input
@@ -332,7 +332,7 @@ export default function ChatLogsPage() {
               </div>
               
               <div>
-                <Label htmlFor="date-end" className="mb-2 block text-sm font-medium text-black">
+                <Label htmlFor="date-end" className="mb-2 block text-sm font-medium text-gray-900">
                   End Date
                 </Label>
                 <Input

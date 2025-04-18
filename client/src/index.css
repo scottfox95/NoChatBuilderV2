@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for better readability */
+input, select, textarea, .text-input {
+  @apply text-gray-900;
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+  @apply text-gray-500;
+}
+
 @layer base {
   :root {
     --primary-bg: #00001E;
