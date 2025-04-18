@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import CareAidPage from "@/pages/care-aid-page";
+import CareAidPublicPage from "@/pages/care-aid-public-page";
 import CareAidEmbedPage from "@/pages/care-aid-embed-page";
 import ChatLogsPage from "@/pages/chat-logs-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
@@ -25,7 +26,8 @@ function Router() {
       <ProtectedRoute path="/logs" component={ChatLogsPage} />
       <ProtectedRoute path="/knowledge-base" component={KnowledgeBasePage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
-      <Route path="/care-aid/:slug/:view?" component={CareAidPage} />
+      <ProtectedRoute path="/care-aid/:slug/:view?" component={CareAidPage} />
+      <Route path="/public/care-aid/:slug" component={CareAidPublicPage} />
       <Route path="/embed/:slug" component={CareAidEmbedPage} />
       <Route component={NotFound} />
     </Switch>

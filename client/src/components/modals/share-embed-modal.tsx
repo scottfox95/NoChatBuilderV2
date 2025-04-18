@@ -30,8 +30,8 @@ export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotS
       // Get the hostname from the window location
       const hostname = window.location.origin;
       
-      // Set the direct link
-      const directLink = `${hostname}/care-aid/${chatbotSlug}`;
+      // Set the direct link (using the public route that doesn't show dashboard navigation)
+      const directLink = `${hostname}/public/care-aid/${chatbotSlug}`;
       setDirectLinkValue(directLink);
       
       // Set the embed iframe code
