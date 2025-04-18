@@ -90,7 +90,7 @@ export default function AnalyticsPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
             <Select value={timeframe} onValueChange={setTimeframe}>
-              <SelectTrigger className="w-[180px] text-gray-900">
+              <SelectTrigger className="w-[180px] text-white">
                 <SelectValue placeholder="Select timeframe" />
               </SelectTrigger>
               <SelectContent>
@@ -181,7 +181,7 @@ export default function AnalyticsPage() {
                       </ResponsiveContainer>
                     ) : (
                       <div className="flex items-center justify-center h-full">
-                        <p className="text-neutral-500">No data available</p>
+                        <p className="text-lg font-medium">No data available</p>
                       </div>
                     )}
                   </div>
@@ -210,7 +210,7 @@ export default function AnalyticsPage() {
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <p className="text-neutral-500">No session data available</p>
+                      <p className="text-lg font-medium">No session data available</p>
                     </div>
                   )}
                 </div>
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <p className="text-neutral-500">No query data available</p>
+                      <p className="text-lg font-medium">No query data available</p>
                     </div>
                   )}
                 </div>
@@ -256,7 +256,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="mt-4 sm:mt-0">
               <Select value={selectedChatbotId} onValueChange={setSelectedChatbotId}>
-                <SelectTrigger className="w-[220px] text-gray-600">
+                <SelectTrigger className="w-[220px] text-white">
                   <SelectValue placeholder="Filter by Care Aid" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
@@ -301,10 +301,10 @@ export default function AnalyticsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-neutral-300">
-                    <th className="text-left p-3 text-sm font-medium text-neutral-500">Care Aid</th>
-                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Sessions</th>
-                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Queries</th>
-                    <th className="text-right p-3 text-sm font-medium text-neutral-500">Avg. Queries/Session</th>
+                    <th className="text-left p-3 text-sm font-medium">Care Aid</th>
+                    <th className="text-right p-3 text-sm font-medium">Sessions</th>
+                    <th className="text-right p-3 text-sm font-medium">Queries</th>
+                    <th className="text-right p-3 text-sm font-medium">Avg. Queries/Session</th>
                   </tr>
                 </thead>
                 <tbody>
