@@ -111,6 +111,8 @@ export default function Knowledge() {
         return <FileText className="text-primary-light" />;
       case "docx":
         return <FileArchive className="text-primary-light" />;
+      case "rtf":
+        return <FileText className="text-primary-light" />;
       default:
         return <File className="text-primary-light" />;
     }
@@ -176,13 +178,13 @@ export default function Knowledge() {
           )}>
             {isDragging ? "Drop your file here" : "Drag files here or click to upload"}
           </h3>
-          <p className="text-neutral-400 text-sm">Supports PDF, DOCX, and TXT files (max 10MB per file)</p>
+          <p className="text-neutral-400 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file)</p>
           <div className="flex justify-center space-x-4">
             <input
               id="file-upload"
               type="file"
               className="hidden"
-              accept=".pdf,.docx,.txt"
+              accept=".pdf,.docx,.txt,.rtf,application/rtf,text/rtf"
               onChange={handleFileChange}
               disabled={uploading}
             />

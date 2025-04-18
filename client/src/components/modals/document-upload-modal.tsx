@@ -118,6 +118,8 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
         return <FileText className="text-primary-light" />;
       case "docx":
         return <FileArchive className="text-primary-light" />;
+      case "rtf":
+        return <FileText className="text-primary-light" />;
       default:
         return <File className="text-primary-light" />;
     }
@@ -172,7 +174,7 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
                     ref={fileInputRef}
                     type="file"
                     className="hidden"
-                    accept=".pdf,.docx,.txt,.rtf"
+                    accept=".pdf,.docx,.txt,.rtf,application/rtf,text/rtf"
                     onChange={handleFileChange}
                     disabled={uploading}
                   />
