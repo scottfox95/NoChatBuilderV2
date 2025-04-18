@@ -155,7 +155,7 @@ export default function KnowledgeBasePage() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
-                  <div className="text-sm text-neutral-400 mb-2">
+                  <div className="text-sm text-neutral-300 mb-2">
                     Added on {formatDate(document.createdAt)}
                   </div>
                   <div className="flex items-center mt-3">
@@ -198,7 +198,7 @@ export default function KnowledgeBasePage() {
           <div className="bg-background-light border border-neutral-800 rounded-lg p-8 text-center">
             <FileText className="h-12 w-12 text-neutral-500 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">No documents found</h3>
-            <p className="text-neutral-400 mb-4">
+            <p className="text-neutral-300 mb-4">
               {searchQuery || selectedCareAid !== "all"
                 ? "No documents match your current filters. Try adjusting your search criteria."
                 : "Upload documents to your Care Aids to enhance their knowledge base."}

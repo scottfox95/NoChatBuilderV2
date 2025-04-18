@@ -127,7 +127,7 @@ export default function Knowledge() {
   if (!chatbotId) {
     return (
       <div className="bg-neutral-800 rounded-lg p-6 text-center">
-        <p className="text-neutral-400">
+        <p className="text-neutral-300">
           Save the basic chatbot information first to enable document uploads.
         </p>
       </div>
@@ -178,7 +178,7 @@ export default function Knowledge() {
           )}>
             {isDragging ? "Drop your file here" : "Drag files here or click to upload"}
           </h3>
-          <p className="text-neutral-400 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file)</p>
+          <p className="text-neutral-300 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file)</p>
           <div className="flex justify-center space-x-4">
             <input
               id="file-upload"
@@ -231,7 +231,7 @@ export default function Knowledge() {
           </div>
         ) : !documents || documents.length === 0 ? (
           <div className="bg-neutral-800 rounded-lg p-4 text-center">
-            <p className="text-neutral-400 text-sm">No documents uploaded yet.</p>
+            <p className="text-neutral-300 text-sm">No documents uploaded yet.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -243,7 +243,7 @@ export default function Knowledge() {
                   </div>
                   <div className="ml-3">
                     <p className="text-white text-sm font-medium">{doc.name}</p>
-                    <p className="text-neutral-500 text-xs">{formatFileSize(doc.size)}</p>
+                    <p className="text-neutral-300 text-xs">{formatFileSize(doc.size)}</p>
                   </div>
                 </div>
                 <Button 
