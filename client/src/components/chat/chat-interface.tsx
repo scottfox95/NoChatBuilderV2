@@ -7,7 +7,7 @@ import ChatMessage from "./chat-message";
 import ChatInput from "./chat-input";
 import { Loader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
-import aidifyIcon from "../../assets/aidify-chat-icon.svg";
+import aidifyIcon from "../../assets/aidify-logo.png";
 
 interface ChatInterfaceProps {
   chatbotSlug: string;

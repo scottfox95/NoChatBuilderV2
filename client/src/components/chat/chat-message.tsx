@@ -1,6 +1,6 @@
 import { Message } from "@shared/schema";
 import React from "react";
-import aidifyIcon from "../../assets/aidify-chat-icon.svg";
+import aidifyIcon from "../../assets/aidify-logo.png";
 
 interface ChatMessageProps {
   message: Message;

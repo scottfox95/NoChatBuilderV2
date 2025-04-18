@@ -1,9 +1,9 @@
 <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Dark blue/purple circle background -->
-  <circle cx="50" cy="50" r="50" fill="#14103B"/>
-
+  <!-- Dark navy background -->
+  <rect width="100" height="100" fill="#09071E"/>
+  
   <!-- White chat bubble outline -->
-  <path d="M65 30H35C30 30 25 35 25 40V55C25 60 30 65 35 65H40V75L50 65H65C70 65 75 60 75 55V40C75 35 70 30 65 30Z" 
+  <path d="M25 33C25 33 30 28 35 28H80C85 28 90 33 90 38V58C90 63 85 68 80 68H50L30 78V68H25C20 68 15 63 15 58V38C15 33 20 28 25 28" 
         stroke="white" 
         stroke-width="3" 
         stroke-linecap="round" 
@@ -11,7 +11,7 @@
         fill="none"/>
   
   <!-- Colored dots -->
-  <circle cx="40" cy="50" r="5" fill="#FF33FF" />
-  <circle cx="50" cy="50" r="5" fill="#7676FF" />
-  <circle cx="60" cy="50" r="5" fill="#a3c4e1" />
+  <circle cx="40" cy="48" r="7" fill="#FF33FF" />
+  <circle cx="60" cy="48" r="7" fill="#7676FF" />
+  <circle cx="80" cy="48" r="7" fill="#A3C4E1" />
 </svg>
