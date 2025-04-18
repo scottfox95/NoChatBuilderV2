@@ -272,7 +272,7 @@ export default function ChatLogsPage() {
     <DashboardLayout>
       <div className="container mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <h1 className="text-2xl font-bold text-white mb-4 md:mb-0">Chat Logs</h1>
+          <h1 className="text-2xl font-bold text-black mb-4 md:mb-0">Chat Logs</h1>
           <div className="flex gap-2">
             <Button 
               variant="outline" 
@@ -293,11 +293,11 @@ export default function ChatLogsPage() {
         </div>
         
         {/* Filters */}
-        <Card className="mb-6 bg-background-light border-neutral-800">
+        <Card className="mb-6 bg-white border border-gray-200 shadow-sm">
           <CardContent className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="chatbot-filter" className="mb-2 block text-sm font-medium text-neutral-300">
+                <Label htmlFor="chatbot-filter" className="mb-2 block text-sm font-medium text-black">
                   Care Aid
                 </Label>
                 <Select
@@ -319,7 +319,7 @@ export default function ChatLogsPage() {
               </div>
               
               <div>
-                <Label htmlFor="date-start" className="mb-2 block text-sm font-medium text-neutral-300">
+                <Label htmlFor="date-start" className="mb-2 block text-sm font-medium text-black">
                   Start Date
                 </Label>
                 <Input
@@ -332,7 +332,7 @@ export default function ChatLogsPage() {
               </div>
               
               <div>
-                <Label htmlFor="date-end" className="mb-2 block text-sm font-medium text-neutral-300">
+                <Label htmlFor="date-end" className="mb-2 block text-sm font-medium text-black">
                   End Date
                 </Label>
                 <Input
@@ -383,12 +383,12 @@ export default function ChatLogsPage() {
               const latestMessage = sessionMap[sessionId][sessionMap[sessionId].length - 1];
               
               return (
-                <Card key={sessionId} className="bg-background-light border-neutral-800 overflow-hidden">
+                <Card key={sessionId} className="bg-white border border-gray-200 shadow-sm overflow-hidden">
                   <CardContent className="p-0">
                     {/* Session Header */}
-                    <div className="border-b border-neutral-800 bg-background-darker px-4 py-3 flex justify-between items-center flex-wrap gap-2">
+                    <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex justify-between items-center flex-wrap gap-2">
                       <div className="flex items-center">
-                        <span className="bg-neutral-800 text-xs text-neutral-400 px-2 py-1 rounded mr-3">
+                        <span className="bg-gray-200 text-xs text-gray-800 px-2 py-1 rounded mr-3">
                           {formatDate(latestMessage.timestamp)}
                         </span>
                         <span className="text-primary text-sm font-medium">
@@ -396,7 +396,7 @@ export default function ChatLogsPage() {
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-xs text-neutral-500">
+                        <span className="text-xs text-gray-600">
                           Session: {sessionId.substring(0, 8)}...
                         </span>
                       </div>
