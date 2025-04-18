@@ -302,9 +302,6 @@ export default function AuthPage() {
             <div className="inline-block p-4 bg-primary/10 rounded-full mb-6">
               <Brain className="h-16 w-16 text-primary" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Create AI Chatbots with Your Documents
-            </h2>
             <p className="text-neutral-300 text-lg leading-relaxed">
               Build powerful conversational AI assistants powered by OpenAI's models and your own content.
               No coding required.
