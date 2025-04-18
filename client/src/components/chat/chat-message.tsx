@@ -2,9 +2,10 @@ import { Message } from "@shared/schema";
 
 interface ChatMessageProps {
   message: Message;
+  chatbotName?: string;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({ message, chatbotName }: ChatMessageProps) {
   // User message
   if (message.isUser) {
     return (
@@ -31,9 +32,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       </div>
       <div className="ml-3 bg-pink-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
         <p className="text-gray-800 whitespace-pre-wrap">{message.content}</p>
-        {!message.isUser && (
+        {!message.isUser && chatbotName && (
           <p className="text-xs text-pink-500 mt-1 text-right font-medium">
-            {message.content.includes("Dr.") ? "Dr. Macaulay's Hip Care Aid" : ""}
+            {chatbotName}
           </p>
         )}
       </div>

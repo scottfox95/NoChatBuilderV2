@@ -260,10 +260,37 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200">
+      {/* Chat Header */}
+      <div className="bg-gradient-to-r from-pink-100 to-blue-100 p-3 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="bg-pink-200 p-2 rounded-full mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 className="font-semibold text-gray-800 text-lg">
+              {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
+            </h2>
+            {!isPreview && chatbotInfo?.description && (
+              <p className="text-sm text-gray-600">{chatbotInfo.description}</p>
+            )}
+          </div>
+        </div>
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+          <span className="w-2 h-2 bg-cyan-400 rounded-full mr-1.5"></span>
+          Online
+        </span>
+      </div>
+
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
+          <ChatMessage 
+            key={message.id} 
+            message={message} 
+            chatbotName={chatbotInfo?.name}
+          />
         ))}
         <div ref={messagesEndRef} />
         
@@ -286,57 +313,57 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         )}
       </div>
       
-      {/* Chat Input */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        {/* Suggested Questions */}
-        {showSuggestions && 
-          (!isPreview ? 
-            (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
-            isPreview) && (
-          <div className="mb-4">
-            <p className="text-sm font-medium text-pink-500 mb-2 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-              Suggested questions:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {isPreview ? (
-                // Show sample suggested questions in preview mode
-                <>
-                  <button 
-                    onClick={() => handleSuggestedQuestionClick("What services do you offer?")}
-                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
-                  >
-                    What services do you offer?
-                  </button>
-                  <button 
-                    onClick={() => handleSuggestedQuestionClick("How do I get started?")}
-                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
-                  >
-                    How do I get started?
-                  </button>
-                  <button 
-                    onClick={() => handleSuggestedQuestionClick("Can you help me with my account?")}
-                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
-                  >
-                    Can you help me with my account?
-                  </button>
-                </>
-              ) : (
-                // Show actual suggested questions from the chatbot
-                chatbotInfo?.suggestedQuestions?.map((question, index) => (
-                  <button 
-                    key={index}
-                    onClick={() => handleSuggestedQuestionClick(question)}
-                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
-                  >
-                    {question}
-                  </button>
-                ))
-              )}
-            </div>
+      {/* Suggested Questions Section */}
+      {showSuggestions && 
+        (!isPreview ? 
+          (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
+          isPreview) && (
+        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <p className="text-sm font-medium text-pink-500 mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            Suggested questions:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {isPreview ? (
+              // Show sample suggested questions in preview mode
+              <>
+                <button 
+                  onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
+                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                >
+                  How long is my surgery going to take?
+                </button>
+                <button 
+                  onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
+                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                >
+                  Tell me about the MAKO Robotic Technique
+                </button>
+                <button 
+                  onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
+                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                >
+                  Why do I need dental clearance?
+                </button>
+              </>
+            ) : (
+              // Show actual suggested questions from the chatbot
+              chatbotInfo?.suggestedQuestions?.map((question, index) => (
+                <button 
+                  key={index}
+                  onClick={() => handleSuggestedQuestionClick(question)}
+                  className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                >
+                  {question}
+                </button>
+              ))
+            )}
           </div>
-        )}
-        
+        </div>
+      )}
+      
+      {/* Chat Input */}
+      <div className="p-4 border-t border-gray-200 bg-white">
         <ChatInput 
           onSendMessage={handleSendMessage} 
           disabled={inputDisabled} 
