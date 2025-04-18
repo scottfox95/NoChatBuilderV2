@@ -15,10 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 interface ShareEmbedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  careAidSlug: string;
+  careAidSlug?: string;
+  chatbotSlug?: string;
 }
 
-export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotSlug }: ShareEmbedModalProps) {
+export default function ShareEmbedModal({ isOpen, onClose, careAidSlug, chatbotSlug }: ShareEmbedModalProps) {
+  // Use whichever slug is provided
+  const slug = chatbotSlug || careAidSlug || "";
   const { toast } = useToast();
   const [copied, setCopied] = useState<string | null>(null);
   const [directLinkValue, setDirectLinkValue] = useState("");
@@ -31,20 +34,20 @@ export default function ShareEmbedModal({ isOpen, onClose, careAidSlug: chatbotS
       const hostname = window.location.origin;
       
       // Set the direct link (using the public route that doesn't show dashboard navigation)
-      const directLink = `${hostname}/public/care-aid/${chatbotSlug}`;
+      const directLink = `${hostname}/public/care-aid/${slug}`;
       setDirectLinkValue(directLink);
       
       // Set the embed iframe code (using public routes)
-      const embedLink = `<iframe src="${hostname}/public/care-aid/${chatbotSlug}" width="100%" height="600px" style="border:none;border-radius:8px;" allow="microphone"></iframe>`;
+      const embedLink = `<iframe src="${hostname}/public/care-aid/${slug}" width="100%" height="600px" style="border:none;border-radius:8px;" allow="microphone"></iframe>`;
       setEmbedLinkValue(embedLink);
       
       // Set the widget script code
-      const widgetScript = `<script src="${hostname}/widget.js" data-care-aid-id="${chatbotSlug}"></script>`;
+      const widgetScript = `<script src="${hostname}/widget.js" data-care-aid-id="${slug}"></script>`;
       setWidgetScriptValue(widgetScript);
     } else {
       setCopied(null);
     }
-  }, [isOpen, chatbotSlug]);
+  }, [isOpen, slug]);
   
   const handleCopyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text)
