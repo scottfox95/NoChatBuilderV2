@@ -13,6 +13,11 @@ import CareAidEmbedPage from "@/pages/care-aid-embed-page";
 import ChatLogsPage from "@/pages/chat-logs-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
 import SettingsPage from "@/pages/settings-page";
+import { Suspense, lazy } from "react";
+import { Loader } from "@/components/ui/loader";
+
+// Lazy-load the Analytics page
+const AnalyticsPage = lazy(() => import("@/pages/analytics-page"));
 
 function Router() {
   return (
@@ -25,7 +30,11 @@ function Router() {
       <ProtectedRoute path="/care-aids" component={DashboardPage} />
       <ProtectedRoute path="/logs" component={ChatLogsPage} />
       <ProtectedRoute path="/knowledge-base" component={KnowledgeBasePage} />
-      <ProtectedRoute path="/analytics" component={() => import('./pages/analytics-page').then(module => <module.default />)} />
+      <ProtectedRoute path="/analytics" component={() => (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader size="lg" variant="primary" /></div>}>
+          <AnalyticsPage />
+        </Suspense>
+      )} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/care-aid/:slug/:view?" component={CareAidPage} />
       <Route path="/public/care-aid/:slug" component={CareAidPublicPage} />
