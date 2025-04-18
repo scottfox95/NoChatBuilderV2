@@ -259,17 +259,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background-light rounded-lg">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-neutral-800">
-        <h3 className="font-medium text-white">
-          {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
-        </h3>
-        {!isPreview && chatbotInfo?.description && (
-          <p className="text-sm text-neutral-400 mt-1">{chatbotInfo.description}</p>
-        )}
-      </div>
-      
+    <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200">
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {messages.map((message) => (
@@ -280,16 +270,16 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response */}
         {inputDisabled && messageMutation.isPending && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-primary/20 w-8 h-8 rounded-full flex items-center justify-center">
-              <svg className="animate-pulse w-5 h-5 text-primary-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex-shrink-0 bg-pink-100 w-8 h-8 rounded-full flex items-center justify-center">
+              <svg className="animate-pulse w-5 h-5 text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <div className="ml-3 bg-neutral-800 rounded-lg py-2 px-4">
+            <div className="ml-3 bg-gray-100 rounded-lg py-2 px-4">
               <div className="flex space-x-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -297,14 +287,15 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       </div>
       
       {/* Chat Input */}
-      <div className="p-4 border-t border-neutral-800">
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
         {/* Suggested Questions */}
         {showSuggestions && 
           (!isPreview ? 
             (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
             isPreview) && (
           <div className="mb-4">
-            <p className="text-sm font-medium text-neutral-400 mb-2">
+            <p className="text-sm font-medium text-pink-500 mb-2 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
               Suggested questions:
             </p>
             <div className="flex flex-wrap gap-2">
@@ -313,19 +304,19 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <>
                   <button 
                     onClick={() => handleSuggestedQuestionClick("What services do you offer?")}
-                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                   >
                     What services do you offer?
                   </button>
                   <button 
                     onClick={() => handleSuggestedQuestionClick("How do I get started?")}
-                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                   >
                     How do I get started?
                   </button>
                   <button 
                     onClick={() => handleSuggestedQuestionClick("Can you help me with my account?")}
-                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                   >
                     Can you help me with my account?
                   </button>
@@ -336,7 +327,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                   <button 
                     key={index}
                     onClick={() => handleSuggestedQuestionClick(question)}
-                    className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-white rounded-full border border-neutral-700 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
                   >
                     {question}
                   </button>
@@ -352,7 +343,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         />
         
         <div className="mt-3 text-center">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-gray-500">
             Powered by Aidify | AI-powered assistance
           </p>
         </div>
