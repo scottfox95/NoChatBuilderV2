@@ -90,7 +90,7 @@ export default function AnalyticsPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
             <Select value={timeframe} onValueChange={setTimeframe}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] text-gray-900">
                 <SelectValue placeholder="Select timeframe" />
               </SelectTrigger>
               <SelectContent>
