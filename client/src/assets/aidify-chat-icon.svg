@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- White outline of chat bubble -->
+  <path d="M256 64C150 64 64 150 64 256c0 35.3 9.3 68.3 25.6 96.7L64 480l127.3-25.5c20.5 6.8 42.5 10.5 64.7 10.5 106 0 192-86 192-192S362 64 256 64z" 
+        stroke="white" 
+        stroke-width="32" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+  
+  <!-- Colored dots -->
+  <circle cx="176" cy="256" r="24" fill="#ff33ff" />
+  <circle cx="256" cy="256" r="24" fill="#7676ff" />
+  <circle cx="336" cy="256" r="24" fill="#a3c4e1" />
+</svg>

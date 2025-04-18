@@ -1,5 +1,6 @@
 import { Message } from "@shared/schema";
 import React from "react";
+import aidifyIcon from "../../assets/aidify-chat-icon.svg";
 
 interface ChatMessageProps {
   message: Message;
@@ -49,35 +50,31 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
   // Bot message
   return (
     <div className="flex items-start">
-      <div className={`flex-shrink-0 ${isStreaming ? 'bg-pink-100' : 'bg-pink-200'} w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300`}>
-        <svg 
-          className={`w-4 h-4 text-pink-500 ${isStreaming ? 'animate-pulse' : ''}`} 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+      <div className={`flex-shrink-0 ${isStreaming ? 'bg-gray-900' : 'bg-gray-950'} w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors duration-300`}>
+        <img 
+          src={aidifyIcon} 
+          className={`w-6 h-6 ${isStreaming ? 'animate-pulse' : ''}`} 
+          alt="Aidify Bot"
+        />
       </div>
-      <div className="ml-3 bg-pink-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
+      <div className="ml-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
         <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
           <p className="text-gray-800 whitespace-pre-wrap">
             {formatMessageContent(message.content)}
             {isStreaming && (
-              <span className="inline-block w-1.5 h-4 bg-pink-500 ml-0.5 animate-blink"></span>
+              <span className="inline-block w-1.5 h-4 bg-indigo-500 ml-0.5 animate-blink"></span>
             )}
           </p>
         </div>
         {!message.isUser && chatbotName && (
-          <p className="text-xs text-pink-500 mt-1 text-right font-medium">
+          <p className="text-xs text-indigo-600 mt-1 text-right font-medium">
             {chatbotName} {isStreaming && (
               <span className="inline-flex items-center ml-1">
                 <span className="text-xs mr-1">typing</span>
                 <span className="flex space-x-1">
-                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                  <span className="inline-block w-1 h-1 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                  <span className="inline-block w-1 h-1 bg-fuchsia-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="inline-block w-1 h-1 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="inline-block w-1 h-1 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                 </span>
               </span>
             )}
