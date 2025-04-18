@@ -434,12 +434,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.params.sessionId
     );
     
-    // Apply redaction if requested
+    // Apply redaction only to user messages if requested
     if (redact) {
-      messages = messages.map(message => ({
-        ...message,
-        content: redactPII(message.content)
-      }));
+      messages = messages.map(message => {
+        // Only redact user messages, not bot responses
+        if (message.isUser) {
+          return {
+            ...message,
+            content: redactPII(message.content)
+          };
+        }
+        return message;
+      });
     }
     
     res.json(messages);
@@ -504,12 +510,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }));
       
-      // Apply redaction if enabled
+      // Apply redaction if enabled (only to user messages)
       if (redact) {
-        processedLogs = processedLogs.map(log => ({
-          ...log,
-          content: redactPII(log.content)
-        }));
+        processedLogs = processedLogs.map(log => {
+          // Only redact user messages, not bot responses
+          if (log.isUser) {
+            return {
+              ...log,
+              content: redactPII(log.content)
+            };
+          }
+          return log;
+        });
       }
       
       res.json({ 

@@ -91,16 +91,21 @@ export function redactPII(text: string): string {
  * @returns New message object with redacted content
  */
 export function redactMessagePII(message: Message): Message {
-  return {
-    ...message,
-    content: redactPII(message.content)
-  };
+  // Only redact content of user messages, not bot responses
+  if (message.isUser) {
+    return {
+      ...message,
+      content: redactPII(message.content)
+    };
+  }
+  return message;
 }
 
 /**
  * Redacts PII from an array of message objects
  * @param messages Array of message objects to redact
  * @returns New array with redacted message contents
+ * @note Only user messages are redacted, not bot responses
  */
 export function redactMessagesPII(messages: Message[]): Message[] {
   return messages.map(message => redactMessagePII(message));
