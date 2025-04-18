@@ -1,9 +1,31 @@
 import { Message } from "@shared/schema";
+import React from "react";
 
 interface ChatMessageProps {
   message: Message;
   chatbotName?: string;
   isStreaming?: boolean;
+}
+
+// Function to format message content with bold text
+function formatMessageContent(content: string): React.ReactNode {
+  if (!content) return null;
+  
+  // Split content by **text** pattern
+  const parts = content.split(/(\*\*.*?\*\*)/g);
+  
+  // Map parts to React nodes with appropriate styling
+  return parts.map((part, index) => {
+    // Check if this part is enclosed in ** **
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Remove the ** from the beginning and end
+      const text = part.slice(2, -2);
+      return <strong key={index} className="font-bold">{text}</strong>;
+    }
+    
+    // Return regular text
+    return part;
+  });
 }
 
 export default function ChatMessage({ message, chatbotName, isStreaming = false }: ChatMessageProps) {
@@ -13,7 +35,7 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
     return (
       <div className="flex items-start justify-end">
         <div className="mr-3 bg-blue-100 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
-          <p className="text-gray-800 whitespace-pre-wrap">{message.content}</p>
+          <p className="text-gray-800 whitespace-pre-wrap">{formatMessageContent(message.content)}</p>
         </div>
         <div className="flex-shrink-0 bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
           <svg className="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,7 +63,7 @@ export default function ChatMessage({ message, chatbotName, isStreaming = false 
       <div className="ml-3 bg-pink-50 rounded-lg py-2 px-4 max-w-[80%] shadow-sm">
         <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
           <p className="text-gray-800 whitespace-pre-wrap">
-            {message.content}
+            {formatMessageContent(message.content)}
             {isStreaming && (
               <span className="inline-block w-1.5 h-4 bg-pink-500 ml-0.5 animate-blink"></span>
             )}
