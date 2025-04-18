@@ -48,6 +48,18 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     enabled: !isPreview && !!sessionId && !!chatbotSlug,
   });
 
+  // State to hold the current streaming message
+  const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
+  const [eventSource, setEventSource] = useState<EventSource | null>(null);
+
+  // Function to close event source
+  const closeEventSource = () => {
+    if (eventSource) {
+      eventSource.close();
+      setEventSource(null);
+    }
+  };
+
   // Message sending mutation
   const messageMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -90,23 +102,129 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           } as ChatResponse;
         }
       } else {
-        const response = await apiRequest(
-          "POST", 
-          `/api/public/chatbot/${chatbotSlug}/messages`, 
-          { message, sessionId }
-        );
-        return await response.json();
+        // Use SSE for streaming responses in real mode
+        return new Promise<ChatResponse>((resolve, reject) => {
+          // Close any existing event source
+          closeEventSource();
+          
+          // Prepare the initial message placeholder for streaming
+          const placeholderMsg: Message = {
+            id: Date.now(),
+            chatbotId: chatbotInfo?.id || 0,
+            sessionId: sessionId || "",
+            isUser: false,
+            content: "",
+            timestamp: new Date(),
+          };
+          
+          // Set the streaming message
+          setStreamingMessage(placeholderMsg);
+          
+          // Make the API request
+          const encodedSlug = encodeURIComponent(chatbotSlug);
+          const url = `/api/public/chatbot/${encodedSlug}/messages`;
+          
+          // For streaming, we use fetch directly to set up the EventSource
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              message, 
+              sessionId,
+              stream: true  // Enable streaming mode
+            }),
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            // Set up EventSource for server-sent events
+            const es = new EventSource(url);
+            setEventSource(es);
+            
+            // Handle session event
+            es.addEventListener('session', (event) => {
+              const data = JSON.parse(event.data);
+              if (!sessionId) {
+                setSessionId(data.sessionId);
+              }
+            });
+            
+            // Handle content chunks
+            es.addEventListener('chunk', (event) => {
+              const data = JSON.parse(event.data);
+              setStreamingMessage(prev => {
+                if (!prev) return null;
+                return {
+                  ...prev,
+                  content: prev.content + data.content
+                };
+              });
+            });
+            
+            // Handle completion
+            es.addEventListener('complete', (event) => {
+              const data = JSON.parse(event.data);
+              // Replace streaming message with the final message
+              setStreamingMessage(null);
+              resolve({
+                message: data.message,
+                sessionId: data.message.sessionId
+              });
+              // Close the connection
+              es.close();
+              setEventSource(null);
+            });
+            
+            // Handle errors
+            es.addEventListener('error', (event) => {
+              console.error('SSE Error:', event);
+              es.close();
+              setEventSource(null);
+              setStreamingMessage(null);
+              reject(new Error('Error during streaming response'));
+            });
+            
+          }).catch(error => {
+            console.error('Fetch error:', error);
+            setStreamingMessage(null);
+            reject(error);
+            
+            // Fallback to non-streaming mode if SSE fails
+            apiRequest(
+              "POST", 
+              `/api/public/chatbot/${chatbotSlug}/messages`, 
+              { message, sessionId }
+            ).then(response => {
+              return response.json();
+            }).then(data => {
+              resolve(data);
+            }).catch(err => {
+              reject(err);
+            });
+          });
+        });
       }
     },
     onSuccess: (data: ChatResponse) => {
       if (!sessionId) {
         setSessionId(data.sessionId);
       }
+      
+      // Add the final message to the chat
+      setMessages(prev => {
+        // Remove any streaming placeholder message
+        const filteredMessages = prev.filter(m => m.id !== streamingMessage?.id);
+        // Add the completed message
+        return [...filteredMessages, data.message];
+      });
     },
     onError: (error) => {
       // Add error message to chat
       setMessages(prev => [
-        ...prev,
+        ...prev.filter(m => m.id !== streamingMessage?.id), // Remove streaming placeholder
         {
           id: Date.now(),
           chatbotId: 0,
@@ -119,6 +237,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     },
     onSettled: () => {
       setInputDisabled(false);
+      setStreamingMessage(null); // Clear streaming message state
     }
   });
 
@@ -292,10 +411,21 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
             chatbotName={chatbotInfo?.name}
           />
         ))}
+        
+        {/* Streaming Message (if any) */}
+        {streamingMessage && (
+          <ChatMessage 
+            key="streaming" 
+            message={streamingMessage} 
+            chatbotName={chatbotInfo?.name}
+            isStreaming={true}
+          />
+        )}
+        
         <div ref={messagesEndRef} />
         
-        {/* Loading indicator for response */}
-        {inputDisabled && messageMutation.isPending && (
+        {/* Loading indicator for response (shows only when not streaming) */}
+        {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
             <div className="flex-shrink-0 bg-pink-100 w-8 h-8 rounded-full flex items-center justify-center">
               <svg className="animate-pulse w-5 h-5 text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

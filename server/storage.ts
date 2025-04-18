@@ -46,6 +46,7 @@ export interface IStorage {
   // Message operations
   getMessagesBySession(chatbotId: number, sessionId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+  updateMessage(id: number, updates: { content: string }): Promise<Message | undefined>;
   getChatLogs(filter: any, page: number, pageSize: number): Promise<{logs: Message[], totalCount: number}>;
   
   // Analytics operations
@@ -251,6 +252,14 @@ export class DatabaseStorage implements IStorage {
       ...insertMessage,
       timestamp: new Date()
     }).returning();
+    return message;
+  }
+
+  async updateMessage(id: number, updates: { content: string }): Promise<Message | undefined> {
+    const [message] = await db.update(messages)
+      .set(updates)
+      .where(eq(messages.id, id))
+      .returning();
     return message;
   }
   

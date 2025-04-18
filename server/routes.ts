@@ -343,6 +343,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create or use existing session ID
       const sessionId = req.body.sessionId || nanoid();
       
+      // Check if streaming mode is requested
+      const streamMode = req.body.stream === true;
+      
       // Validate user message
       const userMessage = req.body.message;
       if (!userMessage || typeof userMessage !== "string") {
@@ -372,6 +375,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // If streaming mode is enabled and no behavior rule matched, handle streaming response
+      if (streamMode && !responseContent) {
+        // Set up streaming response
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        
+        // Helper function to send SSE events
+        const sendEvent = (eventType: string, data: any) => {
+          res.write(`event: ${eventType}\n`);
+          res.write(`data: ${JSON.stringify(data)}\n\n`);
+        };
+
+        // Prepare for streaming
+        let documents: string[] = [];
+        if (chatbot.ragEnabled) {
+          const docs = await storage.getDocumentsByChatbotId(chatbot.id);
+          documents = docs.map(doc => doc.content);
+        }
+
+        // Send initial event with session info
+        sendEvent('session', { sessionId });
+        
+        // Create a placeholder message in the database that will be updated with the final content
+        const initialBotMessage = await storage.createMessage({
+          chatbotId: chatbot.id,
+          sessionId,
+          isUser: false,
+          content: "",
+        });
+        
+        let fullContent = "";
+        
+        try {
+          // Stream the completion
+          await generateStreamingCompletion({
+            model: chatbot.model,
+            systemPrompt: chatbot.systemPrompt,
+            userMessage,
+            previousMessages: previousMessages.map(msg => ({
+              role: msg.isUser ? "user" : "assistant",
+              content: msg.content,
+            })),
+            temperature: chatbot.temperature / 100,
+            maxTokens: chatbot.maxTokens,
+            documents,
+            fallbackResponse: chatbot.fallbackResponse,
+            onChunk: (chunk) => {
+              // Send each chunk as it arrives
+              sendEvent('chunk', { content: chunk });
+            },
+            onComplete: async (completedContent) => {
+              fullContent = completedContent;
+              
+              // Update the message in the database with the final content
+              const updatedMessage = await storage.updateMessage(initialBotMessage.id, {
+                content: fullContent
+              });
+              
+              // Send the complete event with the final message
+              sendEvent('complete', { 
+                message: {
+                  ...initialBotMessage,
+                  content: fullContent
+                }
+              });
+              
+              // End the response
+              res.end();
+            },
+            onError: async (error) => {
+              console.error("Streaming error:", error);
+              
+              const errorMsg = typeof error === 'string' ? error : 
+                chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+              
+              // Update the message in the database with the error message
+              await storage.updateMessage(initialBotMessage.id, {
+                content: errorMsg
+              });
+              
+              // Send error event
+              sendEvent('error', { message: errorMsg });
+              
+              // End the response
+              res.end();
+            }
+          });
+        } catch (error) {
+          console.error("OpenAI streaming error:", error);
+          const errorMsg = chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+          
+          // Update the message with the error content
+          await storage.updateMessage(initialBotMessage.id, {
+            content: errorMsg
+          });
+          
+          // Send error event
+          sendEvent('error', { message: errorMsg });
+          
+          // End the response
+          res.end();
+        }
+        
+        // Return here since the response is being handled by the streaming logic
+        return;
+      }
+
+      // For non-streaming responses or when a behavior rule matched
       // If no behavior rule matched, use OpenAI to generate a response
       if (!responseContent) {
         try {
