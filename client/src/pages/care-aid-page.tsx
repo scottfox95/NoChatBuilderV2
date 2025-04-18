@@ -70,7 +70,7 @@ export default function CareAidPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
       {/* Header */}
       <header className="border-b border-neutral-800 bg-background-light">
         <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
