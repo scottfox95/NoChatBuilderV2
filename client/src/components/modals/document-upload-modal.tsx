@@ -159,7 +159,7 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
             <div className="space-y-4">
               <Upload className="h-14 w-14 mx-auto text-neutral-500" />
               <h3 className="text-lg font-medium text-white">Drag files here or click to upload</h3>
-              <p className="text-neutral-400 text-sm">Supports PDF, DOCX, and TXT files (max 10MB per file)</p>
+              <p className="text-neutral-400 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file)</p>
               <div className="flex justify-center space-x-4">
                 <Button 
                   onClick={openFileSelector}
@@ -172,7 +172,7 @@ export default function DocumentUploadModal({ isOpen, onClose, chatbotId }: Docu
                     ref={fileInputRef}
                     type="file"
                     className="hidden"
-                    accept=".pdf,.docx,.txt"
+                    accept=".pdf,.docx,.txt,.rtf"
                     onChange={handleFileChange}
                     disabled={uploading}
                   />

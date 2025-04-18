@@ -33,15 +33,17 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
   fileFilter: (req, file, cb) => {
-    // Accept pdf, docx, and txt
+    // Accept pdf, docx, txt, and rtf
     if (
       file.mimetype === "application/pdf" ||
       file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype === "text/plain"
+      file.mimetype === "text/plain" ||
+      file.mimetype === "application/rtf" ||
+      file.mimetype === "text/rtf"
     ) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Only PDF, DOCX, and TXT are allowed."));
+      cb(new Error("Invalid file type. Only PDF, DOCX, TXT, and RTF are allowed."));
     }
   },
 });
