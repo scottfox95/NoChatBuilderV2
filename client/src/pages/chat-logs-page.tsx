@@ -186,6 +186,11 @@ export default function ChatLogsPage() {
 
       // CSV Header
       const headers = ["Timestamp", "Chatbot", "Session ID", "User Question", "Bot Response"];
+      
+      // Add information about redaction if enabled
+      const filename = redactPII ? 
+        `chat-logs-redacted-${new Date().toISOString().split("T")[0]}.csv` : 
+        `chat-logs-${new Date().toISOString().split("T")[0]}.csv`;
 
       // Format as CSV rows
       const csvRows = [
@@ -205,6 +210,11 @@ export default function ChatLogsPage() {
         })
       ];
 
+      // If redaction is enabled, add a disclaimer to the file
+      if (redactPII) {
+        csvRows.unshift('# This CSV contains redacted personal information using NER (Named Entity Recognition)');
+      }
+
       // Join rows with newlines
       const csvContent = csvRows.join("\n");
 
@@ -214,9 +224,8 @@ export default function ChatLogsPage() {
       const link = document.createElement("a");
 
       // Set up download attributes
-      const currentDate = new Date().toISOString().split("T")[0];
       link.setAttribute("href", url);
-      link.setAttribute("download", `chat-logs-${currentDate}.csv`);
+      link.setAttribute("download", filename);
 
       // Trigger download and clean up
       document.body.appendChild(link);
@@ -225,7 +234,7 @@ export default function ChatLogsPage() {
 
       toast({
         title: "CSV Export Complete",
-        description: `${allPairs.length} conversation pairs exported successfully.`,
+        description: `${allPairs.length} conversation pairs exported successfully${redactPII ? ' with PII redaction' : ''}.`,
       });
     } catch (error) {
       console.error("Error exporting CSV:", error);
@@ -257,6 +266,7 @@ export default function ChatLogsPage() {
     setSelectedChatbotId("all");
     setSearchTerm("");
     setDateRange({});
+    setRedactPII(false);
     setPage(1);
     refetchLogs();
   };
@@ -364,6 +374,30 @@ export default function ChatLogsPage() {
               <Button onClick={handleSearch} className="bg-primary hover:bg-primary-dark">
                 <Filter className="h-4 w-4 mr-2" /> Filter
               </Button>
+            </div>
+            
+            {/* Redaction control */}
+            <div className="flex items-center space-x-2 pt-2">
+              <Switch 
+                id="redact-pii" 
+                checked={redactPII}
+                onCheckedChange={(checked) => {
+                  setRedactPII(checked);
+                  refetchLogs();
+                }}
+              />
+              <Label htmlFor="redact-pii" className="cursor-pointer flex items-center">
+                <ShieldAlert className="h-4 w-4 mr-2 text-orange-500" />
+                <span>Redact Personal Information</span>
+                <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  Using NER
+                </span>
+              </Label>
+              {logsData?.redactionEnabled && (
+                <span className="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
+                  Redaction active
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
