@@ -504,6 +504,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics endpoints
+  app.get("/api/analytics", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      // Get query parameters
+      const chatbotId = req.query.chatbotId as string;
+      const timeframe = req.query.timeframe as string || 'all';
+      
+      // Get all chatbots owned by the user
+      const userChatbots = await storage.getChatbots(req.user.id);
+      const userChatbotIds = userChatbots.map(c => c.id);
+      
+      if (userChatbotIds.length === 0) {
+        return res.json({ 
+          overallStats: {
+            totalSessions: 0,
+            totalQueries: 0,
+            averageQueriesPerSession: 0,
+            chatbotBreakdown: []
+          },
+          careAidStats: []
+        });
+      }
+      
+      // Prepare filter for time range
+      const timeFilter: any = {};
+      
+      if (timeframe !== 'all') {
+        const now = new Date();
+        let startDate = new Date();
+        
+        if (timeframe === 'today') {
+          startDate.setHours(0, 0, 0, 0);
+        } else if (timeframe === 'week') {
+          startDate.setDate(startDate.getDate() - 7);
+        } else if (timeframe === 'month') {
+          startDate.setDate(startDate.getDate() - 30);
+        }
+        
+        timeFilter.startDate = startDate;
+        timeFilter.endDate = now;
+      }
+      
+      // Get analytics for specific chatbot or all chatbots
+      if (chatbotId && chatbotId !== 'all') {
+        const chatbotIdNum = parseInt(chatbotId);
+        // Ensure the user owns this chatbot
+        if (!userChatbotIds.includes(chatbotIdNum)) {
+          return res.status(403).json({ message: "Not authorized to access this chatbot's analytics" });
+        }
+        
+        // Get sessions and queries for the specific chatbot
+        const chatbotStats = await storage.getChatbotAnalytics(chatbotIdNum, timeFilter);
+        const chatbot = userChatbots.find(c => c.id === chatbotIdNum);
+        
+        res.json({
+          overallStats: {
+            totalSessions: chatbotStats.totalSessions,
+            totalQueries: chatbotStats.totalQueries,
+            averageQueriesPerSession: chatbotStats.totalSessions > 0 
+              ? chatbotStats.totalQueries / chatbotStats.totalSessions 
+              : 0,
+            chatbotBreakdown: [{
+              chatbotId: chatbotIdNum,
+              chatbotName: chatbot?.name || "Unknown",
+              sessions: chatbotStats.totalSessions,
+              queries: chatbotStats.totalQueries
+            }]
+          },
+          careAidStats: [{
+            chatbotId: chatbotIdNum,
+            chatbotName: chatbot?.name || "Unknown",
+            totalSessions: chatbotStats.totalSessions,
+            totalQueries: chatbotStats.totalQueries,
+            averageQueriesPerSession: chatbotStats.totalSessions > 0 
+              ? chatbotStats.totalQueries / chatbotStats.totalSessions 
+              : 0
+          }]
+        });
+      } else {
+        // Get overall analytics for all user's chatbots
+        const overallStats = await storage.getOverallAnalytics(userChatbotIds, timeFilter);
+        
+        // Get individual chatbot analytics
+        const chatbotStats = await Promise.all(
+          userChatbots.map(async (chatbot) => {
+            const stats = await storage.getChatbotAnalytics(chatbot.id, timeFilter);
+            return {
+              chatbotId: chatbot.id,
+              chatbotName: chatbot.name,
+              totalSessions: stats.totalSessions,
+              totalQueries: stats.totalQueries,
+              averageQueriesPerSession: stats.totalSessions > 0 
+                ? stats.totalQueries / stats.totalSessions 
+                : 0
+            };
+          })
+        );
+        
+        // Create breakdown for pie chart
+        const chatbotBreakdown = chatbotStats.map(stat => ({
+          chatbotId: stat.chatbotId,
+          chatbotName: stat.chatbotName,
+          sessions: stat.totalSessions,
+          queries: stat.totalQueries
+        }));
+        
+        res.json({
+          overallStats: {
+            totalSessions: overallStats.totalSessions,
+            totalQueries: overallStats.totalQueries,
+            averageQueriesPerSession: overallStats.totalSessions > 0 
+              ? overallStats.totalQueries / overallStats.totalSessions 
+              : 0,
+            chatbotBreakdown
+          },
+          careAidStats: chatbotStats
+        });
+      }
+    } catch (error) {
+      console.error("Analytics error:", error);
+      res.status(500).json({ message: "Failed to fetch analytics data" });
+    }
+  });
+
   // Preview mode response generation endpoint
   app.post("/api/preview/generate-response", async (req, res) => {
     try {

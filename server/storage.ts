@@ -47,6 +47,10 @@ export interface IStorage {
   getMessagesBySession(chatbotId: number, sessionId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   getChatLogs(filter: any, page: number, pageSize: number): Promise<{logs: Message[], totalCount: number}>;
+  
+  // Analytics operations
+  getChatbotAnalytics(chatbotId: number, timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}>;
+  getOverallAnalytics(chatbotIds: number[], timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}>;
 
   // Session store
   sessionStore: any;
@@ -63,6 +67,73 @@ export class DatabaseStorage implements IStorage {
       tableName: 'sessions',
       createTableIfMissing: true
     });
+  }
+  
+  // Analytics operations
+  async getChatbotAnalytics(chatbotId: number, timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}> {
+    try {
+      // Build queries with time filters if provided
+      let queryConditions = and(eq(messages.chatbotId, chatbotId));
+      
+      if (timeFilter?.startDate) {
+        queryConditions = and(queryConditions, gte(messages.timestamp, timeFilter.startDate));
+      }
+      
+      if (timeFilter?.endDate) {
+        queryConditions = and(queryConditions, lte(messages.timestamp, timeFilter.endDate));
+      }
+      
+      // Count unique session IDs (for totalSessions)
+      const allMessages = await db.select().from(messages).where(queryConditions);
+      
+      // Count unique sessions
+      const uniqueSessions = new Set();
+      allMessages.forEach(message => uniqueSessions.add(message.sessionId));
+      
+      // Count total queries (messages where isUser is true)
+      const totalQueries = allMessages.filter(message => message.isUser).length;
+      
+      return {
+        totalSessions: uniqueSessions.size,
+        totalQueries: totalQueries
+      };
+    } catch (error) {
+      console.error('Error getting chatbot analytics:', error);
+      return { totalSessions: 0, totalQueries: 0 };
+    }
+  }
+  
+  async getOverallAnalytics(chatbotIds: number[], timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}> {
+    try {
+      // Build queries with time filters if provided
+      let queryConditions = inArray(messages.chatbotId, chatbotIds);
+      
+      if (timeFilter?.startDate) {
+        queryConditions = and(queryConditions, gte(messages.timestamp, timeFilter.startDate));
+      }
+      
+      if (timeFilter?.endDate) {
+        queryConditions = and(queryConditions, lte(messages.timestamp, timeFilter.endDate));
+      }
+      
+      // Get all messages for the chatbots
+      const allMessages = await db.select().from(messages).where(queryConditions);
+      
+      // Count unique sessions
+      const uniqueSessions = new Set();
+      allMessages.forEach(message => uniqueSessions.add(`${message.chatbotId}:${message.sessionId}`));
+      
+      // Count total queries (messages where isUser is true)
+      const totalQueries = allMessages.filter(message => message.isUser).length;
+      
+      return {
+        totalSessions: uniqueSessions.size,
+        totalQueries: totalQueries
+      };
+    } catch (error) {
+      console.error('Error getting overall analytics:', error);
+      return { totalSessions: 0, totalQueries: 0 };
+    }
   }
 
   // User operations
