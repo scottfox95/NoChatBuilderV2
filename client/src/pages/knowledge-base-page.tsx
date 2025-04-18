@@ -96,8 +96,8 @@ export default function KnowledgeBasePage() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1">Knowledge Base Documents</h1>
-            <p className="text-neutral-400">
+            <h1 className="text-2xl font-bold text-primary mb-1">Knowledge Base Documents</h1>
+            <p className="text-neutral-300">
               Browse and filter all documents used across your Care Aids
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function KnowledgeBasePage() {
         <div className="bg-background-light border border-neutral-800 rounded-lg p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-300 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search documents..."
