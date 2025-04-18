@@ -350,7 +350,7 @@ export default function ChatLogsPage() {
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search messages..."
-                  className="pl-10 bg-white border-gray-300"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => {
