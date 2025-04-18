@@ -120,12 +120,13 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           // Set the streaming message
           setStreamingMessage(placeholderMsg);
           
-          // Make the API request
+          // Make the API request with streaming enabled
           const encodedSlug = encodeURIComponent(chatbotSlug);
-          const url = `/api/public/chatbot/${encodedSlug}/messages`;
+          const baseUrl = `/api/public/chatbot/${encodedSlug}/messages`;
+          const streamUrl = `/api/public/chatbot/${encodedSlug}/stream`;
           
-          // For streaming, we use fetch directly to set up the EventSource
-          fetch(url, {
+          // First create the initial message
+          fetch(baseUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -133,15 +134,18 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
             body: JSON.stringify({ 
               message, 
               sessionId,
-              stream: true  // Enable streaming mode
+              stream: true  // Indicates this will be followed by a streaming request
             }),
           }).then(response => {
             if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            
-            // Set up EventSource for server-sent events
-            const es = new EventSource(url);
+            return response.json();
+          }).then(data => {
+            // Now that we have the message ID, set up EventSource
+            const streamingUrl = `${streamUrl}?sessionId=${sessionId}`;
+            console.log("Connecting to SSE stream at:", streamingUrl);
+            const es = new EventSource(streamingUrl);
             setEventSource(es);
             
             // Handle session event

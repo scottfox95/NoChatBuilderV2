@@ -332,7 +332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Chat messages
+  // Chat messages - regular endpoint
   app.post("/api/public/chatbot/:slug/messages", async (req, res) => {
     const chatbot = await storage.getChatbotBySlug(req.params.slug);
     if (!chatbot) {
@@ -342,9 +342,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Create or use existing session ID
       const sessionId = req.body.sessionId || nanoid();
-      
-      // Check if streaming mode is requested
-      const streamMode = req.body.stream === true;
       
       // Validate user message
       const userMessage = req.body.message;
@@ -375,30 +372,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // If streaming mode is enabled and no behavior rule matched, handle streaming response
-      if (streamMode && !responseContent) {
-        // Set up streaming response
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        
-        // Helper function to send SSE events
-        const sendEvent = (eventType: string, data: any) => {
-          res.write(`event: ${eventType}\n`);
-          res.write(`data: ${JSON.stringify(data)}\n\n`);
-        };
-
-        // Prepare for streaming
-        let documents: string[] = [];
-        if (chatbot.ragEnabled) {
-          const docs = await storage.getDocumentsByChatbotId(chatbot.id);
-          documents = docs.map(doc => doc.content);
-        }
-
-        // Send initial event with session info
-        sendEvent('session', { sessionId });
-        
-        // Create a placeholder message in the database that will be updated with the final content
+      // Check if this is preparation for streaming mode
+      const streamMode = req.body.stream === true;
+      if (streamMode) {
+        // For streaming mode, just create an empty message and return its ID
+        // The actual streaming will happen in the /stream endpoint
         const initialBotMessage = await storage.createMessage({
           chatbotId: chatbot.id,
           sessionId,
@@ -406,85 +384,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           content: "",
         });
         
-        let fullContent = "";
-        
-        try {
-          // Stream the completion
-          await generateStreamingCompletion({
-            model: chatbot.model,
-            systemPrompt: chatbot.systemPrompt,
-            userMessage,
-            previousMessages: previousMessages.map(msg => ({
-              role: msg.isUser ? "user" : "assistant",
-              content: msg.content,
-            })),
-            temperature: chatbot.temperature / 100,
-            maxTokens: chatbot.maxTokens,
-            documents,
-            fallbackResponse: chatbot.fallbackResponse,
-            onChunk: (chunk) => {
-              // Send each chunk as it arrives
-              sendEvent('chunk', { content: chunk });
-            },
-            onComplete: async (completedContent) => {
-              fullContent = completedContent;
-              
-              // Update the message in the database with the final content
-              const updatedMessage = await storage.updateMessage(initialBotMessage.id, {
-                content: fullContent
-              });
-              
-              // Send the complete event with the final message
-              sendEvent('complete', { 
-                message: {
-                  ...initialBotMessage,
-                  content: fullContent
-                }
-              });
-              
-              // End the response
-              res.end();
-            },
-            onError: async (error) => {
-              console.error("Streaming error:", error);
-              
-              const errorMsg = typeof error === 'string' ? error : 
-                chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
-              
-              // Update the message in the database with the error message
-              await storage.updateMessage(initialBotMessage.id, {
-                content: errorMsg
-              });
-              
-              // Send error event
-              sendEvent('error', { message: errorMsg });
-              
-              // End the response
-              res.end();
-            }
-          });
-        } catch (error) {
-          console.error("OpenAI streaming error:", error);
-          const errorMsg = chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
-          
-          // Update the message with the error content
-          await storage.updateMessage(initialBotMessage.id, {
-            content: errorMsg
-          });
-          
-          // Send error event
-          sendEvent('error', { message: errorMsg });
-          
-          // End the response
-          res.end();
-        }
-        
-        // Return here since the response is being handled by the streaming logic
-        return;
+        return res.json({
+          message: initialBotMessage,
+          sessionId,
+        });
       }
 
-      // For non-streaming responses or when a behavior rule matched
-      // If no behavior rule matched, use OpenAI to generate a response
+      // For non-streaming responses
       if (!responseContent) {
         try {
           // Get documents for RAG if enabled
@@ -528,6 +434,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Chat message error:", error);
+      res.status(500).json({ message: "Failed to process message" });
+    }
+  });
+  
+  // Streaming endpoint for SSE
+  app.get("/api/public/chatbot/:slug/stream", async (req, res) => {
+    try {
+      const chatbot = await storage.getChatbotBySlug(req.params.slug);
+      if (!chatbot) {
+        return res.status(404).json({ message: "Chatbot not found" });
+      }
+      
+      // Get parameters from query string
+      const sessionId = req.query.sessionId as string;
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID is required" });
+      }
+      
+      // Set up SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      
+      // Helper function to send SSE events
+      const sendEvent = (eventType: string, data: any) => {
+        res.write(`event: ${eventType}\n`);
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      };
+      
+      // Send initial event with session info
+      sendEvent('session', { sessionId });
+      
+      // Get the most recent messages from the session
+      const messages = await storage.getMessagesBySession(chatbot.id, sessionId);
+      
+      if (messages.length < 2) {
+        sendEvent('error', { message: "No conversation found" });
+        return res.end();
+      }
+      
+      // Find the latest user message and the empty bot message that will be updated
+      const userMessages = messages.filter(m => m.isUser);
+      const botMessages = messages.filter(m => !m.isUser);
+      
+      if (userMessages.length === 0 || botMessages.length === 0) {
+        sendEvent('error', { message: "Invalid conversation state" });
+        return res.end();
+      }
+      
+      const latestUserMessage = userMessages[userMessages.length - 1];
+      const latestBotMessage = botMessages[botMessages.length - 1];
+      
+      // Get only previous messages for context (excluding the latest pair)
+      const previousMessages = messages.slice(0, -2).map(msg => ({
+        role: msg.isUser ? "user" : "assistant",
+        content: msg.content,
+      }));
+      
+      // Prepare for streaming
+      let documents: string[] = [];
+      if (chatbot.ragEnabled) {
+        const docs = await storage.getDocumentsByChatbotId(chatbot.id);
+        documents = docs.map(doc => doc.content);
+      }
+      
+      let fullContent = "";
+      
+      try {
+        // Stream the completion
+        await generateStreamingCompletion({
+          model: chatbot.model,
+          systemPrompt: chatbot.systemPrompt,
+          userMessage: latestUserMessage.content,
+          previousMessages: previousMessages,
+          temperature: chatbot.temperature / 100,
+          maxTokens: chatbot.maxTokens,
+          documents,
+          fallbackResponse: chatbot.fallbackResponse,
+          onChunk: (chunk) => {
+            // Send each chunk as it arrives
+            sendEvent('chunk', { content: chunk });
+          },
+          onComplete: async (completedContent) => {
+            fullContent = completedContent;
+            
+            // Update the message in the database with the final content
+            const updatedMessage = await storage.updateMessage(latestBotMessage.id, {
+              content: fullContent
+            });
+            
+            // Send the complete event with the final message
+            sendEvent('complete', { 
+              message: {
+                ...latestBotMessage,
+                content: fullContent
+              }
+            });
+            
+            // End the response
+            res.end();
+          },
+          onError: async (error) => {
+            console.error("Streaming error:", error);
+            
+            const errorMsg = typeof error === 'string' ? error : 
+              chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+            
+            // Update the message in the database with the error message
+            await storage.updateMessage(latestBotMessage.id, {
+              content: errorMsg
+            });
+            
+            // Send error event
+            sendEvent('error', { message: errorMsg });
+            
+            // End the response
+            res.end();
+          }
+        });
+      } catch (error) {
+        console.error("OpenAI streaming error:", error);
+        const errorMsg = chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+        
+        // Update the message with the error content
+        await storage.updateMessage(latestBotMessage.id, {
+          content: errorMsg
+        });
+        
+        // Send error event
+        sendEvent('error', { message: errorMsg });
+        
+        // End the response
+        res.end();
+      }
+    } catch (error) {
+      console.error("Streaming endpoint error:", error);
       res.status(500).json({ message: "Failed to process message" });
     }
   });
