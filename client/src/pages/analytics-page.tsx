@@ -107,35 +107,35 @@ export default function AnalyticsPage() {
         <div className="grid gap-4 grid-cols-1 md:grid-cols-3 mb-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-neutral-500">Total Sessions</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{overallStats?.totalSessions || 0}</div>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs mt-1">
                 Total user conversation sessions
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-neutral-500">Total Queries</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Queries</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{overallStats?.totalQueries || 0}</div>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs mt-1">
                 Total questions asked across all Care Aids
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-neutral-500">Avg. Queries/Session</CardTitle>
+              <CardTitle className="text-sm font-medium">Avg. Queries/Session</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
                 {overallStats?.averageQueriesPerSession.toFixed(1) || "0.0"}
               </div>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs mt-1">
                 Average number of queries per session
               </p>
             </CardContent>
