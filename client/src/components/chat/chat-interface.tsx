@@ -7,6 +7,7 @@ import ChatMessage from "./chat-message";
 import ChatInput from "./chat-input";
 import { Loader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
+import aidifyIcon from "../../assets/aidify-chat-icon.svg";
 
 interface ChatInterfaceProps {
   chatbotSlug: string;
@@ -386,12 +387,10 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200">
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-pink-100 to-blue-100 p-3 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-3 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="bg-pink-200 p-2 rounded-full mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
+          <div className="bg-gray-950 p-2 rounded-full mr-3 flex items-center justify-center">
+            <img src={aidifyIcon} alt="Aidify" className="w-6 h-6" />
           </div>
           <div>
             <h2 className="font-semibold text-gray-800 text-lg">
@@ -433,16 +432,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-pink-100 w-8 h-8 rounded-full flex items-center justify-center">
-              <svg className="animate-pulse w-5 h-5 text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+            <div className="flex-shrink-0 bg-gray-900 w-8 h-8 rounded-full flex items-center justify-center">
+              <img src={aidifyIcon} className="animate-pulse w-6 h-6" alt="Aidify" />
             </div>
-            <div className="ml-3 bg-gray-100 rounded-lg py-2 px-4">
+            <div className="ml-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-2 px-4">
               <div className="flex space-x-2">
-                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -455,7 +452,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-          <p className="text-sm font-medium text-pink-500 mb-2 flex items-center">
+          <p className="text-sm font-medium text-indigo-600 mb-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             Suggested questions:
           </p>
