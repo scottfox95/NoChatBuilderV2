@@ -330,7 +330,13 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only scroll to the message container, not the entire page
+    if (messagesEndRef.current) {
+      const messageContainer = messagesEndRef.current.parentElement;
+      if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
+    }
   }, [messages]);
 
   const handleSendMessage = async (message: string) => {
