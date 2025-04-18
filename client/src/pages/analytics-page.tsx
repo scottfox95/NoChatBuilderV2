@@ -256,7 +256,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="mt-4 sm:mt-0">
               <Select value={selectedChatbotId} onValueChange={setSelectedChatbotId}>
-                <SelectTrigger className="w-[220px] text-gray-900">
+                <SelectTrigger className="w-[220px] text-gray-600">
                   <SelectValue placeholder="Filter by Care Aid" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
