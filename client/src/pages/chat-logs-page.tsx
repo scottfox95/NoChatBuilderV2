@@ -304,7 +304,7 @@ export default function ChatLogsPage() {
                   value={selectedChatbotId}
                   onValueChange={(value) => setSelectedChatbotId(value)}
                 >
-                  <SelectTrigger id="chatbot-filter" className="w-full bg-background border-neutral-700">
+                  <SelectTrigger id="chatbot-filter" className="w-full bg-white border-gray-300">
                     <SelectValue placeholder="All Care Aids" />
                   </SelectTrigger>
                   <SelectContent>
@@ -325,7 +325,7 @@ export default function ChatLogsPage() {
                 <Input
                   id="date-start"
                   type="date"
-                  className="bg-background border-neutral-700"
+                  className="bg-white border-gray-300"
                   value={dateRange.start || ""}
                   onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                 />
@@ -338,7 +338,7 @@ export default function ChatLogsPage() {
                 <Input
                   id="date-end"
                   type="date"
-                  className="bg-background border-neutral-700"
+                  className="bg-white border-gray-300"
                   value={dateRange.end || ""}
                   onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                 />
@@ -350,7 +350,7 @@ export default function ChatLogsPage() {
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search messages..."
-                  className="pl-10 bg-background border-neutral-700"
+                  className="pl-10 bg-white border-gray-300"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => {
@@ -371,8 +371,8 @@ export default function ChatLogsPage() {
             <Loader size="lg" variant="primary" />
           </div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-16 text-neutral-400">
-            <p className="text-lg">No messages found</p>
+          <div className="text-center py-16 text-gray-700">
+            <p className="text-lg font-medium">No messages found</p>
             <p className="text-sm mt-2">Try adjusting your filters or search terms</p>
           </div>
         ) : (
@@ -405,22 +405,22 @@ export default function ChatLogsPage() {
                     {/* Conversation Pairs */}
                     <div className="p-4 flex flex-col gap-4">
                       {pairs.map(pair => (
-                        <div key={pair.id} className="border border-neutral-800 rounded-lg overflow-hidden">
+                        <div key={pair.id} className="border border-gray-200 rounded-lg overflow-hidden">
                           {/* User Message */}
-                          <div className="flex items-start gap-3 p-4 border-b border-neutral-800 bg-background-darker/30">
-                            <div className="w-8 h-8 rounded-full bg-neutral-800 flex-shrink-0 flex items-center justify-center">
-                              <UserCircle className="h-5 w-5 text-neutral-400" />
+                          <div className="flex items-start gap-3 p-4 border-b border-gray-200 bg-gray-50">
+                            <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center">
+                              <UserCircle className="h-5 w-5 text-gray-600" />
                             </div>
                             <div className="flex-1">
                               <div className="flex justify-between items-center mb-1">
-                                <div className="font-medium text-white">
+                                <div className="font-medium text-gray-900">
                                   {pair.userMessage.isUser ? "User" : "Care Aid"}
                                 </div>
-                                <div className="text-xs text-neutral-500">
+                                <div className="text-xs text-gray-600">
                                   {formatDate(pair.userMessage.timestamp)}
                                 </div>
                               </div>
-                              <div className="text-neutral-300 text-sm whitespace-pre-wrap">
+                              <div className="text-gray-800 text-sm whitespace-pre-wrap">
                                 {pair.userMessage.content}
                               </div>
                             </div>
@@ -428,18 +428,18 @@ export default function ChatLogsPage() {
                           
                           {/* Bot Response (if available) */}
                           {pair.botResponse && (
-                            <div className="flex items-start gap-3 p-4 bg-background-dark/40">
+                            <div className="flex items-start gap-3 p-4 bg-white">
                               <div className="w-8 h-8 rounded-full bg-primary/20 flex-shrink-0 flex items-center justify-center">
                                 <BotIcon className="h-5 w-5 text-primary" />
                               </div>
                               <div className="flex-1">
                                 <div className="flex justify-between items-center mb-1">
-                                  <div className="font-medium text-white">Care Aid</div>
-                                  <div className="text-xs text-neutral-500">
+                                  <div className="font-medium text-gray-900">Care Aid</div>
+                                  <div className="text-xs text-gray-600">
                                     {formatDate(pair.botResponse.timestamp)}
                                   </div>
                                 </div>
-                                <div className="text-neutral-300 text-sm whitespace-pre-wrap">
+                                <div className="text-gray-800 text-sm whitespace-pre-wrap">
                                   {pair.botResponse.content}
                                 </div>
                               </div>
