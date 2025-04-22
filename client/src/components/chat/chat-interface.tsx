@@ -498,7 +498,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-gray-200">
+      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 flex items-center justify-between fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top">
         <div className="flex items-center">
           <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-7 h-7 md:w-8 md:h-8">
             <img src={aidifyIcon} alt="Aidify" className="w-7 h-7 md:w-8 md:h-8" />
@@ -518,9 +518,12 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         </span>
       </div>
 
+      {/* Spacer for fixed header */}
+      <div className="h-[54px] md:h-[64px]"></div>
+      
       {/* Chat Messages */}
       <div 
-        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white hide-scrollbar mt-0.5"
+        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white hide-scrollbar"
         onScroll={debounce(handleScroll)}
       >
         {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup, showDateSeparator, dateSeparatorText }) => (
