@@ -73,7 +73,7 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message... (Enter to send, Shift+Enter for new line)"
+          placeholder="Type a message..."
           disabled={disabled}
           rows={1}
           className="w-full resize-none bg-white border-gray-300 text-gray-800 placeholder:text-gray-500 focus:ring-blue-500 focus:border-blue-500 pr-12 rounded-2xl shadow-sm py-2.5 px-3.5 text-sm min-h-[44px]"
@@ -82,7 +82,7 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
         <Button
           type="submit"
           disabled={disabled || !message.trim()}
-          className="absolute right-1.5 bottom-1.5 bg-[#0050F5] hover:bg-blue-700 text-white h-9 w-9 p-0 rounded-full flex items-center justify-center"
+          className="absolute right-1.5 bottom-1.5 bg-[#EA19FF] hover:bg-[#C716D1] text-white h-9 w-9 p-0 rounded-full flex items-center justify-center"
           aria-label="Send message"
         >
           <Send className="h-4 w-4" />

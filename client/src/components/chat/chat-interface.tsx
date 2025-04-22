@@ -7,7 +7,7 @@ import ChatMessage from "./chat-message";
 import ChatInput from "./chat-input";
 import { Loader } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
-import aidifyIcon from "../../assets/aidify-logo.png";
+import aidifyIcon from "../../assets/Aidify_ProfileAVI.png";
 
 interface ChatInterfaceProps {
   chatbotSlug: string;
@@ -500,11 +500,11 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       {/* Chat Header */}
       <div className="bg-gray-100 py-3 px-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center">
-          <div className="bg-white p-1.5 rounded-full mr-2.5 flex items-center justify-center shadow-sm border border-gray-200">
-            <img src={aidifyIcon} alt="Aidify" className="w-5 h-5" />
+          <div className="bg-[#00001E] p-0 rounded-full mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8">
+            <img src={aidifyIcon} alt="Aidify" className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="font-semibold text-gray-800 text-base leading-tight">
+            <h2 className="font-semibold text-[#EA19FF] text-base leading-tight">
               {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
             </h2>
             {!isPreview && chatbotInfo?.description && (
@@ -563,14 +563,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-gray-200 w-9 h-9 rounded-full flex items-center justify-center">
-              <img src={aidifyIcon} className="animate-pulse w-5 h-5" alt="Aidify" />
+            <div className="flex-shrink-0 bg-[#00001E] w-9 h-9 rounded-full flex items-center justify-center overflow-hidden">
+              <img src={aidifyIcon} className="animate-pulse w-9 h-9" alt="Aidify" />
             </div>
             <div className="ml-2 bg-gray-100 rounded-[16px] py-2 px-3">
               <div className="flex space-x-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>

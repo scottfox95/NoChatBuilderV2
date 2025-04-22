@@ -1,6 +1,6 @@
 import { Message } from "@shared/schema";
 import React from "react";
-import aidifyIcon from "../../assets/aidify-logo.png";
+import aidifyIcon from "../../assets/Aidify_ProfileAVI.png";
 
 interface ChatMessageProps {
   message: Message;
@@ -75,11 +75,11 @@ export default function ChatMessage({
   return (
     <div className={`flex items-start ${isLastInGroup ? 'mb-3' : 'mb-0.5'}`}>
       {showAvatar ? (
-        <div className={`flex-shrink-0 min-w-[36px] ${isStreaming ? 'bg-[#0050F5]/90' : 'bg-[#0050F5]'} w-9 h-9 rounded-full 
-          flex items-center justify-center shadow-sm transition-colors duration-300`}>
+        <div className={`flex-shrink-0 min-w-[36px] ${isStreaming ? 'bg-[#00001E]/90' : 'bg-[#00001E]'} w-9 h-9 rounded-full 
+          flex items-center justify-center shadow-sm transition-colors duration-300 overflow-hidden`}>
           <img 
             src={aidifyIcon} 
-            className={`w-5 h-5 ${isStreaming ? 'animate-pulse' : ''}`} 
+            className={`w-9 h-9 ${isStreaming ? 'animate-pulse' : ''}`} 
             alt="Aidify Bot"
           />
         </div>
