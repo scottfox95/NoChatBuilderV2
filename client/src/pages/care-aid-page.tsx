@@ -86,9 +86,9 @@ export default function CareAidPage() {
               </Button>
               
               <div>
-                <h1 className="text-xl font-bold text-[#EA19FF]">{chatbot.name}</h1>
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#EA19FF] leading-tight">{chatbot.name}</h1>
                 {chatbot.description && (
-                  <p className="text-sm text-gray-600 mt-0.5 max-w-lg">
+                  <p className="text-sm md:text-base text-gray-600 mt-0.5 max-w-lg">
                     {chatbot.description}
                   </p>
                 )}

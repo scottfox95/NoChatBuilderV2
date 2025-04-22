@@ -514,11 +514,11 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Main header content - centered on desktop */}
         <div className="flex items-center justify-between w-full md:justify-center md:max-w-3xl md:mx-auto">
           <div className="flex items-center">
-            <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-7 h-7 md:w-8 md:h-8">
-              <img src={aidifyIcon} alt="Aidify" className="w-7 h-7 md:w-8 md:h-8" />
+            <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-3 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10">
+              <img src={aidifyIcon} alt="Aidify" className="w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10" />
             </div>
             <div>
-              <h2 className="font-bold text-[#EA19FF] text-sm md:text-base leading-tight">
+              <h2 className="font-bold text-[#EA19FF] text-base md:text-lg lg:text-xl leading-tight">
                 {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
               </h2>
               {!isPreview && !hideDescription && chatbotInfo?.description && (
@@ -534,7 +534,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       </div>
 
       {/* Spacer for fixed header */}
-      <div className="h-[54px] md:h-[64px]"></div>
+      <div className="h-[60px] md:h-[68px] lg:h-[72px]"></div>
       
       {/* Chat Messages */}
       <div 
