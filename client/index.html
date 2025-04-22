@@ -2,10 +2,50 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Aidify - No-Code Care Aid Builder Powered by AI</title>
-    <meta name="description" content="Create custom AI Care Aids powered by OpenAI and your documents, no coding required." />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#0050F5" />
+    <!-- Prefers reduced motion consideration -->
+    <meta name="prefers-reduced-motion" content="media query support" />
+    <!-- Include vibration for haptic feedback -->
+    <meta name="theme-color" content="#0050F5" />
+    
+    <title>Aidify - Healthcare Chat Assistant</title>
+    <meta name="description" content="Get healthcare information and assistance with our AI-powered CareAid chat assistant." />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    
+    <!-- Fix iOS 100vh issue -->
+    <style>
+      html, body {
+        height: 100%;
+        overscroll-behavior-y: none;
+      }
+      /* Fixes iOS 100vh issue */
+      @supports (-webkit-touch-callout: none) {
+        .h-screen, .min-h-screen {
+          height: -webkit-fill-available;
+        }
+      }
+      /* Hide Safari UI components in PWA mode */
+      @media (display-mode: standalone) {
+        .safe-area-inset {
+          padding-top: env(safe-area-inset-top);
+          padding-right: env(safe-area-inset-right);
+          padding-bottom: env(safe-area-inset-bottom);
+          padding-left: env(safe-area-inset-left);
+        }
+      }
+      /* Respect user's reduce motion settings */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
