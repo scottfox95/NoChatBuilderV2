@@ -72,43 +72,46 @@ export default function CareAidPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
       {/* Header */}
-      <header className="border-b border-neutral-800 bg-background-light">
-        <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-center">
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={() => navigate("/")}
-                className="md:mr-2 text-gray-700 hover:bg-gray-100"
+                className="mr-3 text-gray-700 hover:bg-gray-100"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-xl font-bold text-gray-900">{chatbot.name}</h1>
+              
+              <div>
+                <h1 className="text-xl font-bold text-[#EA19FF]">{chatbot.name}</h1>
+                {chatbot.description && (
+                  <p className="text-sm text-gray-600 mt-0.5 max-w-lg">
+                    {chatbot.description}
+                  </p>
+                )}
+              </div>
             </div>
-            {chatbot.description && (
-              <p className="text-sm text-gray-600 mt-1 ml-12 md:ml-10">
-                {chatbot.description}
-              </p>
-            )}
-          </div>
-          
-          <div className="flex gap-2 ml-12 md:ml-0">
-            {isOwner && (
+            
+            <div className="mt-3 md:mt-0 flex gap-2 ml-0 md:ml-0 self-end md:self-auto">
+              {isOwner && (
+                <Button 
+                  variant="outline" 
+                  className="border-gray-300 text-gray-700"
+                  onClick={() => setIsDocumentModalOpen(true)}
+                >
+                  Manage Documents
+                </Button>
+              )}
               <Button 
-                variant="outline" 
-                className="border-neutral-700 text-neutral-200"
-                onClick={() => setIsDocumentModalOpen(true)}
+                className="bg-[#EA19FF] hover:bg-[#d015e6] text-white"
+                onClick={() => setIsShareModalOpen(true)}
               >
-                Manage Documents
+                <Share2 className="mr-2 h-4 w-4" /> Share
               </Button>
-            )}
-            <Button 
-              className="bg-primary hover:bg-primary-dark"
-              onClick={() => setIsShareModalOpen(true)}
-            >
-              <Share2 className="mr-2 h-4 w-4" /> Share
-            </Button>
+            </div>
           </div>
         </div>
       </header>
