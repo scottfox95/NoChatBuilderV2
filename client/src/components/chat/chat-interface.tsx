@@ -566,11 +566,11 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
             <div className="flex-shrink-0 bg-[#00001E] w-9 h-9 rounded-full flex items-center justify-center overflow-hidden">
               <img src={aidifyIcon} className="animate-pulse w-9 h-9" alt="Aidify" />
             </div>
-            <div className="ml-2 bg-gray-100 rounded-[16px] py-2 px-3">
+            <div className="ml-2 bg-[#E9E9EB] rounded-[16px] py-2 px-3">
               <div className="flex space-x-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#EA19FF] animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-[#8E8E93] animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-[#8E8E93] animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-2 h-2 rounded-full bg-[#8E8E93] animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>

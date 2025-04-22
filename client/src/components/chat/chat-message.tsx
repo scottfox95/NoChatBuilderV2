@@ -46,7 +46,7 @@ export default function ChatMessage({
     return (
       <div className={`flex items-start justify-end mb-1 ${isLastInGroup ? 'mb-3' : 'mb-0.5'}`}>
         <div 
-          className={`mr-2 bg-[#F2F3F5] rounded-[16px] py-2 px-3 shadow-sm
+          className={`mr-2 bg-[#0B84FE] rounded-[16px] py-2 px-3 shadow-sm
             ${isFirstInGroup && isLastInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px]' : 
              isFirstInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-sm' :
              isLastInGroup ? 'rounded-tr-sm rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px]' : 
@@ -54,7 +54,7 @@ export default function ChatMessage({
             max-w-[80%] md:max-w-[70%] mr-3
           `}
         >
-          <p className="text-gray-800 whitespace-pre-wrap text-base" 
+          <p className="text-white whitespace-pre-wrap text-base" 
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
           </p>
@@ -87,7 +87,7 @@ export default function ChatMessage({
         <div className="w-9" />
       )}
       <div 
-        className={`ml-2 bg-gray-100 rounded-[16px] py-2 px-3 shadow-sm
+        className={`ml-2 bg-[#E9E9EB] rounded-[16px] py-2 px-3 shadow-sm
           ${isFirstInGroup && isLastInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px]' : 
            isFirstInGroup ? 'rounded-tr-[16px] rounded-tl-sm rounded-bl-sm rounded-br-[16px]' :
            isLastInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-sm' : 
@@ -109,10 +109,10 @@ export default function ChatMessage({
             {chatbotName} {isStreaming && (
               <span className="inline-flex items-center ml-1">
                 <span className="text-xs mr-1">typing</span>
-                <span className="flex space-x-1">
-                  <span className="inline-block w-1 h-1 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                  <span className="inline-block w-1 h-1 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                  <span className="inline-block w-1 h-1 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                <span className="flex space-x-1.5">
+                  <span className="inline-block w-1.5 h-1.5 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="inline-block w-1.5 h-1.5 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="inline-block w-1.5 h-1.5 bg-[#EA19FF] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                 </span>
               </span>
             )}
