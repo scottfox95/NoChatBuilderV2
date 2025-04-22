@@ -90,6 +90,22 @@ input::placeholder, select::placeholder, textarea::placeholder {
   min-height: 44px;
 }
 
+/* Improve suggested questions on mobile */
+@media (max-width: 640px) {
+  .flex-wrap button {
+    flex: 0 0 auto;
+    max-width: calc(100vw - 3rem);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  
+  /* Message group spacing */
+  .message-group {
+    margin-bottom: 8px;
+  }
+}
+
 /* Custom color variables */
 @layer base {
   :root {

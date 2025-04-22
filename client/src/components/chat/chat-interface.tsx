@@ -461,7 +461,13 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   
   // Check scroll position
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    // Guard against null currentTarget
+    if (!e.currentTarget) return;
+    
+    const scrollTop = e.currentTarget.scrollTop || 0;
+    const scrollHeight = e.currentTarget.scrollHeight || 0;
+    const clientHeight = e.currentTarget.clientHeight || 0;
+    
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     setIsNearBottom(distanceFromBottom < 100); // within 100px of bottom
     
@@ -492,17 +498,17 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header */}
-      <div className="bg-[#0050F5] py-3 px-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+      <div className="bg-gray-100 py-3 px-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center">
-          <div className="bg-white p-1.5 rounded-full mr-2.5 flex items-center justify-center">
+          <div className="bg-white p-1.5 rounded-full mr-2.5 flex items-center justify-center shadow-sm border border-gray-200">
             <img src={aidifyIcon} alt="Aidify" className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-semibold text-white text-base leading-tight">
+            <h2 className="font-semibold text-gray-800 text-base leading-tight">
               {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
             </h2>
             {!isPreview && chatbotInfo?.description && (
-              <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{chatbotInfo.description}</p>
+              <p className="text-xs text-gray-600 line-clamp-1 mt-0.5">{chatbotInfo.description}</p>
             )}
           </div>
         </div>
@@ -518,7 +524,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         onScroll={debounce(handleScroll)}
       >
         {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup, showDateSeparator, dateSeparatorText }) => (
-          <React.Fragment key={message.id}>
+          <div key={message.id} className="message-group">
             {/* Date separator */}
             {showDateSeparator && dateSeparatorText && (
               <div className="flex justify-center my-3">
@@ -536,7 +542,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
               isLastInGroup={isLastInGroup}
               isFirstInGroup={isFirstInGroup}
             />
-          </React.Fragment>
+          </div>
         ))}
         
         {/* Streaming Message (if any) */}
@@ -557,14 +563,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-[#0050F5] w-9 h-9 rounded-full flex items-center justify-center">
+            <div className="flex-shrink-0 bg-gray-200 w-9 h-9 rounded-full flex items-center justify-center">
               <img src={aidifyIcon} className="animate-pulse w-5 h-5" alt="Aidify" />
             </div>
-            <div className="ml-2 bg-[#0050F5]/10 rounded-[16px] py-2 px-3">
+            <div className="ml-2 bg-gray-100 rounded-[16px] py-2 px-3">
               <div className="flex space-x-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -574,7 +580,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {showNewMessageToast && (
           <button 
             onClick={scrollToBottom}
-            className="fixed bottom-[80px] left-1/2 transform -translate-x-1/2 bg-[#0050F5] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm animate-fade-in-up z-10"
+            className="fixed bottom-[80px] left-1/2 transform -translate-x-1/2 bg-[#EA19FF] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm animate-fade-in-up z-10"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 19V5M5 12l7 7 7-7" />
@@ -590,29 +596,29 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
         <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
-          <p className="text-xs font-medium text-[#0050F5] mb-2 flex items-center">
+          <p className="text-xs font-medium text-[#EA19FF] mb-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             Quick questions you can ask:
           </p>
-          <div className="flex overflow-x-auto pb-1 hide-scrollbar gap-2">
+          <div className="flex flex-wrap overflow-x-auto pb-2 hide-scrollbar gap-2 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -623,7 +629,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
