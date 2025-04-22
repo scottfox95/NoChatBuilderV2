@@ -331,13 +331,29 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     }
   }, [isPreview, messages.length, chatbotInfo, sessionId]);
 
-  // Scroll to bottom when messages change
+  // State to track if there are multiple welcome messages
+  const [hasMoreWelcomeMessages, setHasMoreWelcomeMessages] = useState(false);
+
+  // Scroll behavior management
   useEffect(() => {
     // Only scroll to the message container, not the entire page
     if (messagesEndRef.current) {
       const messageContainer = messagesEndRef.current.parentElement;
       if (messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
+        // If this is the initial load (welcome messages), scroll to show the first message at the top
+        if (messages.length > 0 && messages.every(m => !m.isUser)) {
+          // This is likely the welcome message sequence
+          messageContainer.scrollTop = 0;
+          
+          // Mark if there are multiple welcome messages for the scroll indicator
+          setHasMoreWelcomeMessages(messages.length > 1);
+        } else {
+          // For normal conversation flow, scroll to bottom
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+          
+          // No more welcome-only state
+          setHasMoreWelcomeMessages(false);
+        }
       }
     }
   }, [messages]);
@@ -577,6 +593,21 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         )}
         
         <div ref={messagesEndRef} />
+        
+        {/* Scroll indicator for welcome messages */}
+        {hasMoreWelcomeMessages && (
+          <div className="flex justify-center mt-3 mb-4 animate-bounce">
+            <button 
+              onClick={scrollToBottom}
+              className="text-[#EA19FF] hover:text-[#d015e6] flex flex-col items-center"
+            >
+              <p className="text-xs font-medium mb-1">More information below</p>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+              </svg>
+            </button>
+          </div>
+        )}
         
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
