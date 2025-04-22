@@ -497,22 +497,22 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
-      {/* Chat Header */}
-      <div className="bg-gray-100 py-3 px-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+      {/* Chat Header - Fixed to top */}
+      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-gray-200">
         <div className="flex items-center">
-          <div className="bg-[#00001E] p-0 rounded-full mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8">
-            <img src={aidifyIcon} alt="Aidify" className="w-8 h-8" />
+          <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-7 h-7 md:w-8 md:h-8">
+            <img src={aidifyIcon} alt="Aidify" className="w-7 h-7 md:w-8 md:h-8" />
           </div>
           <div>
-            <h2 className="font-semibold text-[#EA19FF] text-base leading-tight">
+            <h2 className="font-bold text-[#EA19FF] text-sm md:text-base leading-tight">
               {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
             </h2>
             {!isPreview && chatbotInfo?.description && (
-              <p className="text-xs text-gray-600 line-clamp-1 mt-0.5">{chatbotInfo.description}</p>
+              <p className="text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[200px] md:max-w-none">{chatbotInfo.description}</p>
             )}
           </div>
         </div>
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 text-green-800">
           <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
           Online
         </span>
@@ -520,7 +520,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
       {/* Chat Messages */}
       <div 
-        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white hide-scrollbar"
+        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white hide-scrollbar mt-0.5"
         onScroll={debounce(handleScroll)}
       >
         {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup, showDateSeparator, dateSeparatorText }) => (
@@ -595,7 +595,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
           <p className="text-xs font-medium text-[#EA19FF] mb-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             Quick questions you can ask:
@@ -640,7 +640,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
       )}
       
       {/* Chat Input */}
-      <div className="px-3 py-2.5 border-t border-gray-200 bg-white">
+      <div className="px-3 py-2.5 border-t border-gray-200 bg-white sticky bottom-0 z-20">
         <ChatInput 
           onSendMessage={handleSendMessage} 
           disabled={inputDisabled} 
