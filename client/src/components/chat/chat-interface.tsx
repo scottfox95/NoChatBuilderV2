@@ -14,6 +14,7 @@ interface ChatInterfaceProps {
   chatbotSlug: string;
   isPreview?: boolean;
   previewSystemPrompt?: string;
+  hideDescription?: boolean;
 }
 
 interface ChatbotPublicInfo {
@@ -31,7 +32,7 @@ interface ChatResponse {
   sessionId: string;
 }
 
-export default function ChatInterface({ chatbotSlug, isPreview = false, previewSystemPrompt }: ChatInterfaceProps) {
+export default function ChatInterface({ chatbotSlug, isPreview = false, previewSystemPrompt, hideDescription = false }: ChatInterfaceProps) {
   const [sessionId, setSessionId] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputDisabled, setInputDisabled] = useState(false);
@@ -520,7 +521,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
               <h2 className="font-bold text-[#EA19FF] text-sm md:text-base leading-tight">
                 {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
               </h2>
-              {!isPreview && chatbotInfo?.description && (
+              {!isPreview && !hideDescription && chatbotInfo?.description && (
                 <p className="text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[200px] md:max-w-none">{chatbotInfo.description}</p>
               )}
             </div>
