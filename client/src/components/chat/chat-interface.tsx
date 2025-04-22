@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { Link, useLocation } from "wouter";
 import { nanoid } from "nanoid";
 import { apiRequest } from "@/lib/queryClient";
 import { Message } from "@shared/schema";
@@ -36,6 +37,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   const [inputDisabled, setInputDisabled] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [location] = useLocation();
 
   // Get chatbot information
   const { data: chatbotInfo, isLoading: isLoadingChatbot, error: chatbotError } = useQuery<ChatbotPublicInfo>({
@@ -498,24 +500,36 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 flex items-center justify-between fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top">
-        <div className="flex items-center">
-          <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-7 h-7 md:w-8 md:h-8">
-            <img src={aidifyIcon} alt="Aidify" className="w-7 h-7 md:w-8 md:h-8" />
+      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top flex items-center">
+        {/* Back button - Only shown in care-aid page (not public) */}
+        {location.pathname.startsWith('/care-aid/') && !location.pathname.includes('/public/') && (
+          <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </Link>
+        )}
+        
+        {/* Main header content - centered on desktop */}
+        <div className="flex items-center justify-between w-full md:justify-center md:max-w-3xl md:mx-auto">
+          <div className="flex items-center">
+            <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-2.5 flex items-center justify-center shadow-sm overflow-hidden w-7 h-7 md:w-8 md:h-8">
+              <img src={aidifyIcon} alt="Aidify" className="w-7 h-7 md:w-8 md:h-8" />
+            </div>
+            <div>
+              <h2 className="font-bold text-[#EA19FF] text-sm md:text-base leading-tight">
+                {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
+              </h2>
+              {!isPreview && chatbotInfo?.description && (
+                <p className="text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[200px] md:max-w-none">{chatbotInfo.description}</p>
+              )}
+            </div>
           </div>
-          <div>
-            <h2 className="font-bold text-[#EA19FF] text-sm md:text-base leading-tight">
-              {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
-            </h2>
-            {!isPreview && chatbotInfo?.description && (
-              <p className="text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[200px] md:max-w-none">{chatbotInfo.description}</p>
-            )}
-          </div>
+          <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 text-green-800">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
+            Online
+          </span>
         </div>
-        <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 text-green-800">
-          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
-          Online
-        </span>
       </div>
 
       {/* Spacer for fixed header */}
