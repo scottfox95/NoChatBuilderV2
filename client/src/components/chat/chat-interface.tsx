@@ -390,36 +390,108 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     );
   }
 
+  // Group messages by sender for UI rendering
+  const processedMessages = messages.map((message, index) => {
+    // Determine if the next message is from the same sender
+    const nextMessage = messages[index + 1];
+    const isLastInGroup = !nextMessage || nextMessage.isUser !== message.isUser;
+    
+    // Determine if the previous message is from the same sender
+    const prevMessage = messages[index - 1];
+    const isFirstInGroup = !prevMessage || prevMessage.isUser !== message.isUser;
+    
+    // Only show avatar for first message in a group
+    const showAvatar = isFirstInGroup;
+    
+    return {
+      message,
+      showAvatar,
+      isLastInGroup,
+      isFirstInGroup
+    };
+  });
+  
+  // Auto-scrolling logic
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const [showNewMessageToast, setShowNewMessageToast] = useState(false);
+  
+  // Debounce function for scroll events
+  const debounce = (fn: Function, ms = 16) => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return function(...args: any[]) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => fn.apply(this, args), ms);
+    };
+  };
+  
+  // Check scroll position
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    setIsNearBottom(distanceFromBottom < 100); // within 100px of bottom
+    
+    // If user scrolls up and we are showing the toast, hide it when they scroll to bottom
+    if (distanceFromBottom < 50 && showNewMessageToast) {
+      setShowNewMessageToast(false);
+    }
+  };
+  
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      setShowNewMessageToast(false);
+    }
+  };
+  
+  // When new messages arrive, auto-scroll if we're near the bottom
+  useEffect(() => {
+    if (isNearBottom && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+    } else if (!isNearBottom && (messages.length > 0 && messages[messages.length - 1]?.isUser === false)) {
+      // If we have new messages from the bot and we're not at the bottom
+      setShowNewMessageToast(true);
+    }
+  }, [messages, isNearBottom]);
+
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200">
+    <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header */}
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 py-2 px-3 flex items-center justify-between">
+      <div className="bg-[#0050F5] py-3 px-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center">
-          <div className="bg-gray-950 p-1.5 rounded-full mr-2 flex items-center justify-center">
+          <div className="bg-white p-1.5 rounded-full mr-2.5 flex items-center justify-center">
             <img src={aidifyIcon} alt="Aidify" className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-semibold text-gray-800 text-base">
+            <h2 className="font-semibold text-white text-base leading-tight">
               {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
             </h2>
             {!isPreview && chatbotInfo?.description && (
-              <p className="text-xs text-gray-600 line-clamp-1">{chatbotInfo.description}</p>
+              <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{chatbotInfo.description}</p>
             )}
           </div>
         </div>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
-          <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-1"></span>
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
           Online
         </span>
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2.5 custom-scrollbar">
-        {messages.map((message) => (
+      <div 
+        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white"
+        onScroll={debounce(handleScroll)}
+      >
+        {/* Message date separators would go here */}
+        
+        {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup }) => (
           <ChatMessage 
             key={message.id} 
             message={message} 
             chatbotName={chatbotInfo?.name}
+            showAvatar={showAvatar}
+            isLastInGroup={isLastInGroup}
+            isFirstInGroup={isFirstInGroup}
           />
         ))}
         
@@ -430,6 +502,9 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
             message={streamingMessage} 
             chatbotName={chatbotInfo?.name}
             isStreaming={true}
+            showAvatar={!messages.length || messages[messages.length - 1].isUser}
+            isFirstInGroup={!messages.length || messages[messages.length - 1].isUser}
+            isLastInGroup={true}
           />
         )}
         
@@ -438,17 +513,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {/* Loading indicator for response (shows only when not streaming) */}
         {inputDisabled && messageMutation.isPending && !streamingMessage && (
           <div className="flex items-start">
-            <div className="flex-shrink-0 bg-gray-900 w-7 h-7 rounded-full flex items-center justify-center">
+            <div className="flex-shrink-0 bg-[#0050F5] w-9 h-9 rounded-full flex items-center justify-center">
               <img src={aidifyIcon} className="animate-pulse w-5 h-5" alt="Aidify" />
             </div>
-            <div className="ml-2 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg py-1.5 px-3">
+            <div className="ml-2 bg-[#0050F5]/10 rounded-[16px] py-2 px-3">
               <div className="flex space-x-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#0050F5] animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
+        )}
+        
+        {/* New Messages Toast */}
+        {showNewMessageToast && (
+          <button 
+            onClick={scrollToBottom}
+            className="fixed bottom-[80px] left-1/2 transform -translate-x-1/2 bg-[#0050F5] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm animate-fade-in-up z-10"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M5 12l7 7 7-7" />
+            </svg>
+            New messages
+          </button>
         )}
       </div>
       
