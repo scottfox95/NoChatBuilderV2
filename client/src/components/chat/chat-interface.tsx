@@ -501,8 +501,8 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
       <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top flex items-center">
-        {/* Back button - Only shown in care-aid page (not public) */}
-        {location.pathname.startsWith('/care-aid/') && !location.pathname.includes('/public/') && (
+        {/* Back button - Show except in preview mode or public page */}
+        {!isPreview && !location.includes('public') && (
           <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7"/>
