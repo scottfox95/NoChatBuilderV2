@@ -1,0 +1,50 @@
+CareAid — Mobile Chat UI Implementation Guide (Replit Coding Agent)
+1 Objective
+Build/refresh the Care Aid public chat interface so that it meets modern mobile‑first chat UX standards, follows Apple Human Interface Guidelines (HIG) & Google Material 3 messaging patterns, and embeds Aidify’s healthcare‑specific privacy guardrails.
+2 Key References
+Apple HIG › Components › Messages – layout, typography, safe‑area, motion.
+Material Design 3 › Messaging – bubble grouping, input bar, accessibility.
+3 Layout & Responsiveness
+Topic
+Spec
+Safe areas
+Wrap main container in CSS env(safe‑area‑*) insets; UI must never be obscured by notches or the home bar.
+View height
+Single scroll column at 100 vh that resizes on orientation or keyboard appearance.
+Bubble width
+Max width ≤ 80 % of viewport to reduce long line lengths & thumb stretch.
+Auto‑scroll
+If user is ≤ 2 msg from bottom, auto‑scroll on new bot msg; else show “⬇ New messages” toast.
+Virtual list
+Window historic messages (e.g., react‑virtualized) to keep memory < 50 MB on mid‑range phones.
+
+4 Typography & Touch Targets
+Item
+Value
+Base font
+System font; respect OS Dynamic Type. Min 16 px body text.
+Contrast
+WCAG 2.1 AA (≥ 4.5 : 1).
+Touch targets
+≥ 44 × 44 pt / 48 dp.
+
+5 Conversation Mechanics
+Message grouping: consecutive bubbles from same speaker share avatar; date separator only when calendar date changes.
+Typing indicator: animated ellipsis during server streaming; hide after final chunk.
+Failed send: red exclamation + tap to retry.
+6 Input Bar
+Sticky at bottom (position: sticky; bottom: 0).
+Self‑resizing multiline; send on Enter; Shift+Enter inserts line break.
+Accessory row (quick‑replies / emoji) collapses automatically when text grows beyond one line.
+Haptic feedback (navigator.vibrate(10) / iOS haptic) on successful send.
+7 Performance & Streaming
+Stream OpenAI token chunks; flush to DOM every ≤ 80 ms for smooth “typing” effect.
+Debounce resize/scroll listeners at 16 ms.
+8 Visual Style (Aidify Brand)
+Sender palette: Aidify Primary #0050F5 text on 10 % tint; User palette: neutral gray #F2F3F5.
+16 px iOS / 12 dp Android corner radius.
+Entry animation: fade‑in & slide‑up ≤ 250 ms, prefers-reduced-motion respects OS.
+10 Internationalization
+RTL support (direction: rtl;) with mirrored bubble alignment.
+
+
