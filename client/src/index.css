@@ -11,6 +11,86 @@ input::placeholder, select::placeholder, textarea::placeholder {
   @apply text-gray-500;
 }
 
+/* 
+ * Mobile-friendly chat UI styling (CareAid spec)
+ */
+
+/* Safe area insets for mobile devices */
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top, 0);
+  padding-right: env(safe-area-inset-right, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+}
+
+/* Hide scrollbars but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari and Opera */
+}
+
+/* Mobile chat interface specific animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+@keyframes text-fade-in {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-text-fade-in {
+  animation: text-fade-in 0.5s ease-out;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.animate-blink {
+  animation: blink 0.8s infinite;
+}
+
+/* RTL Support */
+[dir="rtl"] .chat-message-user {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .chat-message-bot {
+  flex-direction: row-reverse;
+}
+
+/* Adjust accessibility for touch targets */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Custom color variables */
 @layer base {
   :root {
     --primary-bg: #00001E;
@@ -24,6 +104,11 @@ input::placeholder, select::placeholder, textarea::placeholder {
     --mint: #11ECB4;
     --deep-blue: #020B3F;
     --black: #000000;
+    
+    /* CareAid Brand Colors */
+    --care-aid-primary: #0050F5;
+    --care-aid-primary-tint: rgba(0, 80, 245, 0.1);
+    --care-aid-user-bubble: #F2F3F5;
   }
 
   * {
@@ -34,6 +119,10 @@ input::placeholder, select::placeholder, textarea::placeholder {
     @apply font-sans antialiased text-foreground;
     background-color: var(--primary-bg);
     color: var(--text-on-dark);
+    
+    /* Ensure enough contrast for accessibility */
+    line-height: 1.5;
+    font-size: 16px; /* Minimum text size for readability */
   }
 
   h1, h2, h3, h4, h5, h6 {

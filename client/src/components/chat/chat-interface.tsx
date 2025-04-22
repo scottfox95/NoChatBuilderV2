@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { apiRequest } from "@/lib/queryClient";
@@ -390,7 +390,31 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     );
   }
 
-  // Group messages by sender for UI rendering
+  // Function to format date for separators
+  const formatDateForSeparator = (date: Date): string => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // Check if date is today
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    }
+    
+    // Check if date is yesterday
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    }
+    
+    // Return formatted date
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      month: 'short', 
+      day: 'numeric'
+    });
+  };
+  
+  // Group messages by date and sender for UI rendering
   const processedMessages = messages.map((message, index) => {
     // Determine if the next message is from the same sender
     const nextMessage = messages[index + 1];
@@ -403,11 +427,22 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
     // Only show avatar for first message in a group
     const showAvatar = isFirstInGroup;
     
+    // Determine if this message starts a new date group
+    const messageDate = new Date(message.timestamp);
+    const prevMessageDate = prevMessage ? new Date(prevMessage.timestamp) : null;
+    const showDateSeparator = 
+      !prevMessageDate || 
+      messageDate.toDateString() !== prevMessageDate.toDateString();
+    
+    const dateSeparatorText = showDateSeparator ? formatDateForSeparator(messageDate) : null;
+    
     return {
       message,
       showAvatar,
       isLastInGroup,
-      isFirstInGroup
+      isFirstInGroup,
+      showDateSeparator,
+      dateSeparatorText
     };
   });
   
@@ -418,9 +453,9 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   // Debounce function for scroll events
   const debounce = (fn: Function, ms = 16) => {
     let timeoutId: ReturnType<typeof setTimeout>;
-    return function(...args: any[]) {
+    return (...args: any[]) => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => fn.apply(this, args), ms);
+      timeoutId = setTimeout(() => fn(...args), ms);
     };
   };
   
@@ -479,20 +514,29 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
       {/* Chat Messages */}
       <div 
-        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white"
+        className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar relative bg-white hide-scrollbar"
         onScroll={debounce(handleScroll)}
       >
-        {/* Message date separators would go here */}
-        
-        {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup }) => (
-          <ChatMessage 
-            key={message.id} 
-            message={message} 
-            chatbotName={chatbotInfo?.name}
-            showAvatar={showAvatar}
-            isLastInGroup={isLastInGroup}
-            isFirstInGroup={isFirstInGroup}
-          />
+        {processedMessages.map(({ message, showAvatar, isLastInGroup, isFirstInGroup, showDateSeparator, dateSeparatorText }) => (
+          <React.Fragment key={message.id}>
+            {/* Date separator */}
+            {showDateSeparator && dateSeparatorText && (
+              <div className="flex justify-center my-3">
+                <div className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium text-gray-600">
+                  {dateSeparatorText}
+                </div>
+              </div>
+            )}
+            
+            {/* Message */}
+            <ChatMessage 
+              message={message} 
+              chatbotName={chatbotInfo?.name}
+              showAvatar={showAvatar}
+              isLastInGroup={isLastInGroup}
+              isFirstInGroup={isFirstInGroup}
+            />
+          </React.Fragment>
         ))}
         
         {/* Streaming Message (if any) */}
@@ -545,30 +589,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-3 py-2 border-t border-gray-200 bg-gray-50">
-          <p className="text-xs font-medium text-indigo-600 mb-1.5 flex items-center">
+        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+          <p className="text-xs font-medium text-[#0050F5] mb-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-            Suggested questions:
+            Quick questions you can ask:
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex overflow-x-auto pb-1 hide-scrollbar gap-2">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -579,7 +623,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="px-2.5 py-1 text-xs bg-white hover:bg-gray-100 text-gray-800 rounded-full border border-gray-300 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap px-3 py-1.5 text-xs bg-[#0050F5]/5 hover:bg-[#0050F5]/10 text-[#0050F5] rounded-full border border-[#0050F5]/20 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
