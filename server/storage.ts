@@ -3,6 +3,7 @@ import {
   chatbots, 
   documents, 
   messages, 
+  userChatbotAssignments,
   type User, 
   type InsertUser, 
   type Chatbot, 
@@ -10,7 +11,9 @@ import {
   type Document, 
   type InsertDocument, 
   type Message, 
-  type InsertMessage 
+  type InsertMessage,
+  type UserChatbotAssignment,
+  type InsertUserChatbotAssignment
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";

@@ -17,11 +17,13 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").notNull().default("admin"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  role: true,
 });
 
 export const chatbots = pgTable("chatbots", {
@@ -94,9 +96,23 @@ export type Message = typeof messages.$inferSelect;
 // Extended schemas with validation
 export const loginSchema = insertUserSchema;
 
+export const userChatbotAssignments = pgTable("user_chatbot_assignments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  chatbotId: integer("chatbot_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertUserChatbotAssignmentSchema = createInsertSchema(userChatbotAssignments).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const behaviorRuleSchema = z.object({
   condition: z.string(),
   response: z.string(),
 });
 
 export type BehaviorRule = z.infer<typeof behaviorRuleSchema>;
+export type InsertUserChatbotAssignment = z.infer<typeof insertUserChatbotAssignmentSchema>;
+export type UserChatbotAssignment = typeof userChatbotAssignments.$inferSelect;
