@@ -79,15 +79,29 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
+      // Use the role from request body or default to "admin"
+      const role = req.body.role || "admin";
+      
+      // Only admin users can create care team users
+      if (role === "careteam" && (!req.isAuthenticated() || req.user.role !== "admin")) {
+        return res.status(403).json({ message: "Only admin users can create care team users" });
+      }
+
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
+        role: role,
       });
 
-      req.login(user, (err) => {
-        if (err) return next(err);
+      // If already logged in (admin creating a care team user), don't log in as the new user
+      if (req.isAuthenticated() && role === "careteam") {
         res.status(201).json(user);
-      });
+      } else {
+        req.login(user, (err) => {
+          if (err) return next(err);
+          res.status(201).json(user);
+        });
+      }
     } catch (error) {
       next(error);
     }
