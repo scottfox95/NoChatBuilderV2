@@ -30,6 +30,13 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getUsersByRole(role: string): Promise<User[]>;
+
+  // Chatbot assignments operations
+  getAssignedChatbots(userId: number): Promise<Chatbot[]>;
+  assignChatbotToUser(assignment: InsertUserChatbotAssignment): Promise<UserChatbotAssignment>;
+  removeAssignment(userId: number, chatbotId: number): Promise<boolean>;
+  getChatbotAssignments(chatbotId: number): Promise<UserChatbotAssignment[]>;
 
   // Chatbot operations
   getChatbots(userId: number): Promise<Chatbot[]>;
@@ -154,6 +161,75 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  async getUsersByRole(role: string): Promise<User[]> {
+    return await db.select().from(users).where(eq(users.role, role));
+  }
+  
+  // Chatbot assignments operations
+  async getAssignedChatbots(userId: number): Promise<Chatbot[]> {
+    const assignments = await db
+      .select({
+        chatbotId: userChatbotAssignments.chatbotId
+      })
+      .from(userChatbotAssignments)
+      .where(eq(userChatbotAssignments.userId, userId));
+    
+    if (assignments.length === 0) {
+      return [];
+    }
+    
+    const chatbotIds = assignments.map(a => a.chatbotId);
+    return await db
+      .select()
+      .from(chatbots)
+      .where(inArray(chatbots.id, chatbotIds));
+  }
+  
+  async assignChatbotToUser(assignment: InsertUserChatbotAssignment): Promise<UserChatbotAssignment> {
+    // Check if assignment already exists
+    const [existing] = await db
+      .select()
+      .from(userChatbotAssignments)
+      .where(
+        and(
+          eq(userChatbotAssignments.userId, assignment.userId),
+          eq(userChatbotAssignments.chatbotId, assignment.chatbotId)
+        )
+      );
+    
+    if (existing) {
+      return existing;
+    }
+    
+    // Create new assignment
+    const [newAssignment] = await db
+      .insert(userChatbotAssignments)
+      .values(assignment)
+      .returning();
+    
+    return newAssignment;
+  }
+  
+  async removeAssignment(userId: number, chatbotId: number): Promise<boolean> {
+    const result = await db
+      .delete(userChatbotAssignments)
+      .where(
+        and(
+          eq(userChatbotAssignments.userId, userId),
+          eq(userChatbotAssignments.chatbotId, chatbotId)
+        )
+      );
+    
+    return result.rowCount > 0;
+  }
+  
+  async getChatbotAssignments(chatbotId: number): Promise<UserChatbotAssignment[]> {
+    return await db
+      .select()
+      .from(userChatbotAssignments)
+      .where(eq(userChatbotAssignments.chatbotId, chatbotId));
   }
 
   // Chatbot operations
