@@ -1188,6 +1188,294 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== Care Team Portal API Routes =====
+
+  // Authentication middleware for care team only
+  function requireCareTeamRole(req, res, next) {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "careteam") return res.sendStatus(403);
+    next();
+  }
+
+  // Get assigned chatbots for a care team member
+  app.get("/api/care-team/chatbots", requireCareTeamRole, async (req, res) => {
+    try {
+      const chatbots = await storage.getAssignedChatbots(req.user.id);
+      res.json(chatbots);
+    } catch (error) {
+      console.error("Error fetching assigned chatbots:", error);
+      res.status(500).json({ message: "Failed to fetch assigned chatbots" });
+    }
+  });
+
+  // Get chat logs for care team member (filtered by assigned chatbots)
+  app.get("/api/care-team/logs", requireCareTeamRole, async (req, res) => {
+    try {
+      // Get assigned chatbots first
+      const chatbots = await storage.getAssignedChatbots(req.user.id);
+      
+      if (!chatbots || chatbots.length === 0) {
+        return res.json({ logs: [], totalCount: 0 });
+      }
+      
+      // Extract chatbot IDs
+      const chatbotIds = chatbots.map(chatbot => chatbot.id);
+      
+      // Parse query parameters
+      const chatbotId = req.query.chatbotId ? Number(req.query.chatbotId) : null;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 20;
+      const search = req.query.search as string;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+      const redact = req.query.redact !== "false"; // Default to true if not specified
+      
+      // Build filter object
+      const filter: any = {
+        chatbotIds: chatbotId ? [Number(chatbotId)] : chatbotIds,
+      };
+      
+      if (search) {
+        filter.search = search;
+      }
+      
+      if (startDate) {
+        filter.startDate = new Date(startDate);
+      }
+      
+      if (endDate) {
+        filter.endDate = new Date(endDate);
+      }
+      
+      // Get logs with pagination
+      const { logs: rawLogs, totalCount } = await storage.getChatLogs(filter, page, pageSize);
+      
+      // Apply redaction if enabled
+      const logs = redact ? redactMessagesPII(rawLogs) : rawLogs;
+      
+      // Add chatbot names to logs for display
+      const logsWithChatbotNames = logs.map(log => {
+        const chatbot = chatbots.find(c => c.id === log.chatbotId);
+        return {
+          ...log,
+          chatbotName: chatbot ? chatbot.name : "Unknown",
+          timestamp: log.timestamp,
+        };
+      });
+      
+      res.json({ 
+        logs: logsWithChatbotNames, 
+        totalCount,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize),
+        redactionEnabled: redact
+      });
+    } catch (error) {
+      console.error("Error fetching care team logs:", error);
+      res.status(500).json({ message: "Failed to fetch chat logs" });
+    }
+  });
+
+  // Get analytics data for care team member
+  app.get("/api/care-team/analytics", requireCareTeamRole, async (req, res) => {
+    try {
+      // Get assigned chatbots first
+      const chatbots = await storage.getAssignedChatbots(req.user.id);
+      
+      if (!chatbots || chatbots.length === 0) {
+        return res.json({ careAidStats: [] });
+      }
+      
+      // Extract chatbot IDs
+      const chatbotIds = chatbots.map(chatbot => chatbot.id);
+      
+      // Parse query parameters
+      const chatbotId = req.query.chatbotId ? Number(req.query.chatbotId) : null;
+      const timeframe = req.query.timeframe as string || "all";
+      
+      // Build time filter object
+      const timeFilter: any = {};
+      
+      if (timeframe === "month") {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        timeFilter.startDate = thirtyDaysAgo;
+      } else if (timeframe === "week") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        timeFilter.startDate = sevenDaysAgo;
+      } else if (timeframe === "today") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        timeFilter.startDate = today;
+      }
+      
+      // If specific chatbot is requested, get stats for just that one
+      let responseData: any = { careAidStats: [] };
+      
+      if (chatbotId) {
+        // Verify this chatbot is assigned to the user
+        if (!chatbotIds.includes(chatbotId)) {
+          return res.status(403).json({ message: "Not authorized to access this chatbot's data" });
+        }
+        
+        const chatbot = chatbots.find(c => c.id === chatbotId);
+        const stats = await storage.getChatbotAnalytics(chatbotId, timeFilter);
+        
+        responseData.careAidStats = [{
+          chatbotId: chatbotId,
+          chatbotName: chatbot ? chatbot.name : "Unknown",
+          totalSessions: stats.totalSessions,
+          totalQueries: stats.totalQueries,
+          averageQueriesPerSession: stats.totalSessions > 0 ? stats.totalQueries / stats.totalSessions : 0
+        }];
+      } else {
+        // Get overall stats and per-chatbot breakdown
+        const overallStats = await storage.getOverallAnalytics(chatbotIds, timeFilter);
+        
+        // Get individual chatbot stats
+        const careAidStatsPromises = chatbots.map(async (chatbot) => {
+          const stats = await storage.getChatbotAnalytics(chatbot.id, timeFilter);
+          return {
+            chatbotId: chatbot.id,
+            chatbotName: chatbot.name,
+            totalSessions: stats.totalSessions,
+            totalQueries: stats.totalQueries,
+            averageQueriesPerSession: stats.totalSessions > 0 ? stats.totalQueries / stats.totalSessions : 0
+          };
+        });
+        
+        responseData.careAidStats = await Promise.all(careAidStatsPromises);
+        
+        // Add overall stats with chatbot breakdown
+        if (overallStats.totalSessions > 0) {
+          responseData.overallStats = {
+            totalSessions: overallStats.totalSessions,
+            totalQueries: overallStats.totalQueries,
+            averageQueriesPerSession: overallStats.totalQueries / overallStats.totalSessions,
+            chatbotBreakdown: responseData.careAidStats.map(stat => ({
+              chatbotId: stat.chatbotId,
+              chatbotName: stat.chatbotName,
+              sessions: stat.totalSessions,
+              queries: stat.totalQueries
+            }))
+          };
+        }
+      }
+      
+      res.json(responseData);
+    } catch (error) {
+      console.error("Error fetching care team analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics data" });
+    }
+  });
+
+  // ===== Admin API Routes for managing Care Team =====
+
+  // Get all users with care team role
+  app.get("/api/admin/care-team/users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const careTeamUsers = await storage.getUsersByRole("careteam");
+      res.json(careTeamUsers);
+    } catch (error) {
+      console.error("Error fetching care team users:", error);
+      res.status(500).json({ message: "Failed to fetch care team users" });
+    }
+  });
+
+  // Get chatbot assignments for a specific chatbot
+  app.get("/api/admin/chatbots/:id/assignments", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const chatbotId = Number(req.params.id);
+      const chatbot = await storage.getChatbot(chatbotId);
+      
+      if (!chatbot) {
+        return res.status(404).json({ message: "Chatbot not found" });
+      }
+      
+      if (chatbot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to access this chatbot's assignments" });
+      }
+      
+      const assignments = await storage.getChatbotAssignments(chatbotId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching chatbot assignments:", error);
+      res.status(500).json({ message: "Failed to fetch chatbot assignments" });
+    }
+  });
+
+  // Assign chatbot to care team member
+  app.post("/api/admin/care-team/assignments", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const { userId, chatbotId } = req.body;
+      
+      if (!userId || !chatbotId) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Verify the chatbot belongs to this admin
+      const chatbot = await storage.getChatbot(Number(chatbotId));
+      if (!chatbot || chatbot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to assign this chatbot" });
+      }
+      
+      // Verify the user exists and has care team role
+      const user = await storage.getUser(Number(userId));
+      if (!user || user.role !== "careteam") {
+        return res.status(400).json({ message: "Invalid care team user" });
+      }
+      
+      const assignment = await storage.assignChatbotToUser({
+        userId: Number(userId),
+        chatbotId: Number(chatbotId)
+      });
+      
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Error assigning chatbot to care team member:", error);
+      res.status(500).json({ message: "Failed to assign chatbot" });
+    }
+  });
+
+  // Remove chatbot assignment
+  app.delete("/api/admin/care-team/assignments/:userId/:chatbotId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const userId = Number(req.params.userId);
+      const chatbotId = Number(req.params.chatbotId);
+      
+      // Verify the chatbot belongs to this admin
+      const chatbot = await storage.getChatbot(chatbotId);
+      if (!chatbot || chatbot.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to manage this chatbot's assignments" });
+      }
+      
+      const success = await storage.removeAssignment(userId, chatbotId);
+      
+      if (success) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ message: "Assignment not found" });
+      }
+    } catch (error) {
+      console.error("Error removing chatbot assignment:", error);
+      res.status(500).json({ message: "Failed to remove assignment" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
