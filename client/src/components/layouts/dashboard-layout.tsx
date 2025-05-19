@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Loader2, TrendingUp, MessageSquare, Settings, LogOut, FileText, Database, BarChart2 } from "lucide-react";
+import { Loader2, TrendingUp, MessageSquare, Settings, LogOut, FileText, Database, BarChart2, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -96,6 +96,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/care-team-management">
+                  <a className={`flex items-center p-2 rounded-lg ${isActive("/care-team-management")}`}>
+                    <Users className="h-5 w-5" />
+                    <span className="ml-3 hidden md:block">Care Team Users</span>
+                  </a>
+                </Link>
+              </li>
+              <li>
                 <Link href="/settings">
                   <a className={`flex items-center p-2 rounded-lg ${isActive("/settings")}`}>
                     <Settings className="h-5 w-5" />
@@ -170,6 +178,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/analytics" ? "text-primary" : "text-black"}`}>
               <BarChart2 className="h-5 w-5" />
               <span className="text-xs mt-1">Analytics</span>
+            </a>
+          </Link>
+          <Link href="/care-team-management">
+            <a className={`flex flex-col items-center p-2 rounded-lg ${location === "/care-team-management" ? "text-primary" : "text-black"}`}>
+              <Users className="h-5 w-5" />
+              <span className="text-xs mt-1">Team</span>
             </a>
           </Link>
           <Link href="/settings">

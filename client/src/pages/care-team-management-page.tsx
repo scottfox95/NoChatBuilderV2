@@ -86,19 +86,19 @@ export default function CareTeamManagementPage() {
   });
 
   // Fetch all care team users
-  const { data: careTeamUsers, isLoading: isLoadingUsers } = useQuery({
+  const { data: careTeamUsers = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ["/api/admin/care-team/users"],
     retry: false,
   });
 
   // Fetch all chatbots for assignment
-  const { data: chatbots, isLoading: isLoadingChatbots } = useQuery({
+  const { data: chatbots = [], isLoading: isLoadingChatbots } = useQuery({
     queryKey: ["/api/chatbots"],
     retry: false,
   });
 
   // Fetch assignments for selected user
-  const { data: userAssignments, refetch: refetchAssignments } = useQuery({
+  const { data: userAssignments = [], refetch: refetchAssignments } = useQuery({
     queryKey: ["/api/care-team/assignments", selectedUserId],
     enabled: !!selectedUserId,
     retry: false,
@@ -107,7 +107,7 @@ export default function CareTeamManagementPage() {
   // Create care team user
   const createUserMutation = useMutation({
     mutationFn: async (values: CreateUserValues) => {
-      const res = await apiRequest<any>("/api/register", {
+      const res = await apiRequest("/api/register", {
         method: "POST",
         body: JSON.stringify(values),
       });

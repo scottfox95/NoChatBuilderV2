@@ -18,6 +18,7 @@ import { Loader } from "@/components/ui/loader";
 
 // Lazy-load the Analytics page
 const AnalyticsPage = lazy(() => import("@/pages/analytics-page"));
+const CareTeamManagementPage = lazy(() => import("@/pages/care-team-management-page"));
 
 // Lazy-load the Care Team portal pages
 const CareTeamDashboardPage = lazy(() => import("@/pages/care-team/dashboard-page"));
@@ -114,6 +115,15 @@ function Router() {
       <RoleProtectedRoute 
         path="/settings" 
         component={SettingsPage} 
+        roles={["admin"]}
+      />
+      <RoleProtectedRoute 
+        path="/care-team-management" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader size="lg" variant="primary" /></div>}>
+            <CareTeamManagementPage />
+          </Suspense>
+        )} 
         roles={["admin"]}
       />
       <RoleProtectedRoute 
