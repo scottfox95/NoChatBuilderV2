@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -69,9 +69,19 @@ const createUserSchema = z.object({
 
 type CreateUserValues = z.infer<typeof createUserSchema>;
 
+interface User {
+  id: number;
+  username: string;
+  role: string;
+}
+
+interface Chatbot {
+  id: number;
+  name: string;
+}
+
 export default function CareTeamManagementPage() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedChatbots, setSelectedChatbots] = useState<number[]>([]);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -106,13 +116,17 @@ export default function CareTeamManagementPage() {
 
   // Create care team user
   const createUserMutation = useMutation({
-    mutationFn: async (values: CreateUserValues) => {
-      const res = await apiRequest("/api/register", {
+    mutationFn: (values: CreateUserValues) => 
+      fetch("/api/register", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
-      });
-      return res;
-    },
+      }).then(res => {
+        if (!res.ok) {
+          return res.json().then(err => Promise.reject(err));
+        }
+        return res.json();
+      }),
     onSuccess: () => {
       toast({
         title: "User created",
@@ -121,7 +135,7 @@ export default function CareTeamManagementPage() {
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["/api/admin/care-team/users"] });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to create user",
@@ -132,13 +146,17 @@ export default function CareTeamManagementPage() {
 
   // Assign chatbot to user
   const assignChatbotMutation = useMutation({
-    mutationFn: async ({ userId, chatbotId }: { userId: number; chatbotId: number }) => {
-      const res = await apiRequest<any>("/api/admin/care-team/assignments", {
+    mutationFn: ({ userId, chatbotId }: { userId: number; chatbotId: number }) => 
+      fetch("/api/admin/care-team/assignments", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, chatbotId }),
-      });
-      return res;
-    },
+      }).then(res => {
+        if (!res.ok) {
+          return res.json().then(err => Promise.reject(err));
+        }
+        return res.json();
+      }),
     onSuccess: () => {
       toast({
         title: "Chatbot assigned",
@@ -147,7 +165,7 @@ export default function CareTeamManagementPage() {
       refetchAssignments();
       setIsAssignDialogOpen(false);
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to assign chatbot",
@@ -158,11 +176,15 @@ export default function CareTeamManagementPage() {
 
   // Remove chatbot assignment
   const removeAssignmentMutation = useMutation({
-    mutationFn: async ({ userId, chatbotId }: { userId: number; chatbotId: number }) => {
-      await apiRequest<any>(`/api/admin/care-team/assignments/${userId}/${chatbotId}`, {
-        method: "DELETE",
-      });
-    },
+    mutationFn: ({ userId, chatbotId }: { userId: number; chatbotId: number }) => 
+      fetch(`/api/admin/care-team/assignments/${userId}/${chatbotId}`, {
+        method: "DELETE"
+      }).then(res => {
+        if (!res.ok && res.status !== 204) {
+          return res.json().then(err => Promise.reject(err));
+        }
+        return true;
+      }),
     onSuccess: () => {
       toast({
         title: "Assignment removed",
@@ -170,7 +192,7 @@ export default function CareTeamManagementPage() {
       });
       refetchAssignments();
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to remove assignment",
@@ -202,7 +224,6 @@ export default function CareTeamManagementPage() {
 
   // Get assigned chatbot IDs
   const getAssignedChatbotIds = () => {
-    if (!userAssignments) return [];
     return userAssignments.map((chatbot: any) => chatbot.id);
   };
 
@@ -324,7 +345,7 @@ export default function CareTeamManagementPage() {
                 <div className="flex items-center justify-center p-6">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
-              ) : !careTeamUsers || careTeamUsers.length === 0 ? (
+              ) : !careTeamUsers.length ? (
                 <div className="text-center py-6 text-neutral-500">
                   No Care Team users found. Create one to get started.
                 </div>
@@ -338,7 +359,7 @@ export default function CareTeamManagementPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {careTeamUsers.map((user: any) => (
+                    {careTeamUsers.map((user: User) => (
                       <TableRow key={user.id} className={user.id === selectedUserId ? "bg-primary/10" : ""}>
                         <TableCell>
                           <div className="flex items-center space-x-3">
@@ -352,12 +373,12 @@ export default function CareTeamManagementPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {user.id === selectedUserId && userAssignments ? (
+                          {user.id === selectedUserId ? (
                             <div className="flex flex-wrap gap-1">
-                              {userAssignments.length === 0 ? (
+                              {!userAssignments.length ? (
                                 <span className="text-sm text-neutral-500">No assignments</span>
                               ) : (
-                                userAssignments.map((chatbot: any) => (
+                                userAssignments.map((chatbot: Chatbot) => (
                                   <Badge variant="outline" key={chatbot.id} className="flex items-center gap-1">
                                     {chatbot.name}
                                     <Button
@@ -411,13 +432,13 @@ export default function CareTeamManagementPage() {
                                   <div className="flex items-center justify-center p-6">
                                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                                   </div>
-                                ) : !chatbots || chatbots.length === 0 ? (
+                                ) : !chatbots.length ? (
                                   <div className="text-center py-6 text-neutral-500">
                                     No care aids available for assignment
                                   </div>
                                 ) : (
                                   <div className="space-y-1 max-h-60 overflow-auto">
-                                    {chatbots.map((chatbot: any) => (
+                                    {chatbots.map((chatbot: Chatbot) => (
                                       <div 
                                         key={chatbot.id} 
                                         className={`flex items-center justify-between p-2 rounded-md ${
