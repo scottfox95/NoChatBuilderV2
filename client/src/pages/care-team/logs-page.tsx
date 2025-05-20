@@ -44,7 +44,7 @@ export default function CareTeamLogsPage() {
   const [location, setLocation] = useLocation();
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
   const initialChatbotId = searchParams.get('chatbotId') || "all";
-  
+
   const [selectedChatbotId, setSelectedChatbotId] = useState<string>(initialChatbotId);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
@@ -234,7 +234,7 @@ export default function CareTeamLogsPage() {
   const sortedSessions = Object.keys(sessionMap).sort((a, b) => {
     const aMessages = sessionMap[a];
     const bMessages = sessionMap[b];
-    
+
     const aLatest = new Date(aMessages[aMessages.length - 1].timestamp).getTime();
     const bLatest = new Date(bMessages[bMessages.length - 1].timestamp).getTime();
 
@@ -323,12 +323,9 @@ export default function CareTeamLogsPage() {
                 </Label>
                 <div className="relative">
                   <Input
-                    id="search-filter"
-                    type="text"
-                    placeholder="Search in messages"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="bg-background border-neutral-700 pr-9"
+                    placeholder="Search in messages"
+                    className="bg-background border-neutral-700 pr-9 text-white placeholder:text-neutral-400"
                   />
                   <Button
                     variant="ghost"
@@ -368,7 +365,7 @@ export default function CareTeamLogsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="mt-4 flex items-center">
               <Switch
                 id="redact-toggle"
@@ -479,7 +476,7 @@ export default function CareTeamLogsPage() {
                   className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                 />
               </PaginationItem>
-              
+
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 // Show current page and neighboring pages
                 let pageNum = page;
@@ -490,11 +487,11 @@ export default function CareTeamLogsPage() {
                 } else {
                   pageNum = page - 2 + i;
                 }
-                
+
                 // Ensure page number is within valid range
                 if (pageNum < 1) pageNum = 1;
                 if (pageNum > totalPages) pageNum = totalPages;
-                
+
                 return (
                   <PaginationItem key={i}>
                     <PaginationLink 
@@ -510,7 +507,7 @@ export default function CareTeamLogsPage() {
                   </PaginationItem>
                 );
               })}
-              
+
               <PaginationItem>
                 <PaginationNext 
                   href="#" 
