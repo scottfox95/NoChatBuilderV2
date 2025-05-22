@@ -595,7 +595,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         {showNewMessageToast && (
           <button 
             onClick={scrollToBottom}
-            className="fixed bottom-[80px] left-1/2 transform -translate-x-1/2 bg-[#EA19FF] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm animate-fade-in-up z-10"
+            className="fixed bottom-[80px] left-1/2 transform -translate-x-1/2 bg-[#9083FF] text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm animate-fade-in-up z-10"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 19V5M5 12l7 7 7-7" />
@@ -627,13 +627,13 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -644,7 +644,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
