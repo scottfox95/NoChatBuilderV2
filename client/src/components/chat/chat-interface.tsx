@@ -613,30 +613,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
-          <p className="text-xs font-medium text-[#EA19FF] mb-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-            Quick questions you can ask:
+        <div className="px-3 py-1 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
+          <p className="text-xs font-medium text-[#00001e] mb-1 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            Quick questions:
           </p>
-          <div className="flex flex-wrap overflow-x-auto pb-2 hide-scrollbar gap-2 scrollbar-none">
+          <div className="flex flex-nowrap overflow-x-auto pb-1 hide-scrollbar gap-1 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-2 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-2 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-2 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -647,7 +647,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-1 px-2 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
                 >
                   {question}
                 </button>
