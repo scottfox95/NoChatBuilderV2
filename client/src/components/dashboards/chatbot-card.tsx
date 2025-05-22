@@ -67,7 +67,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
       <Card 
         className="hover:shadow-lg transition-all overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #9083FF 0%, #EA19FF 100%)",
+          background: "linear-gradient(135deg, #000033 0%, #00001e 100%)",
           boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
           position: "relative",
           border: "none",
