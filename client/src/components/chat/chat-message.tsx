@@ -44,29 +44,26 @@ export default function ChatMessage({
   // User message
   if (message.isUser) {
     return (
-      <div className={`flex items-start justify-end mb-1 ${isLastInGroup ? 'mb-3' : 'mb-0.5'}`}>
+      <div className={`flex items-start justify-end ${isLastInGroup ? 'mb-3' : 'mb-0.5'} px-3`}>
         <div 
-          className={`mr-2 bg-[#0B84FE] rounded-[16px] py-2 px-3 shadow-sm
-            ${isFirstInGroup && isLastInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px]' : 
-             isFirstInGroup ? 'rounded-tr-[16px] rounded-tl-[16px] rounded-bl-[16px] rounded-br-sm' :
-             isLastInGroup ? 'rounded-tr-sm rounded-tl-[16px] rounded-bl-[16px] rounded-br-[16px]' : 
-             'rounded-tr-sm rounded-tl-[16px] rounded-bl-[16px] rounded-br-sm'}
-            max-w-[80%] md:max-w-[70%] mr-3
+          className={`bg-[#0B84FE] rounded-[16px] py-2 px-3 shadow-sm
+            ${isFirstInGroup && isLastInGroup ? 'rounded-[16px]' : 
+             isFirstInGroup ? 'rounded-[16px] rounded-br-sm' :
+             isLastInGroup ? 'rounded-[16px] rounded-br-sm' : 
+             'rounded-[16px] rounded-br-sm'}
+            max-w-[80%] md:max-w-[70%] relative
           `}
         >
           <p className="text-white whitespace-pre-wrap text-sm" 
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
           </p>
+          
+          {/* Message tail */}
+          {isLastInGroup && (
+            <div className="absolute bottom-0 right-0 w-4 h-4 bg-[#0B84FE] transform translate-x-1/4 translate-y-1/3 rotate-45 z-[-1]"></div>
+          )}
         </div>
-        {showAvatar && (
-          <div className="flex-shrink-0 min-w-[36px] h-9 w-9 rounded-full flex items-center justify-center shadow-sm">
-            <svg className="w-4.5 h-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-        )}
-        {!showAvatar && <div className="w-9" />}
       </div>
     );
   }
