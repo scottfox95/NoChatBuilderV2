@@ -54,7 +54,7 @@ export default function ChatMessage({
             max-w-[80%] md:max-w-[70%] mr-3
           `}
         >
-          <p className="text-white whitespace-pre-wrap text-sm font-['Montserrat']" 
+          <p className="text-white whitespace-pre-wrap text-base" 
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
           </p>
@@ -96,7 +96,7 @@ export default function ChatMessage({
         `}
       >
         <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
-          <p className="text-gray-800 whitespace-pre-wrap text-sm font-['Montserrat']"
+          <p className="text-gray-800 whitespace-pre-wrap text-base"
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
             {isStreaming && (
@@ -105,7 +105,7 @@ export default function ChatMessage({
           </p>
         </div>
         {isLastInGroup && !message.isUser && chatbotName && (
-          <p className="text-xs text-[#00001e] mt-1.5 font-medium font-['Montserrat']">
+          <p className="text-xs text-[#EA19FF] mt-1.5 font-medium">
             {chatbotName} {isStreaming && (
               <span className="inline-flex items-center ml-1">
                 <span className="text-xs mr-1">typing</span>

@@ -500,38 +500,36 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
-      {/* Chat Header - Fixed to top - matches width with chat */}
-      <div className="bg-[#eef2f5] py-2 md:py-3 px-3 fixed top-0 left-0 right-0 z-30 shadow-sm border-b border-gray-200 safe-area-inset-top flex items-center justify-center">
-        <div className="w-full max-w-2xl mx-auto flex items-center" style={{maxWidth: "calc(100% - 2rem)"}}>
-          {/* Back button - Show except in preview mode or public page */}
-          {!isPreview && !location.includes('public') && (
-            <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-            </Link>
-          )}
-          
-          {/* Main header content - centered */}
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center">
-              <div className="bg-[#00001E] p-0.5 rounded-full mr-2 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8">
-                <img src={aidifyIcon} alt="Aidify" className="w-7 h-7" />
-              </div>
-              <div>
-                <h2 className="font-['MADE_Evolve_Sans'] font-bold text-[#00001e] text-sm leading-tight">
-                  {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
-                </h2>
-                {!isPreview && !hideDescription && chatbotInfo?.description && (
-                  <p className="font-['Montserrat'] text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[180px] md:max-w-[260px]">{chatbotInfo.description}</p>
-                )}
-              </div>
+      {/* Chat Header - Fixed to top */}
+      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top flex items-center">
+        {/* Back button - Show except in preview mode or public page */}
+        {!isPreview && !location.includes('public') && (
+          <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </Link>
+        )}
+        
+        {/* Main header content - centered on desktop */}
+        <div className="flex items-center justify-between w-full md:justify-center md:max-w-3xl md:mx-auto">
+          <div className="flex items-center">
+            <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-3 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10">
+              <img src={aidifyIcon} alt="Aidify" className="w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10" />
             </div>
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-green-100 text-green-800 font-['Montserrat']">
-              <span className="w-1 h-1 bg-green-500 rounded-full mr-1"></span>
-              Online
-            </span>
+            <div>
+              <h2 className="font-bold text-[#EA19FF] text-base md:text-lg lg:text-xl leading-tight">
+                {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
+              </h2>
+              {!isPreview && !hideDescription && chatbotInfo?.description && (
+                <p className="text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[200px] md:max-w-none">{chatbotInfo.description}</p>
+              )}
+            </div>
           </div>
+          <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-100 text-green-800">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
+            Online
+          </span>
         </div>
       </div>
 
@@ -615,31 +613,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full py-1.5" style={{maxWidth: "calc(100% - 2rem)"}}>
-          <div className="flex gap-2 items-center">
-            <p className="text-xs font-medium text-[#00001e] flex items-center font-['Montserrat'] shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-              Quick Questions:
-            </p>
-            <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-2 scrollbar-none">
+        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
+          <p className="text-xs font-medium text-[#EA19FF] mb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            Quick questions you can ask:
+          </p>
+          <div className="flex flex-wrap overflow-x-auto pb-2 hide-scrollbar gap-2 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -650,13 +647,12 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
+                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#EA19FF]/5 hover:bg-[#EA19FF]/10 text-[#EA19FF] rounded-full border border-[#EA19FF]/20 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
               ))
             )}
-            </div>
           </div>
         </div>
       )}
