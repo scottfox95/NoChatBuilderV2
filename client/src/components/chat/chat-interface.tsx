@@ -615,30 +615,31 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-3 py-0.5 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-3xl mx-auto w-full">
-          <p className="text-[10px] font-medium text-[#00001e] mb-0.5 flex items-center font-montserrat">
-            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-            Quick questions:
-          </p>
-          <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1 scrollbar-none">
+        <div className="px-3 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full">
+          <div className="flex gap-1 items-center">
+            <p className="text-[9px] font-medium text-[#00001e] flex items-center font-['Montserrat'] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+              Quick questions:
+            </p>
+            <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="touch-target whitespace-nowrap font-montserrat px-2 py-0.5 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
+                  className="touch-target whitespace-nowrap font-['Montserrat'] px-2 py-0 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-5 leading-tight"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="touch-target whitespace-nowrap font-montserrat px-2 py-0.5 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
+                  className="touch-target whitespace-nowrap font-['Montserrat'] px-2 py-0 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-5 leading-tight"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="touch-target whitespace-nowrap font-montserrat px-2 py-0.5 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
+                  className="touch-target whitespace-nowrap font-['Montserrat'] px-2 py-0 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-5 leading-tight"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -649,12 +650,13 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="touch-target whitespace-nowrap font-montserrat px-2 py-0.5 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors"
+                  className="touch-target whitespace-nowrap font-['Montserrat'] px-2 py-0 text-[10px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-5 leading-tight"
                 >
                   {question}
                 </button>
               ))
             )}
+            </div>
           </div>
         </div>
       )}
