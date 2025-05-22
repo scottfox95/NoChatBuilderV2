@@ -615,31 +615,31 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full py-0.5">
-          <div className="flex gap-1 items-center">
-            <p className="text-[8px] font-medium text-[#00001e] flex items-center font-['Montserrat'] shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-0.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-              Questions:
+        <div className="px-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full py-1.5">
+          <div className="flex gap-2 items-center">
+            <p className="text-xs font-medium text-[#00001e] flex items-center font-['Montserrat'] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+              Quick Questions:
             </p>
-            <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1 scrollbar-none">
+            <div className="flex flex-nowrap overflow-x-auto hide-scrollbar gap-2 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="whitespace-nowrap font-['Montserrat'] px-1.5 py-0 text-[8px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-4 leading-tight flex items-center"
+                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="whitespace-nowrap font-['Montserrat'] px-1.5 py-0 text-[8px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-4 leading-tight flex items-center"
+                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="whitespace-nowrap font-['Montserrat'] px-1.5 py-0 text-[8px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-4 leading-tight flex items-center"
+                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
                 >
                   Why do I need dental clearance?
                 </button>
