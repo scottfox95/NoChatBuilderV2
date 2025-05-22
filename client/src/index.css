@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* Custom styles for better readability */
 input, select, textarea, .text-input {
   @apply text-gray-900;
@@ -132,7 +134,8 @@ input::placeholder, select::placeholder, textarea::placeholder {
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
+    font-family: 'Poppins', sans-serif;
+    @apply antialiased text-foreground;
     background-color: var(--primary-bg);
     color: var(--text-on-dark);
     
