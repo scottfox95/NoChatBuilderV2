@@ -501,12 +501,12 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-1 md:py-1.5 px-3 fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top flex items-center justify-center">
+      <div className="bg-[#eef2f5] py-2 md:py-3 px-3 fixed top-0 left-0 right-0 z-30 shadow-sm border-b border-gray-200 safe-area-inset-top flex items-center justify-center">
         <div className="max-w-2xl w-full mx-auto flex items-center">
           {/* Back button - Show except in preview mode or public page */}
           {!isPreview && !location.includes('public') && (
             <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </Link>
@@ -515,15 +515,15 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           {/* Main header content - centered */}
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center">
-              <div className="bg-[#00001E] p-0 rounded-full mr-2 flex items-center justify-center shadow-sm overflow-hidden w-6 h-6">
-                <img src={aidifyIcon} alt="Aidify" className="w-6 h-6" />
+              <div className="bg-[#00001E] p-0.5 rounded-full mr-2 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8">
+                <img src={aidifyIcon} alt="Aidify" className="w-7 h-7" />
               </div>
               <div>
-                <h2 className="font-['MADE_Evolve_Sans'] font-bold text-[#00001e] text-xs leading-tight">
+                <h2 className="font-['MADE_Evolve_Sans'] font-bold text-[#00001e] text-sm leading-tight">
                   {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
                 </h2>
                 {!isPreview && !hideDescription && chatbotInfo?.description && (
-                  <p className="font-['Montserrat'] text-[9px] text-gray-600 line-clamp-1 mt-0.5 max-w-[180px] md:max-w-[260px]">{chatbotInfo.description}</p>
+                  <p className="font-['Montserrat'] text-xs text-gray-600 line-clamp-1 mt-0.5 max-w-[180px] md:max-w-[260px]">{chatbotInfo.description}</p>
                 )}
               </div>
             </div>
@@ -650,7 +650,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="whitespace-nowrap font-['Montserrat'] px-1.5 py-0 text-[8px] bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors h-4 leading-tight flex items-center"
+                  className="whitespace-nowrap font-['Montserrat'] px-3 py-1 text-xs bg-[#aecee9]/30 hover:bg-[#aecee9]/50 text-[#00001e] rounded-full border border-[#aecee9]/50 transition-colors leading-none flex items-center"
                 >
                   {question}
                 </button>
