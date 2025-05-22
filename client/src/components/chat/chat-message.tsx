@@ -54,7 +54,7 @@ export default function ChatMessage({
             max-w-[80%] md:max-w-[70%] mr-3
           `}
         >
-          <p className="text-white whitespace-pre-wrap text-base" 
+          <p className="text-white whitespace-pre-wrap text-sm" 
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
           </p>
