@@ -500,9 +500,9 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
-      {/* Chat Header - Fixed to top */}
+      {/* Chat Header - Fixed to top - matches width with chat */}
       <div className="bg-[#eef2f5] py-2 md:py-3 px-3 fixed top-0 left-0 right-0 z-30 shadow-sm border-b border-gray-200 safe-area-inset-top flex items-center justify-center">
-        <div className="max-w-2xl w-full mx-auto flex items-center">
+        <div className="w-full max-w-2xl mx-auto flex items-center" style={{maxWidth: "calc(100% - 2rem)"}}>
           {/* Back button - Show except in preview mode or public page */}
           {!isPreview && !location.includes('public') && (
             <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
@@ -615,7 +615,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full py-1.5">
+        <div className="px-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10 max-w-2xl mx-auto w-full py-1.5" style={{maxWidth: "calc(100% - 2rem)"}}>
           <div className="flex gap-2 items-center">
             <p className="text-xs font-medium text-[#00001e] flex items-center font-['Montserrat'] shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
