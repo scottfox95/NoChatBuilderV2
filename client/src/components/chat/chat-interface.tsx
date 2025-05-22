@@ -501,7 +501,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-2 md:py-3 px-3 md:px-4 fixed top-0 left-0 right-0 z-30 shadow-md border-b border-gray-200 safe-area-inset-top flex items-center">
+      <div className="bg-white py-2 md:py-3 px-3 md:px-4 w-full z-30 shadow-sm border-b border-gray-200 flex items-center">
         {/* Back button - Show except in preview mode or public page */}
         {!isPreview && !location.includes('public') && (
           <Link to="/dashboard" className="mr-2 text-gray-600 hover:text-gray-800 transition-colors">
@@ -511,14 +511,14 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           </Link>
         )}
         
-        {/* Main header content - centered on desktop */}
-        <div className="flex items-center justify-between w-full md:justify-center md:max-w-3xl md:mx-auto">
+        {/* Main header content */}
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <div className="bg-[#00001E] p-0 rounded-full mr-2 md:mr-3 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10">
+            <div className="bg-[#aecee9] p-0 rounded-full mr-2 md:mr-3 flex items-center justify-center shadow-sm overflow-hidden w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10">
               <img src={aidifyIcon} alt="Aidify" className="w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10" />
             </div>
             <div>
-              <h2 className="font-bold text-[#EA19FF] text-base md:text-lg lg:text-xl leading-tight">
+              <h2 className="font-bold text-[#00001e] text-base md:text-lg lg:text-xl leading-tight">
                 {isPreview ? "Chatbot Preview" : chatbotInfo?.name}
               </h2>
               {!isPreview && !hideDescription && chatbotInfo?.description && (
@@ -532,9 +532,6 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
           </span>
         </div>
       </div>
-
-      {/* Spacer for fixed header */}
-      <div className="h-[60px] md:h-[68px] lg:h-[72px]"></div>
       
       {/* Chat Messages */}
       <div 
