@@ -610,30 +610,30 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
         (!isPreview ? 
           (chatbotInfo?.suggestedQuestions && chatbotInfo.suggestedQuestions.length > 0) : 
           isPreview) && (
-        <div className="px-3 py-2 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
-          <p className="text-xs font-medium text-[#9083FF] mb-2 flex items-center">
+        <div className="px-3 py-1 border-t border-gray-200 bg-white/95 backdrop-blur-sm sticky bottom-[61px] z-10">
+          <p className="text-xs font-medium text-[#9083FF] mb-1 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             Quick questions you can ask:
           </p>
-          <div className="flex flex-wrap overflow-x-auto pb-2 hide-scrollbar gap-2 scrollbar-none">
+          <div className="flex flex-wrap overflow-x-auto pb-1 hide-scrollbar gap-1.5 scrollbar-none">
             {isPreview ? (
               // Show sample suggested questions in preview mode
               <>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("How long is my surgery going to take?")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-0.5 px-2.5 py-0.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   How long is my surgery going to take?
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Tell me about the MAKO Robotic Technique")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-0.5 px-2.5 py-0.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   Tell me about the MAKO Robotic Technique
                 </button>
                 <button 
                   onClick={() => handleSuggestedQuestionClick("Why do I need dental clearance?")}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-0.5 px-2.5 py-0.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   Why do I need dental clearance?
                 </button>
@@ -644,7 +644,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
                 <button 
                   key={index}
                   onClick={() => handleSuggestedQuestionClick(question)}
-                  className="touch-target whitespace-nowrap mb-1 px-3 py-1.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
+                  className="touch-target whitespace-nowrap mb-0.5 px-2.5 py-0.5 text-xs bg-[#9083FF]/5 hover:bg-[#9083FF]/10 text-[#9083FF] rounded-full border border-[#9083FF]/20 transition-colors shadow-sm"
                 >
                   {question}
                 </button>
