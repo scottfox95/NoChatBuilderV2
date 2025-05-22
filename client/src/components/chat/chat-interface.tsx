@@ -499,7 +499,7 @@ export default function ChatInterface({ chatbotSlug, isPreview = false, previewS
   }, [messages, isNearBottom]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-white rounded-lg shadow border border-gray-200 safe-area-inset">
       {/* Chat Header - Fixed to top */}
       <div className="bg-white py-2 md:py-3 px-3 md:px-4 w-full z-30 shadow-sm border-b border-gray-200 flex items-center">
         {/* Back button - Show except in preview mode or public page */}
