@@ -45,24 +45,24 @@ export default function ChatMessage({
   if (message.isUser) {
     return (
       <div className={`flex items-start justify-end ${isLastInGroup ? 'mb-3' : 'mb-0.5'} px-3`}>
-        <div 
-          className={`bg-[#0B84FE] rounded-[16px] py-2 px-3 shadow-sm
-            ${isFirstInGroup && isLastInGroup ? 'rounded-[16px]' : 
-             isFirstInGroup ? 'rounded-[16px] rounded-br-sm' :
-             isLastInGroup ? 'rounded-[16px] rounded-br-sm' : 
-             'rounded-[16px] rounded-br-sm'}
-            max-w-[80%] md:max-w-[70%] relative
-          `}
-        >
-          <p className="text-white whitespace-pre-wrap text-sm" 
-             style={{ wordBreak: 'break-word' }}>
-            {formatMessageContent(message.content)}
-          </p>
+        <div className="relative">
+          <div 
+            className={`bg-[#0B84FE] rounded-[16px] py-2 px-3 shadow-sm
+              max-w-[80%] md:max-w-[70%] relative
+              rounded-br-none
+            `}
+          >
+            <p className="text-white whitespace-pre-wrap text-sm" 
+               style={{ wordBreak: 'break-word' }}>
+              {formatMessageContent(message.content)}
+            </p>
+          </div>
           
-          {/* Message tail */}
-          {isLastInGroup && (
-            <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-[#0B84FE] transform rotate-45"></div>
-          )}
+          {/* Triangle tail at bottom right */}
+          <div className="absolute bottom-0 right-0 w-0 h-0 
+            border-t-[8px] border-t-[#0B84FE] 
+            border-r-[8px] border-r-transparent">
+          </div>
         </div>
       </div>
     );
