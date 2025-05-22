@@ -61,7 +61,7 @@ export default function ChatMessage({
           
           {/* Message tail */}
           {isLastInGroup && (
-            <div className="absolute bottom-0 right-0 w-4 h-4 bg-[#0B84FE] transform translate-x-1/4 translate-y-1/3 rotate-45 z-[-1]"></div>
+            <div className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-[#0B84FE] transform rotate-45"></div>
           )}
         </div>
       </div>
