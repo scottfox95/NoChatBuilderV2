@@ -96,7 +96,7 @@ export default function ChatMessage({
         `}
       >
         <div className={`relative ${isStreaming ? 'animate-text-fade-in' : ''}`}>
-          <p className="text-gray-800 whitespace-pre-wrap text-base"
+          <p className="text-gray-800 whitespace-pre-wrap text-sm"
              style={{ wordBreak: 'break-word' }}>
             {formatMessageContent(message.content)}
             {isStreaming && (
