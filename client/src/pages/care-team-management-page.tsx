@@ -58,6 +58,11 @@ export default function CareTeamManagementPage() {
     },
   });
 
+  // Update form role when tab changes
+  React.useEffect(() => {
+    form.setValue("role", activeTab as "careteam" | "admin");
+  }, [activeTab, form]);
+
   // Fetch users by role
   const { data: careTeamUsers = [], isLoading: isLoadingCareTeam } = useQuery<User[]>({
     queryKey: ["/api/admin/users/careteam"],
