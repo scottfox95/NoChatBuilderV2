@@ -60,12 +60,12 @@ export default function CareTeamManagementPage() {
 
   // Fetch users by role
   const { data: careTeamUsers = [], isLoading: isLoadingCareTeam } = useQuery<User[]>({
-    queryKey: ["/api/admin/users/careteam"],
+    queryKey: ["/api/admin/care-team/users"],
     retry: false,
   });
 
   const { data: adminUsers = [], isLoading: isLoadingAdmins } = useQuery<User[]>({
-    queryKey: ["/api/admin/users/admin"],
+    queryKey: ["/api/admin/admin-users"],
     retry: false,
   });
 
@@ -97,8 +97,8 @@ export default function CareTeamManagementPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/careteam"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/admin"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/care-team/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/admin-users"] });
       form.reset();
       toast({
         title: "Success",
@@ -127,8 +127,8 @@ export default function CareTeamManagementPage() {
       return response.ok;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/careteam"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/admin"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/care-team/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/admin-users"] });
       toast({
         title: "Success",
         description: "User deleted successfully",

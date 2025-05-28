@@ -1452,7 +1452,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Delete the user from the database using SQL
-      await storage.pool.query('DELETE FROM users WHERE id = $1', [userId]);
+      const { db } = await import("./db");
+      await db.delete(users).where(eq(users.id, userId));
       
       res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
@@ -1472,6 +1473,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching care team users:", error);
       res.status(500).json({ message: "Failed to fetch care team users" });
+    }
+  });
+
+  // Get admin users endpoint
+  app.get("/api/admin/admin-users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const adminUsers = await storage.getUsersByRole("admin");
+      res.json(adminUsers);
+    } catch (error) {
+      console.error("Error fetching admin users:", error);
+      res.status(500).json({ message: "Failed to fetch admin users" });
     }
   });
 
