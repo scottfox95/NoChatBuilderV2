@@ -74,7 +74,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/chatbots", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
-    const chatbots = await storage.getChatbots(req.user.id);
+    // Admin users can see all chatbots, others only see their own
+    let chatbots;
+    if (req.user.role === "admin") {
+      chatbots = await storage.getAllChatbots();
+    } else {
+      chatbots = await storage.getChatbots(req.user.id);
+    }
     res.json(chatbots);
   });
 

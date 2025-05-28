@@ -40,6 +40,7 @@ export interface IStorage {
 
   // Chatbot operations
   getChatbots(userId: number): Promise<Chatbot[]>;
+  getAllChatbots(): Promise<Chatbot[]>;
   getChatbot(id: number): Promise<Chatbot | undefined>;
   getChatbotBySlug(slug: string): Promise<Chatbot | undefined>;
   createChatbot(chatbot: InsertChatbot): Promise<Chatbot>;
@@ -235,6 +236,10 @@ export class DatabaseStorage implements IStorage {
   // Chatbot operations
   async getChatbots(userId: number): Promise<Chatbot[]> {
     return await db.select().from(chatbots).where(eq(chatbots.userId, userId));
+  }
+
+  async getAllChatbots(): Promise<Chatbot[]> {
+    return await db.select().from(chatbots);
   }
 
   async getChatbot(id: number): Promise<Chatbot | undefined> {
