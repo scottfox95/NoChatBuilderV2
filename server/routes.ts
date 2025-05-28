@@ -1408,6 +1408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (req.user.role !== "admin") return res.sendStatus(403);
     
     try {
+      console.log("Creating user with data:", req.body);
       const userData = insertUserSchema.parse(req.body);
       
       if (userData.role !== "careteam" && userData.role !== "admin") {
@@ -1421,11 +1422,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const newUser = await storage.createUser(userData);
+      console.log("User created successfully:", newUser.id, newUser.username, newUser.role);
       // Remove password from response
       const { password, ...userResponse } = newUser;
       res.status(201).json(userResponse);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log("Validation error:", error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       console.error("Error creating user:", error);
