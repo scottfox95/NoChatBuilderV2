@@ -82,10 +82,10 @@ export default function CareTeamManagementPage() {
     retry: false,
   });
 
-  // Create user mutation
+  // Create user mutation using the working register endpoint
   const createUserMutation = useMutation({
     mutationFn: async (values: CreateUserValues) => {
-      const response = await fetch("/api/admin/users", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
