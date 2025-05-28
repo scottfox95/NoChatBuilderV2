@@ -59,24 +59,24 @@ export default function CareTeamManagementPage() {
   });
 
   // Fetch users by role
-  const { data: careTeamUsers = [], isLoading: isLoadingCareTeam } = useQuery({
+  const { data: careTeamUsers = [], isLoading: isLoadingCareTeam } = useQuery<User[]>({
     queryKey: ["/api/admin/users/careteam"],
     retry: false,
   });
 
-  const { data: adminUsers = [], isLoading: isLoadingAdmins } = useQuery({
+  const { data: adminUsers = [], isLoading: isLoadingAdmins } = useQuery<User[]>({
     queryKey: ["/api/admin/users/admin"],
     retry: false,
   });
 
   // Fetch all chatbots for assignment
-  const { data: chatbots = [], isLoading: isLoadingChatbots } = useQuery({
+  const { data: chatbots = [], isLoading: isLoadingChatbots } = useQuery<Chatbot[]>({
     queryKey: ["/api/chatbots"],
     retry: false,
   });
 
   // Fetch assignments for selected user (only for care team users)
-  const { data: userAssignments = [], refetch: refetchAssignments } = useQuery({
+  const { data: userAssignments = [], refetch: refetchAssignments } = useQuery<Chatbot[]>({
     queryKey: ["/api/care-team/assignments", selectedUserId],
     enabled: !!selectedUserId && activeTab === "careteam",
     retry: false,
@@ -145,11 +145,18 @@ export default function CareTeamManagementPage() {
 
   // Assign chatbot mutation
   const assignChatbotMutation = useMutation({
-    mutationFn: ({ userId, chatbotId }: { userId: number; chatbotId: number }) =>
-      apiRequest("/api/admin/care-team/assignments", {
+    mutationFn: async ({ userId, chatbotId }: { userId: number; chatbotId: number }) => {
+      const response = await fetch("/api/admin/care-team/assignments", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, chatbotId }),
-      }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to assign Care Aid");
+      }
+      return response.json();
+    },
     onSuccess: () => {
       refetchAssignments();
       toast({
@@ -168,10 +175,16 @@ export default function CareTeamManagementPage() {
 
   // Remove assignment mutation
   const removeAssignmentMutation = useMutation({
-    mutationFn: ({ userId, chatbotId }: { userId: number; chatbotId: number }) =>
-      apiRequest(`/api/admin/care-team/assignments/${userId}/${chatbotId}`, {
+    mutationFn: async ({ userId, chatbotId }: { userId: number; chatbotId: number }) => {
+      const response = await fetch(`/api/admin/care-team/assignments/${userId}/${chatbotId}`, {
         method: "DELETE",
-      }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to remove assignment");
+      }
+      return response.ok;
+    },
     onSuccess: () => {
       refetchAssignments();
       toast({
