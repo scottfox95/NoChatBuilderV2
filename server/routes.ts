@@ -1483,6 +1483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const adminUsers = await storage.getUsersByRole("admin");
+      console.log("Admin users found:", adminUsers);
       res.json(adminUsers);
     } catch (error) {
       console.error("Error fetching admin users:", error);
