@@ -51,6 +51,12 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Ensure API routes always return JSON, not HTML
+  app.use("/api/*", (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
+    next();
+  });
+
   // Serve widget.js static file
   app.get("/widget.js", (req, res) => {
     const widgetPath = path.join(process.cwd(), "client", "public", "widget.js");
