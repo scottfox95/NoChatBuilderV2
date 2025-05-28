@@ -90,10 +90,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Add the current user's ID to the request data
       console.log("Creating chatbot with user ID:", req.user.id);
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      
       const data = insertChatbotSchema.parse({
         ...req.body,
         userId: req.user.id,
       });
+      
+      console.log("Parsed chatbot data:", JSON.stringify(data, null, 2));
       
       // Check for duplicate slug
       const existingChatbot = await storage.getChatbotBySlug(data.slug);
@@ -102,12 +106,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const chatbot = await storage.createChatbot(data);
+      console.log("Created chatbot successfully:", chatbot.id);
       res.status(201).json(chatbot);
     } catch (error) {
+      console.error("Error creating chatbot:", error);
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create chatbot" });
+      res.status(500).json({ message: "Failed to create chatbot", error: error.message });
     }
   });
 
