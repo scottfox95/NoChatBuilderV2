@@ -296,7 +296,7 @@ export default function CareTeamManagementPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter username" {...field} />
+                              <Input placeholder="Enter username" className="bg-[#f4f4f4]" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -309,7 +309,7 @@ export default function CareTeamManagementPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Enter password" {...field} />
+                              <Input type="password" placeholder="Enter password" className="bg-[#f4f4f4]" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -528,7 +528,7 @@ export default function CareTeamManagementPage() {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter username" {...field} />
+                              <Input placeholder="Enter username" className="bg-[#f4f4f4]" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -541,7 +541,7 @@ export default function CareTeamManagementPage() {
                           <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Enter password" {...field} />
+                              <Input type="password" placeholder="Enter password" className="bg-[#f4f4f4]" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
