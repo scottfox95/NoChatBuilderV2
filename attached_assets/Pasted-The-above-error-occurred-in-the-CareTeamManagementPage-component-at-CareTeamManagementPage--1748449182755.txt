@@ -1,0 +1,27 @@
+The above error occurred in the <CareTeamManagementPage> component:
+
+    at CareTeamManagementPage (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/src/pages/care-team-management-page.tsx?t=1748449094547:45:21)
+    at Suspense
+    at component
+    at render
+    at Route (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=5424a31b:323:16)
+    at RoleProtectedRoute (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/src/App.tsx?t=1748449094547&v=79tnHfatf5U7cXh5QXrdn:44:42)
+    at Switch (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=5424a31b:379:17)
+    at Router (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/src/App.tsx?t=1748449094547&v=79tnHfatf5U7cXh5QXrdn:87:20)
+    at AuthProvider (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=5424a31b:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+React is not defined
+at CareTeamManagementPage (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/src/pages/care-team-management-page.tsx?t=1748449094547:59:3)
+at renderWithHooks (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:11548:26)
+at updateFunctionComponent (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:14582:28)
+at mountLazyComponent (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:14833:23)
+at beginWork (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:15918:22)
+at beginWork$1 (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:19753:22)
+at performUnitOfWork (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:19198:20)
+at workLoopSync (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:19137:13)
+at renderRootSync (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:19116:15)
+at recoverFromConcurrentError (https://f0f8fbdb-a193-44b3-8738-7b37058a6b77-00-27k079c9ipp3l.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5424a31b:18736:28)

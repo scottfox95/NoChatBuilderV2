@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -59,7 +59,7 @@ export default function CareTeamManagementPage() {
   });
 
   // Update form role when tab changes
-  React.useEffect(() => {
+  useEffect(() => {
     form.setValue("role", activeTab as "careteam" | "admin");
   }, [activeTab, form]);
 
