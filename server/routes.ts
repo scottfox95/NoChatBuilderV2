@@ -1374,13 +1374,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== Admin API Routes for User Management =====
 
-  // Get admin users
+  // Get admin users (using the correct endpoint that frontend expects)
   app.get("/api/admin/users/admin", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (req.user.role !== "admin") return res.sendStatus(403);
     
     try {
       const users = await storage.getUsersByRole("admin");
+      console.log("Admin users found for /api/admin/users/admin:", users);
       res.json(users);
     } catch (error) {
       console.error("Error fetching admin users:", error);
