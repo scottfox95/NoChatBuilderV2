@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
-import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema } from "@shared/schema";
+import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { generateCompletion, generateStreamingCompletion, processDocumentText, verifyApiKey } from "./openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
@@ -1373,22 +1374,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== Admin API Routes for User Management =====
 
-  // Get users by role (care team or admin)
-  app.get("/api/admin/users/:role", async (req, res) => {
+  // Get admin users
+  app.get("/api/admin/users/admin", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (req.user.role !== "admin") return res.sendStatus(403);
     
     try {
-      const { role } = req.params;
-      if (role !== "careteam" && role !== "admin") {
-        return res.status(400).json({ message: "Invalid role. Must be 'careteam' or 'admin'" });
-      }
-      
-      const users = await storage.getUsersByRole(role);
+      const users = await storage.getUsersByRole("admin");
       res.json(users);
     } catch (error) {
-      console.error(`Error fetching ${req.params.role} users:`, error);
-      res.status(500).json({ message: `Failed to fetch ${req.params.role} users` });
+      console.error("Error fetching admin users:", error);
+      res.status(500).json({ message: "Failed to fetch admin users" });
+    }
+  });
+
+  // Get care team users  
+  app.get("/api/admin/users/careteam", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const users = await storage.getUsersByRole("careteam");
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching careteam users:", error);
+      res.status(500).json({ message: "Failed to fetch careteam users" });
     }
   });
 
@@ -1441,9 +1451,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // For now, we'll implement a simple approach - just check if user exists
-      // In a real implementation, you'd want to add a deleteUser method to storage
-      res.status(501).json({ message: "User deletion not yet implemented" });
+      // Delete the user from the database using SQL
+      await storage.pool.query('DELETE FROM users WHERE id = $1', [userId]);
+      
+      res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Failed to delete user" });
