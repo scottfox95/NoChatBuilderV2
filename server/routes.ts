@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
-import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema } from "@shared/schema";
+import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema } from "@shared/schema";
 import { generateCompletion, generateStreamingCompletion, processDocumentText, verifyApiKey } from "./openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
@@ -1371,9 +1371,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ===== Admin API Routes for managing Care Team =====
+  // ===== Admin API Routes for User Management =====
 
-  // Get all users with care team role
+  // Get users by role (care team or admin)
+  app.get("/api/admin/users/:role", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const { role } = req.params;
+      if (role !== "careteam" && role !== "admin") {
+        return res.status(400).json({ message: "Invalid role. Must be 'careteam' or 'admin'" });
+      }
+      
+      const users = await storage.getUsersByRole(role);
+      res.json(users);
+    } catch (error) {
+      console.error(`Error fetching ${req.params.role} users:`, error);
+      res.status(500).json({ message: `Failed to fetch ${req.params.role} users` });
+    }
+  });
+
+  // Create a new user (admin or care team)
+  app.post("/api/admin/users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      if (userData.role !== "careteam" && userData.role !== "admin") {
+        return res.status(400).json({ message: "Invalid role. Must be 'careteam' or 'admin'" });
+      }
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(userData.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      const newUser = await storage.createUser(userData);
+      // Remove password from response
+      const { password, ...userResponse } = newUser;
+      res.status(201).json(userResponse);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // Delete a user
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const userId = Number(req.params.id);
+      
+      // Prevent admin from deleting themselves
+      if (userId === req.user.id) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // For now, we'll implement a simple approach - just check if user exists
+      // In a real implementation, you'd want to add a deleteUser method to storage
+      res.status(501).json({ message: "User deletion not yet implemented" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Keep the old endpoint for backward compatibility
   app.get("/api/admin/care-team/users", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (req.user.role !== "admin") return res.sendStatus(403);
