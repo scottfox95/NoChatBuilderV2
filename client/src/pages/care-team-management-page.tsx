@@ -60,7 +60,7 @@ export default function CareTeamManagementPage() {
 
   // Fetch users by role
   const { data: careTeamUsers = [], isLoading: isLoadingCareTeam } = useQuery<User[]>({
-    queryKey: ["/api/admin/care-team/users"],
+    queryKey: ["/api/admin/users/careteam"],
     retry: false,
   });
 
@@ -97,7 +97,7 @@ export default function CareTeamManagementPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/care-team/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/careteam"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users/admin"] });
       form.reset();
       toast({

@@ -1374,7 +1374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== Admin API Routes for User Management =====
 
-  // Get admin users (using the correct endpoint that frontend expects)
+  // Get admin users 
   app.get("/api/admin/users/admin", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (req.user.role !== "admin") return res.sendStatus(403);
@@ -1389,19 +1389,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get care team users  
+  // Get care team users (consistent endpoint)
   app.get("/api/admin/users/careteam", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (req.user.role !== "admin") return res.sendStatus(403);
     
     try {
       const users = await storage.getUsersByRole("careteam");
+      console.log("Care team users found for /api/admin/users/careteam:", users);
       res.json(users);
     } catch (error) {
       console.error("Error fetching careteam users:", error);
       res.status(500).json({ message: "Failed to fetch careteam users" });
     }
   });
+
+
 
   // Create a new user (admin or care team)
   app.post("/api/admin/users", async (req, res) => {
@@ -1480,20 +1483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get admin users endpoint
-  app.get("/api/admin/admin-users", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    if (req.user.role !== "admin") return res.sendStatus(403);
-    
-    try {
-      const adminUsers = await storage.getUsersByRole("admin");
-      console.log("Admin users found:", adminUsers);
-      res.json(adminUsers);
-    } catch (error) {
-      console.error("Error fetching admin users:", error);
-      res.status(500).json({ message: "Failed to fetch admin users" });
-    }
-  });
+
 
   // Get chatbot assignments for a specific chatbot
   app.get("/api/admin/chatbots/:id/assignments", async (req, res) => {
