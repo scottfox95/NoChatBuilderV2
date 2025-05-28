@@ -1469,19 +1469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Keep the old endpoint for backward compatibility
-  app.get("/api/admin/care-team/users", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    if (req.user.role !== "admin") return res.sendStatus(403);
-    
-    try {
-      const careTeamUsers = await storage.getUsersByRole("careteam");
-      res.json(careTeamUsers);
-    } catch (error) {
-      console.error("Error fetching care team users:", error);
-      res.status(500).json({ message: "Failed to fetch care team users" });
-    }
-  });
+
 
 
 

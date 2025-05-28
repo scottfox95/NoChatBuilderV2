@@ -127,7 +127,7 @@ export default function CareTeamManagementPage() {
       return response.ok;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/care-team/users"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users/careteam"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users/admin"] });
       toast({
         title: "Success",
