@@ -1,4 +1,5 @@
 import { openai } from "./client";
+import { generateResponseCompletion, generateStreamingResponseCompletion } from "./openai-responses";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 
@@ -84,7 +85,7 @@ interface StreamingCompletionOptions extends CompletionOptions {
   onError: (error: any) => void;
 }
 
-// Single helper that covers both streaming and non-streaming modes
+// Single helper that covers both streaming and non-streaming modes using responses API
 export async function askLLM({
   userMessage,
   chatbot,
@@ -110,69 +111,22 @@ export async function askLLM({
   onError?: (error: any) => void;
   fallbackResponse?: string;
 }): Promise<string | void> {
-  try {
-    const messages = [
-      ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
-      ...previousMessages,
-      { role: "user" as const, content: userMessage },
-    ];
-
-    const resp = await openai.responses.create({
-      model: "gpt-4o-mini",
-      input: userMessage,
-      ...(chatbot?.vectorStoreId && {
-        tools: [{
-          type: "file_search",
-          vector_store_ids: [chatbot.vectorStoreId],
-        }]
-      }),
-      stream: stream,
+  if (!stream) {
+    return await generateResponseCompletion({
+      userMessage,
+      chatbot,
+      fallbackResponse: fallbackResponse || "I couldn't generate a response.",
     });
-
-    if (!stream) {
-      const response = resp as any;
-      return response.output_text || fallbackResponse || "I couldn't generate a response.";
-    }
-
-    const chunks: string[] = [];
-    let fullResponse = "";
-    
-    for await (const chunk of resp as any) {
-      // Handle different chunk types from responses API
-      if (chunk.type === 'response.output_text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        chunks.push(content);
-        fullResponse += content;
-        onChunk?.(content);
-      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
-        // Final chunk with complete text
-        const content = chunk.response.output_text;
-        if (!fullResponse) {
-          fullResponse = content;
-          onChunk?.(content);
-        }
-      }
-    }
-
-    if (fullResponse.trim() === "" && fallbackResponse) {
-      fullResponse = fallbackResponse;
-      onChunk?.(fallbackResponse);
-    } else if (fullResponse.trim() === "") {
-      fullResponse = "I'm sorry, I couldn't generate a response.";
-      onChunk?.(fullResponse);
-    }
-
-    onComplete?.(fullResponse);
-    return fullResponse;
-  } catch (error) {
-    console.error("OpenAI completion error:", error);
-    const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
-    if (stream) {
-      onError?.(errorResponse);
-    } else {
-      return errorResponse;
-    }
   }
+
+  await generateStreamingResponseCompletion({
+    userMessage,
+    chatbot,
+    onChunk: onChunk || (() => {}),
+    onComplete: onComplete || (() => {}),
+    onError: onError || (() => {}),
+    fallbackResponse: fallbackResponse || "I couldn't generate a response.",
+  });
 }
 
 // Standard non-streaming completion (keep for backward compatibility)
@@ -187,47 +141,24 @@ export async function generateCompletion({
   fallbackResponse,
 }: CompletionOptions): Promise<string> {
   try {
-    // Create a modified system prompt that includes documents if RAG is enabled
-    let enhancedSystemPrompt = systemPrompt;
-    
-    if (documents && documents.length > 0) {
-      // Combine all document text but limit by token count (rough approximation)
-      const combinedDocs = documents.join("\n\n");
-      const contextLimit = 4000; // Rough limit to avoid token limits
-      const truncatedDocs = combinedDocs.length > contextLimit
-        ? combinedDocs.substring(0, contextLimit) + "..."
-        : combinedDocs;
-      
-      enhancedSystemPrompt += `\n\nHere is additional context to help answer the user's questions:\n${truncatedDocs}`;
-    }
-
-    // Prepare messages for OpenAI
-    const messages: Message[] = [
-      { role: "system", content: enhancedSystemPrompt },
-      ...previousMessages,
-      { role: "user", content: userMessage },
-    ];
-
     // Map internal model names to actual OpenAI model IDs
     const modelMap: Record<string, string> = {
-      "gpt4-1": "gpt-4-1106-preview", // GPT-4.1 Turbo (similar naming convention)
-      "gpt4o": "gpt-4o", // GPT-4o (latest model as of May 2024)
+      "gpt4-1": "gpt-4-1106-preview",
+      "gpt4o": "gpt-4o",
       "gpt4": "gpt-4",
-      "gpt4-mini": "gpt-4o-mini", // GPT-4 Mini
+      "gpt4-mini": "gpt-4o-mini",
       "gpt35turbo": "gpt-3.5-turbo",
-      "gpt3-mini": "gpt-3.5-turbo-instruct", // GPT-3.5 Turbo Instruct (more like GPT-3 Mini)
-      "gpt4-1-nano": "gpt-4-0125-preview", // GPT-4.1 Nano (approximation based on parameter count)
-      "gpt4o-mini": "gpt-4o-mini", // GPT-4o Mini
+      "gpt3-mini": "gpt-3.5-turbo-instruct",
+      "gpt4-1-nano": "gpt-4-0125-preview",
+      "gpt4o-mini": "gpt-4o-mini",
     };
 
     const actualModel = modelMap[model] || "gpt-3.5-turbo";
 
-    const response = await openai.responses.create({
-      model: actualModel,
-      input: userMessage,
+    return await generateResponseCompletion({
+      userMessage,
+      fallbackResponse: fallbackResponse || "I couldn't generate a response.",
     });
-
-    return response.output_text || fallbackResponse || "I couldn't generate a response.";
   } catch (error) {
     console.error("OpenAI completion error:", error);
     return fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
