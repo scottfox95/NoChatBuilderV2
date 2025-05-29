@@ -242,17 +242,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/chatbots/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
-    const chatbot = await storage.getChatbot(Number(req.params.id));
-    if (!chatbot) {
-      return res.status(404).json({ message: "Chatbot not found" });
+    try {
+      const chatbot = await storage.getChatbot(Number(req.params.id));
+      if (!chatbot) {
+        return res.status(404).json({ message: "Chatbot not found" });
+      }
+      
+      if (chatbot.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to delete this chatbot" });
+      }
+      
+      // Clean up OpenAI vector store if it exists
+      if (chatbot.vectorStoreId) {
+        try {
+          await openai.vectorStores.del(chatbot.vectorStoreId);
+          console.log("Deleted OpenAI vector store:", chatbot.vectorStoreId);
+        } catch (error) {
+          console.error("Error deleting OpenAI vector store:", error);
+          // Continue with chatbot deletion even if vector store cleanup fails
+        }
+      }
+      
+      // Delete the chatbot from our database
+      await storage.deleteChatbot(Number(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting chatbot:", error);
+      res.status(500).json({ message: "Failed to delete chatbot" });
     }
-    
-    if (chatbot.userId !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to delete this chatbot" });
-    }
-    
-    await storage.deleteChatbot(Number(req.params.id));
-    res.status(204).send();
   });
 
   // Document routes
@@ -366,21 +383,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/documents/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
-    // Make sure the document belongs to a chatbot owned by the user
-    const documents = await storage.getDocumentsByChatbotId(Number(req.params.id));
-    const document = documents.find(doc => doc.id === Number(req.params.id));
-    
-    if (!document) {
-      return res.status(404).json({ message: "Document not found" });
+    try {
+      // First get the document to find its details
+      const allDocuments = await storage.getAllDocuments(req.user!.id);
+      const document = allDocuments.find(doc => doc.id === Number(req.params.id));
+      
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      const chatbot = await storage.getChatbot(document.chatbotId);
+      if (!chatbot || chatbot.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to delete this document" });
+      }
+      
+      // Clean up OpenAI file if it exists
+      if (document.openaiFileId) {
+        try {
+          await openai.files.del(document.openaiFileId);
+          console.log("Deleted OpenAI file:", document.openaiFileId);
+        } catch (error) {
+          console.error("Error deleting OpenAI file:", error);
+          // Continue with document deletion even if file cleanup fails
+        }
+      }
+      
+      // Delete the document from our database
+      await storage.deleteDocument(Number(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      res.status(500).json({ message: "Failed to delete document" });
     }
-    
-    const chatbot = await storage.getChatbot(document.chatbotId);
-    if (!chatbot || chatbot.userId !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to delete this document" });
-    }
-    
-    await storage.deleteDocument(Number(req.params.id));
-    res.status(204).send();
   });
 
   // Public chatbot access
