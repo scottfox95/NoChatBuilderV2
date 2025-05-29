@@ -1,0 +1,50 @@
+You’re a UX/UI designer helping improve the visual clarity and user experience of a healthcare admin dashboard. Below is a screenshot of the current interface for doctors managing their Care Aids (AI-powered assistants). The design is functional but lacks visual cleanliness, hierarchy, and polish. Please provide a redesign plan with the following goals in mind:
+
+⸻
+
+🎯 Objectives
+	•	Improve visual hierarchy and spacing
+	•	Simplify layout and reduce visual noise
+	•	Make it easier to scan and navigate Care Aids
+	•	Create a cleaner, more modern UI consistent with healthcare tech
+	•	Emphasize the most important elements (e.g., Care Aid name, usage stats, view button)
+
+⸻
+
+📋 Redesign Instructions
+	1.	Layout Simplification
+	•	Use a grid layout with consistent spacing (e.g., 24px gutter between cards).
+	•	Reduce the card size or padding to improve information density without feeling cluttered.
+	•	Align content consistently—icons, text, and buttons should snap to a common baseline.
+	2.	Card Design Enhancements
+	•	Add clearer card headers (larger font for Care Aid name, subtitle below in smaller text).
+	•	Move action icons (share, copy, edit, delete) into a “More Options” (⋮) dropdown to reduce clutter.
+	•	Use subtle hover effects (e.g., light elevation or shadow) for interactivity feedback.
+	3.	Typography & Spacing
+	•	Increase font size for Care Aid names to establish hierarchy.
+	•	Use font weight and color to visually separate title, subtitle, and metadata (views, model).
+	•	Add more vertical spacing between lines of text within a card.
+	4.	Color & Visual Contrast
+	•	Use white cards on a soft gray or muted blue background to reduce visual monotony.
+	•	Ensure sufficient contrast between text and background for readability (e.g., black on light backgrounds, or dark gray for metadata).
+	•	Highlight the active model with a badge-style icon (e.g., “GPT-4”, “Turbo”).
+	5.	Buttons
+	•	Use a primary button style (e.g., filled button with brand color) for “View Care Aid”.
+	•	Remove the “external link” icon unless it actually opens in a new tab.
+	6.	Top Bar & Header
+	•	Increase vertical space in the top bar.
+	•	Separate “My Care Aids” and “Create New” more clearly, maybe by moving “Create New” to a sticky top-right position or floating action button.
+	7.	Left Sidebar
+	•	Use subtle icon styling (outline or duotone) to reduce visual weight.
+	•	Highlight the active menu item more distinctly with background shading or a left border indicator.
+	8.	Data Display Improvements
+	•	Replace raw “views” count with better indicators (e.g., eye icon + “94 views” in smaller font, perhaps a trend arrow or sparkline).
+	•	Consider adding a last updated timestamp or usage trend line.
+	9.	Responsiveness
+	•	Ensure that on smaller screens, cards collapse into a vertical layout with adjusted spacing and font size.
+
+⸻
+
+✅ Deliverables
+	•	Clean UI wireframe suggestions or updated visual mockups
+	•	Optional: dark mode variant with appropriate contrast ratios
