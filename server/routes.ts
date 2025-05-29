@@ -630,8 +630,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         });
       } else {
-          // Fall back to traditional RAG for chatbots without vector stores
-          await generateStreamingCompletion({
+        // Fall back to traditional RAG for chatbots without vector stores
+        await generateStreamingCompletion({
             model: chatbot.model,
             systemPrompt: chatbot.systemPrompt,
             userMessage: latestUserMessage.content,
