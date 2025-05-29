@@ -285,16 +285,14 @@ export async function generateStreamingCompletion({
 
     let fullResponse = "";
 
-    const stream = await openai.chat.completions.create({
+    const stream = await openai.responses.create({
       model: actualModel,
-      messages,
-      temperature,
-      max_tokens: maxTokens,
+      input: userMessage,
       stream: true,
     });
 
     for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
+      const content = chunk.content || "";
       if (content) {
         fullResponse += content;
         onChunk(content);
@@ -445,7 +443,17 @@ export async function generateAssistantCompletion({
     };
 
     const response = await withExponentialBackoff(() => 
-      openai.chat.completions.create(completionOptions)
+      openai.responses.create({
+        model,
+        input: userMessage,
+        ...(vectorStoreId && {
+          tools: [{
+            type: "file_search",
+            vector_store_ids: [vectorStoreId],
+          }]
+        }),
+        stream: false,
+      })
     );
     
     const content = response.choices[0].message.content;
