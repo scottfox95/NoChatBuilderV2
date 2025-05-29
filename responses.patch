@@ -1,0 +1,42 @@
+--- a/server/openai.ts
++++ b/server/openai.ts
+@@
+-import { openai } from "./client";           // existing import
++import { openai } from "./client";           // unchanged
+@@
+-// Build the messages array for Chat Completions
+-const messages: ChatCompletionMessageParam[] = [
+-  { role: "system", content: systemPrompt },
+-  ...history,
+-  { role: "user", content: userMessage },
+-];
+-
+-// === OLD === Chat Completions call
+-const completion = await openai.chat.completions.create({
+-  model,
+-  messages,
+-  temperature,
+-  max_tokens,
+-  stream: true,
+-});
++// === NEW === Responses API call with Retrieval tool
++const completion = await openai.responses.create({
++  model,
++  input: userMessage,
++  tools: [
++    {
++      type: "file_search",
++      vector_store_ids: [chatbot.vectorStoreId], // each bot has its own store
++    },
++  ],
++  temperature,
++  max_tokens,
++  stream: true,
++});
+@@
+-  const delta = chunk.choices[0].delta;
+-  if (delta.content) yield delta.content;          // stream tokens
++  const delta = chunk.choices[0].delta;
++  if (delta.content) yield delta.content;          // stream tokens
++  // Ignore delta.file_search_results to keep citations hidden
+ }
