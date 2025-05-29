@@ -354,15 +354,6 @@ export async function generateAssistantCompletion({
       max_tokens: maxTokens,
     };
 
-    // Add tool_resources for vector store if available
-    if (vectorStoreId) {
-      completionOptions.tool_resources = {
-        file_search: {
-          vector_store_ids: [vectorStoreId]
-        }
-      };
-    }
-
     const response = await withExponentialBackoff(() => 
       openai.chat.completions.create(completionOptions)
     );
@@ -415,15 +406,6 @@ export async function generateStreamingAssistantCompletion({
       max_tokens: maxTokens,
       stream: true,
     };
-
-    // Add tool_resources for vector store if available
-    if (vectorStoreId) {
-      completionOptions.tool_resources = {
-        file_search: {
-          vector_store_ids: [vectorStoreId]
-        }
-      };
-    }
 
     const stream = await withExponentialBackoff(() => 
       openai.chat.completions.create(completionOptions)
