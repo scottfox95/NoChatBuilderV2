@@ -78,6 +78,7 @@ export async function generateStreamingResponseCompletion({
     let fullResponse = "";
     
     for await (const chunk of stream as any) {
+      console.log("STREAM‑EVENT:", chunk.event ?? chunk.type, JSON.stringify(chunk.choices?.[0]?.delta));
       // Handle streaming chunks from responses API
       if (chunk.type === 'response.output_text.delta' && chunk.delta) {
         const content = chunk.delta;

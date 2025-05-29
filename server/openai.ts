@@ -224,6 +224,7 @@ export async function generateStreamingCompletion({
     });
 
     for await (const chunk of stream) {
+      console.log("STREAM‑EVENT:", chunk.event ?? chunk.type, JSON.stringify(chunk.choices?.[0]?.delta));
       // Handle different chunk types from responses API
       if (chunk.type === 'response.text.delta' && chunk.delta) {
         const content = chunk.delta;
@@ -460,6 +461,7 @@ export async function generateStreamingAssistantCompletion({
 
     let fullResponse = "";
     for await (const chunk of stream) {
+      console.log("STREAM‑EVENT:", chunk.event ?? chunk.type, JSON.stringify(chunk.choices?.[0]?.delta));
       // Handle different chunk types from responses API
       if (chunk.type === 'response.text.delta' && chunk.delta) {
         const content = chunk.delta;
