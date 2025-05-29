@@ -58,6 +58,10 @@ export async function generateStreamingResponseCompletion({
   onError: (error: any) => void;
   fallbackResponse?: string;
 }): Promise<void> {
+  console.log("=== RESPONSES API CALLED ===");
+  console.log("User message:", userMessage);
+  console.log("Has vector store:", !!chatbot?.vectorStoreId);
+  
   try {
     const stream = await openai.responses.create({
       model: "gpt-4o-mini",
