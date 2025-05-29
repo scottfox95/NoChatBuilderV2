@@ -59,59 +59,45 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <nav className="flex-1 p-3 overflow-y-auto">
             <ul className="space-y-1">
               <li>
-                <Link href="/dashboard">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/dashboard")}`}>
-                    <TrendingUp className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Dashboard</span>
-                  </a>
+                <Link href="/dashboard" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/dashboard")}`}>
+                  <TrendingUp className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Dashboard</span>
                 </Link>
               </li>
               <li>
-                <Link href="/care-aids">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/care-aids")}`}>
-                    <MessageSquare className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Care Aids</span>
-                  </a>
+                <Link href="/care-aids" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/care-aids")}`}>
+                  <MessageSquare className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Care Aids</span>
                 </Link>
               </li>
               <li>
-                <Link href="/logs">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/logs")}`}>
-                    <FileText className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Chat Logs</span>
-                  </a>
+                <Link href="/logs" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/logs")}`}>
+                  <FileText className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Chat Logs</span>
                 </Link>
               </li>
               <li>
-                <Link href="/knowledge-base">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/knowledge-base")}`}>
-                    <Database className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Knowledge Base</span>
-                  </a>
+                <Link href="/knowledge-base" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/knowledge-base")}`}>
+                  <Database className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Knowledge Base</span>
                 </Link>
               </li>
               <li>
-                <Link href="/analytics">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/analytics")}`}>
-                    <BarChart2 className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Analytics</span>
-                  </a>
+                <Link href="/analytics" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/analytics")}`}>
+                  <BarChart2 className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Analytics</span>
                 </Link>
               </li>
               <li>
-                <Link href="/care-team-management">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/care-team-management")}`}>
-                    <Users className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Care Team Users</span>
-                  </a>
+                <Link href="/care-team-management" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/care-team-management")}`}>
+                  <Users className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Care Team Users</span>
                 </Link>
               </li>
               <li>
-                <Link href="/settings">
-                  <a className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/settings")}`}>
-                    <Settings className="h-5 w-5 stroke-2" />
-                    <span className="ml-3 hidden md:block">Settings</span>
-                  </a>
+                <Link href="/settings" className={`flex items-center p-3 rounded-lg text-sm font-medium transition-colors ${isActive("/settings")}`}>
+                  <Settings className="h-5 w-5 stroke-2" />
+                  <span className="ml-3 hidden md:block">Settings</span>
                 </Link>
               </li>
             </ul>
@@ -153,47 +139,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
         <Separator className="bg-slate-200" />
         <nav className="flex justify-around p-2 bg-slate-50">
-          <Link href="/dashboard">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/dashboard" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <TrendingUp className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Dashboard</span>
-            </a>
+          <Link href="/dashboard" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/dashboard" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <TrendingUp className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Dashboard</span>
           </Link>
-          <Link href="/care-aids">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/care-aids" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <MessageSquare className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Care Aids</span>
-            </a>
+          <Link href="/care-aids" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/care-aids" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <MessageSquare className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Care Aids</span>
           </Link>
-          <Link href="/logs">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/logs" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <FileText className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Logs</span>
-            </a>
+          <Link href="/logs" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/logs" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <FileText className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Logs</span>
           </Link>
-          <Link href="/knowledge-base">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/knowledge-base" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <Database className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Knowledge</span>
-            </a>
+          <Link href="/knowledge-base" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/knowledge-base" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <Database className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Knowledge</span>
           </Link>
-          <Link href="/analytics">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/analytics" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <BarChart2 className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Analytics</span>
-            </a>
+          <Link href="/analytics" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/analytics" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <BarChart2 className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Analytics</span>
           </Link>
-          <Link href="/care-team-management">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/care-team-management" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <Users className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Team</span>
-            </a>
+          <Link href="/care-team-management" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/care-team-management" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <Users className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Team</span>
           </Link>
-          <Link href="/settings">
-            <a className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/settings" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
-              <Settings className="h-5 w-5 stroke-2" />
-              <span className="text-xs mt-1 font-medium">Settings</span>
-            </a>
+          <Link href="/settings" className={`flex flex-col items-center p-2 rounded-lg transition-colors ${location === "/settings" ? "text-primary bg-primary/10" : "text-slate-600"}`}>
+            <Settings className="h-5 w-5 stroke-2" />
+            <span className="text-xs mt-1 font-medium">Settings</span>
           </Link>
         </nav>
       </div>
