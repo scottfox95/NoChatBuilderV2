@@ -223,20 +223,21 @@ export async function generateStreamingCompletion({
       stream: true,
     });
 
-    for await (const chunk of stream) {
-      console.log("STREAM‑EVENT:", chunk.event ?? chunk.type, JSON.stringify(chunk.choices?.[0]?.delta));
-      // Handle different chunk types from responses API
-      if (chunk.type === 'response.text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        fullResponse += content;
-        onChunk(content);
-      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
-        // Final chunk with complete text
-        const content = chunk.response.output_text;
-        if (!fullResponse) {
-          fullResponse = content;
-          onChunk(content);
+    for await (const chunk of stream as any) {
+      const ev = chunk.event ?? chunk.type ?? "";
+
+      // incremental tokens
+      if (ev === "response.output_text.delta") {
+        const text = chunk.data as string;   // <-- token lives here
+        if (text) {
+          onChunk(text);        // or push to the WebSocket
+          fullResponse += text;
         }
+      }
+
+      // end‑of‑answer
+      if (ev === "response.output_text.done" || ev === "response.completed") {
+        break;
       }
     }
 
@@ -460,20 +461,21 @@ export async function generateStreamingAssistantCompletion({
     );
 
     let fullResponse = "";
-    for await (const chunk of stream) {
-      console.log("STREAM‑EVENT:", chunk.event ?? chunk.type, JSON.stringify(chunk.choices?.[0]?.delta));
-      // Handle different chunk types from responses API
-      if (chunk.type === 'response.text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        fullResponse += content;
-        onChunk(content);
-      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
-        // Final chunk with complete text
-        const content = chunk.response.output_text;
-        if (!fullResponse) {
-          fullResponse = content;
-          onChunk(content);
+    for await (const chunk of stream as any) {
+      const ev = chunk.event ?? chunk.type ?? "";
+
+      // incremental tokens
+      if (ev === "response.output_text.delta") {
+        const text = chunk.data as string;   // <-- token lives here
+        if (text) {
+          onChunk(text);        // or push to the WebSocket
+          fullResponse += text;
         }
+      }
+
+      // end‑of‑answer
+      if (ev === "response.output_text.done" || ev === "response.completed") {
+        break;
       }
     }
 
