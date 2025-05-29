@@ -80,7 +80,95 @@ interface StreamingCompletionOptions extends CompletionOptions {
   onError: (error: any) => void;
 }
 
-// Standard non-streaming completion (keep for backward compatibility)
+// Single helper that covers both streaming and non-streaming modes
+export async function askLLM({
+  userMessage,
+  chatbot,
+  systemPrompt,
+  previousMessages = [],
+  temperature = 0.7,
+  maxTokens = 512,
+  stream = true,
+  onChunk,
+  onComplete,
+  onError,
+  fallbackResponse,
+}: {
+  userMessage: string;
+  chatbot?: { vectorStoreId?: string };
+  systemPrompt?: string;
+  previousMessages?: Message[];
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+  onChunk?: (chunk: string) => void;
+  onComplete?: (fullContent: string) => void;
+  onError?: (error: any) => void;
+  fallbackResponse?: string;
+}): Promise<string | void> {
+  try {
+    const messages: Array<{role: "system" | "user" | "assistant", content: string}> = [
+      ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
+      ...previousMessages,
+      { role: "user" as const, content: userMessage },
+    ];
+
+    const completionParams = {
+      model: "gpt-4o-mini",
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+      ...(chatbot?.vectorStoreId && {
+        tools: [{
+          type: "file_search" as const,
+          file_search: {
+            vector_store_ids: [chatbot.vectorStoreId],
+          }
+        }]
+      }),
+      ...(stream && { stream: true }),
+    };
+
+    const resp = await openai.chat.completions.create(completionParams);
+
+    if (!stream) {
+      return resp.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
+    }
+
+    const chunks: string[] = [];
+    let fullResponse = "";
+    
+    for await (const chunk of resp) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        chunks.push(content);
+        fullResponse += content;
+        onChunk?.(content);
+      }
+    }
+
+    if (fullResponse.trim() === "" && fallbackResponse) {
+      fullResponse = fallbackResponse;
+      onChunk?.(fallbackResponse);
+    } else if (fullResponse.trim() === "") {
+      fullResponse = "I'm sorry, I couldn't generate a response.";
+      onChunk?.(fullResponse);
+    }
+
+    onComplete?.(fullResponse);
+    return fullResponse;
+  } catch (error) {
+    console.error("OpenAI completion error:", error);
+    const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+    if (stream) {
+      onError?.(errorResponse);
+    } else {
+      return errorResponse;
+    }
+  }
+}
+
+// Backward compatibility wrapper
 export async function generateCompletion({
   model,
   systemPrompt,
@@ -91,57 +179,30 @@ export async function generateCompletion({
   documents,
   fallbackResponse,
 }: CompletionOptions): Promise<string> {
-  try {
-    // Create a modified system prompt that includes documents if RAG is enabled
-    let enhancedSystemPrompt = systemPrompt;
+  let enhancedSystemPrompt = systemPrompt;
+  
+  if (documents && documents.length > 0) {
+    const combinedDocs = documents.join("\n\n");
+    const contextLimit = 4000;
+    const truncatedDocs = combinedDocs.length > contextLimit
+      ? combinedDocs.substring(0, contextLimit) + "..."
+      : combinedDocs;
     
-    if (documents && documents.length > 0) {
-      // Combine all document text but limit by token count (rough approximation)
-      const combinedDocs = documents.join("\n\n");
-      const contextLimit = 4000; // Rough limit to avoid token limits
-      const truncatedDocs = combinedDocs.length > contextLimit
-        ? combinedDocs.substring(0, contextLimit) + "..."
-        : combinedDocs;
-      
-      enhancedSystemPrompt += `\n\nHere is additional context to help answer the user's questions:\n${truncatedDocs}`;
-    }
-
-    // Prepare messages for OpenAI
-    const messages: Message[] = [
-      { role: "system", content: enhancedSystemPrompt },
-      ...previousMessages,
-      { role: "user", content: userMessage },
-    ];
-
-    // Map internal model names to actual OpenAI model IDs
-    const modelMap: Record<string, string> = {
-      "gpt4-1": "gpt-4-1106-preview", // GPT-4.1 Turbo (similar naming convention)
-      "gpt4o": "gpt-4o", // GPT-4o (latest model as of May 2024)
-      "gpt4": "gpt-4",
-      "gpt4-mini": "gpt-4o-mini", // GPT-4 Mini
-      "gpt35turbo": "gpt-3.5-turbo",
-      "gpt3-mini": "gpt-3.5-turbo-instruct", // GPT-3.5 Turbo Instruct (more like GPT-3 Mini)
-      "gpt4-1-nano": "gpt-4-0125-preview", // GPT-4.1 Nano (approximation based on parameter count)
-      "gpt4o-mini": "gpt-4o-mini", // GPT-4o Mini
-    };
-
-    const actualModel = modelMap[model] || "gpt-3.5-turbo";
-
-    const response = await openai.chat.completions.create({
-      model: actualModel,
-      messages,
-      temperature,
-      max_tokens: maxTokens,
-    });
-
-    return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
-  } catch (error) {
-    console.error("OpenAI completion error:", error);
-    return fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+    enhancedSystemPrompt += `\n\nHere is additional context to help answer the user's questions:\n${truncatedDocs}`;
   }
+
+  return await askLLM({
+    userMessage,
+    systemPrompt: enhancedSystemPrompt,
+    previousMessages,
+    temperature,
+    maxTokens,
+    stream: false,
+    fallbackResponse,
+  }) as string;
 }
 
-// Streaming completion function that sends chunks as they arrive
+// Streaming completion function using Responses API
 export async function generateStreamingCompletion({
   model,
   systemPrompt,
@@ -170,42 +231,46 @@ export async function generateStreamingCompletion({
       enhancedSystemPrompt += `\n\nHere is additional context to help answer the user's questions:\n${truncatedDocs}`;
     }
 
-    // Prepare messages for OpenAI
-    const messages: Message[] = [
+    // Combine all messages into a single input string
+    const allMessages = [
       { role: "system", content: enhancedSystemPrompt },
       ...previousMessages,
       { role: "user", content: userMessage },
     ];
+    
+    const combinedInput = allMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n\n');
 
     // Map internal model names to actual OpenAI model IDs
     const modelMap: Record<string, string> = {
-      "gpt4-1": "gpt-4-1106-preview", // GPT-4.1 Turbo (similar naming convention)
-      "gpt4o": "gpt-4o", // GPT-4o (latest model as of May 2024)
+      "gpt4-1": "gpt-4-1106-preview",
+      "gpt4o": "gpt-4o",
       "gpt4": "gpt-4",
-      "gpt4-mini": "gpt-4o-mini", // GPT-4 Mini
+      "gpt4-mini": "gpt-4o-mini",
       "gpt35turbo": "gpt-3.5-turbo",
-      "gpt3-mini": "gpt-3.5-turbo-instruct", // GPT-3.5 Turbo Instruct (more like GPT-3 Mini)
-      "gpt4-1-nano": "gpt-4-0125-preview", // GPT-4.1 Nano (approximation based on parameter count)
-      "gpt4o-mini": "gpt-4o-mini", // GPT-4o Mini
+      "gpt3-mini": "gpt-3.5-turbo-instruct",
+      "gpt4-1-nano": "gpt-4-0125-preview",
+      "gpt4o-mini": "gpt-4o-mini",
     };
 
-    const actualModel = modelMap[model] || "gpt-3.5-turbo";
+    const actualModel = modelMap[model] || "gpt-4o-mini";
 
     let fullResponse = "";
 
-    const stream = await openai.chat.completions.create({
+    const resp = await openai.responses.create({
       model: actualModel,
-      messages,
+      input: combinedInput,
       temperature,
       max_tokens: maxTokens,
       stream: true,
     });
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
-        fullResponse += content;
-        onChunk(content);
+    const chunks: string[] = [];
+    for await (const chunk of resp) {
+      const d = chunk.choices[0].delta;
+      if (d.content) {
+        chunks.push(d.content);
+        fullResponse += d.content;
+        onChunk(d.content);
       }
     }
 
