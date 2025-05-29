@@ -225,7 +225,7 @@ export async function generateStreamingCompletion({
 
     for await (const chunk of stream) {
       // Handle different chunk types from responses API
-      if (chunk.type === 'text.delta' && chunk.delta) {
+      if (chunk.type === 'response.output_text.delta' && chunk.delta) {
         const content = chunk.delta;
         fullResponse += content;
         onChunk(content);
