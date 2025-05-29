@@ -6,6 +6,7 @@ import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { generateCompletion, generateStreamingCompletion, processDocumentText, verifyApiKey } from "./openai";
+import OpenAI from "openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
 import { nanoid } from "nanoid";
@@ -15,6 +16,9 @@ import { promisify } from "util";
 
 const readFile = promisify(fs.readFile);
 const unlink = promisify(fs.unlink);
+
+// Initialize OpenAI client for vector store operations
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
 
 // Configure multer for file uploads
 const upload = multer({
@@ -107,7 +111,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const chatbot = await storage.createChatbot(data);
       console.log("Created chatbot successfully:", chatbot.id);
-      res.status(201).json(chatbot);
+      
+      // Create a private vector store for this chatbot
+      try {
+        const vectorStore = await openai.vectorStores.create({
+          name: `aidify-bot-${chatbot.id}`,
+        });
+        
+        // Update the chatbot with the vector store ID
+        await storage.updateChatbot(chatbot.id, { vectorStoreId: vectorStore.id });
+        console.log("Created vector store:", vectorStore.id, "for chatbot:", chatbot.id);
+        
+        // Return the updated chatbot with vector store ID
+        const updatedChatbot = await storage.getChatbot(chatbot.id);
+        res.status(201).json(updatedChatbot);
+      } catch (error) {
+        console.error("Error creating vector store:", error);
+        // Even if vector store creation fails, we still return the chatbot
+        // The vector store can be created later
+        res.status(201).json(chatbot);
+      }
     } catch (error) {
       console.error("Error creating chatbot:", error);
       if (error instanceof z.ZodError) {
