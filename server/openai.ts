@@ -235,3 +235,148 @@ export async function processDocumentText(text: string, fileType: string): Promi
   
   return text;
 }
+
+interface AssistantCompletionOptions {
+  model: string;
+  systemPrompt: string;
+  userMessage: string;
+  previousMessages: Message[];
+  vectorStoreId?: string;
+  temperature: number;
+  maxTokens: number;
+  fallbackResponse?: string;
+}
+
+interface StreamingAssistantCompletionOptions extends AssistantCompletionOptions {
+  onChunk: (chunk: string) => void;
+  onComplete: (fullContent: string) => void;
+  onError: (error: any) => void;
+}
+
+export async function generateAssistantCompletion({
+  model,
+  systemPrompt,
+  userMessage,
+  previousMessages,
+  vectorStoreId,
+  temperature,
+  maxTokens,
+  fallbackResponse
+}: AssistantCompletionOptions): Promise<string> {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OpenAI API key is not configured");
+    }
+
+    // Build messages array
+    const messages: any[] = [
+      { role: "system", content: systemPrompt },
+      ...previousMessages,
+      { role: "user", content: userMessage }
+    ];
+
+    const completionOptions: any = {
+      model,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    };
+
+    // Add file_search tool if vector store is available
+    if (vectorStoreId) {
+      completionOptions.tools = [{
+        type: "file_search"
+      }];
+      completionOptions.tool_resources = {
+        file_search: {
+          vector_store_ids: [vectorStoreId]
+        }
+      };
+    }
+
+    const response = await openai.chat.completions.create(completionOptions);
+    
+    const content = response.choices[0].message.content;
+    
+    if (!content && fallbackResponse) {
+      return fallbackResponse;
+    }
+    
+    return content || "I'm sorry, I couldn't generate a response.";
+  } catch (error) {
+    console.error("OpenAI assistant completion error:", error);
+    return fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+  }
+}
+
+export async function generateStreamingAssistantCompletion({
+  model,
+  systemPrompt,
+  userMessage,
+  previousMessages,
+  vectorStoreId,
+  temperature,
+  maxTokens,
+  fallbackResponse,
+  onChunk,
+  onComplete,
+  onError
+}: StreamingAssistantCompletionOptions): Promise<void> {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OpenAI API key is not configured");
+    }
+
+    // Build messages array
+    const messages: any[] = [
+      { role: "system", content: systemPrompt },
+      ...previousMessages,
+      { role: "user", content: userMessage }
+    ];
+
+    const completionOptions: any = {
+      model,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+      stream: true,
+    };
+
+    // Add file_search tool if vector store is available
+    if (vectorStoreId) {
+      completionOptions.tools = [{
+        type: "file_search"
+      }];
+      completionOptions.tool_resources = {
+        file_search: {
+          vector_store_ids: [vectorStoreId]
+        }
+      };
+    }
+
+    const stream = await openai.chat.completions.create(completionOptions);
+
+    let fullResponse = "";
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        fullResponse += content;
+        onChunk(content);
+      }
+    }
+
+    if (fullResponse.trim() === "" && fallbackResponse) {
+      fullResponse = fallbackResponse;
+      onChunk(fallbackResponse);
+    } else if (fullResponse.trim() === "") {
+      fullResponse = "I'm sorry, I couldn't generate a response.";
+      onChunk(fullResponse);
+    }
+
+    onComplete(fullResponse);
+  } catch (error) {
+    console.error("OpenAI streaming assistant completion error:", error);
+    const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+    onError(errorResponse);
+  }
+}

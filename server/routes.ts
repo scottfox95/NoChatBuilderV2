@@ -5,7 +5,7 @@ import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { generateCompletion, generateStreamingCompletion, processDocumentText, verifyApiKey } from "./openai";
+import { generateCompletion, generateStreamingCompletion, generateStreamingAssistantCompletion, processDocumentText, verifyApiKey } from "./openai";
 import OpenAI from "openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
@@ -576,27 +576,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fullContent = "";
       
       try {
-        // Stream the completion
-        await generateStreamingCompletion({
-          model: chatbot.model,
-          systemPrompt: chatbot.systemPrompt,
-          userMessage: latestUserMessage.content,
-          previousMessages: previousMessages,
-          temperature: chatbot.temperature / 100,
-          maxTokens: chatbot.maxTokens,
-          documents,
-          fallbackResponse: chatbot.fallbackResponse,
-          onChunk: (chunk) => {
-            // Send each chunk as it arrives
-            sendEvent('chunk', { content: chunk });
-          },
-          onComplete: async (completedContent) => {
-            fullContent = completedContent;
-            
-            // Update the message in the database with the final content
-            const updatedMessage = await storage.updateMessage(latestBotMessage.id, {
-              content: fullContent
-            });
+        // Use vector store if available, otherwise fall back to traditional RAG
+        if (chatbot.vectorStoreId) {
+          // Stream the completion with vector store support
+          await generateStreamingAssistantCompletion({
+            model: chatbot.model,
+            systemPrompt: chatbot.systemPrompt,
+            userMessage: latestUserMessage.content,
+            previousMessages: previousMessages as any[],
+            vectorStoreId: chatbot.vectorStoreId,
+            temperature: chatbot.temperature / 100,
+            maxTokens: chatbot.maxTokens,
+            fallbackResponse: chatbot.fallbackResponse || undefined,
+            onChunk: (chunk) => {
+              // Send each chunk as it arrives
+              sendEvent('chunk', { content: chunk });
+            },
+            onComplete: async (completedContent) => {
+              fullContent = completedContent;
+              
+              // Update the message in the database with the final content
+              const updatedMessage = await storage.updateMessage(latestBotMessage.id, {
+                content: fullContent
+              });
             
             // Send the complete event with the final message
             sendEvent('complete', { 
@@ -627,6 +629,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
             res.end();
           }
         });
+      } else {
+          // Fall back to traditional RAG for chatbots without vector stores
+          await generateStreamingCompletion({
+            model: chatbot.model,
+            systemPrompt: chatbot.systemPrompt,
+            userMessage: latestUserMessage.content,
+            previousMessages: previousMessages,
+            temperature: chatbot.temperature / 100,
+            maxTokens: chatbot.maxTokens,
+            documents,
+            fallbackResponse: chatbot.fallbackResponse,
+            onChunk: (chunk) => {
+              sendEvent('chunk', { content: chunk });
+            },
+            onComplete: async (completedContent) => {
+              fullContent = completedContent;
+              
+              const updatedMessage = await storage.updateMessage(latestBotMessage.id, {
+                content: fullContent
+              });
+            
+              sendEvent('complete', { 
+                message: {
+                  ...latestBotMessage,
+                  content: fullContent
+                }
+              });
+              
+              res.end();
+            },
+            onError: async (error) => {
+              console.error("Streaming error:", error);
+              
+              const errorMsg = typeof error === 'string' ? error : 
+                chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
+              
+              await storage.updateMessage(latestBotMessage.id, {
+                content: errorMsg
+              });
+              
+              sendEvent('error', { message: errorMsg });
+              res.end();
+            }
+          });
+        }
       } catch (error) {
         console.error("OpenAI streaming error:", error);
         const errorMsg = chatbot.fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
