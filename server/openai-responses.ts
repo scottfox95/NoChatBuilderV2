@@ -16,6 +16,12 @@ export async function generateResponseCompletion({
   fallbackResponse?: string;
 }): Promise<string> {
   try {
+    console.log("Making responses API call with:", { 
+      model: "gpt-4o-mini", 
+      input: userMessage,
+      hasVectorStore: !!chatbot?.vectorStoreId 
+    });
+    
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
       input: userMessage,
@@ -27,9 +33,11 @@ export async function generateResponseCompletion({
       }),
     });
 
+    console.log("Responses API response:", JSON.stringify(response, null, 2));
     return (response as any).output_text || fallbackResponse;
   } catch (error) {
     console.error("OpenAI responses completion error:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
     return fallbackResponse;
   }
 }
