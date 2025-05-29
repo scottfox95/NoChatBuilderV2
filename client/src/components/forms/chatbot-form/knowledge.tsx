@@ -13,9 +13,10 @@ export default function Knowledge() {
   const form = useFormContext();
   const chatbotId = form.getValues("id");
   const { toast } = useToast();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: [`/api/chatbots/${chatbotId}/documents`],
@@ -42,7 +43,6 @@ export default function Knowledge() {
       return await response.json();
     },
     onSuccess: () => {
-      setSelectedFile(null);
       queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}/documents`] });
       toast({
         title: "Document uploaded",
@@ -82,15 +82,30 @@ export default function Knowledge() {
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+    if (event.target.files && event.target.files.length > 0) {
+      const filesArray = Array.from(event.target.files);
+      setSelectedFiles(filesArray);
     }
   };
 
   const handleUpload = async () => {
-    if (selectedFile) {
+    if (selectedFiles.length > 0) {
       try {
-        await uploadMutation.mutateAsync(selectedFile);
+        setUploadProgress(0);
+        
+        // Upload files one by one
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          await uploadMutation.mutateAsync(file);
+          
+          // Update progress
+          setUploadProgress(Math.round(((i + 1) / selectedFiles.length) * 100));
+        }
+        
+        // Clear selection after all uploads complete
+        setSelectedFiles([]);
+        setUploadProgress(0);
+        
       } catch (error) {
         // Error is handled in the mutation
       }
@@ -162,8 +177,9 @@ export default function Knowledge() {
           e.preventDefault();
           e.stopPropagation();
           setIsDragging(false);
-          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setSelectedFile(e.dataTransfer.files[0]);
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const filesArray = Array.from(e.dataTransfer.files);
+            setSelectedFiles(filesArray);
           }
         }}
       >
@@ -176,9 +192,9 @@ export default function Knowledge() {
             "text-lg font-medium",
             isDragging ? "text-primary" : "text-white"
           )}>
-            {isDragging ? "Drop your file here" : "Drag files here or click to upload"}
+            {isDragging ? "Drop your files here" : "Drag files here or click to upload"}
           </h3>
-          <p className="text-neutral-300 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file)</p>
+          <p className="text-neutral-300 text-sm">Supports PDF, DOCX, TXT, and RTF files (max 10MB per file). Select multiple files at once.</p>
           <div className="flex justify-center space-x-4">
             <input
               id="file-upload"
@@ -187,6 +203,7 @@ export default function Knowledge() {
               accept=".pdf,.docx,.txt,.rtf,application/rtf,text/rtf"
               onChange={handleFileChange}
               disabled={uploading}
+              multiple
             />
             <Button 
               disabled={uploading} 
@@ -194,9 +211,9 @@ export default function Knowledge() {
               className="bg-transparent border-neutral-700 hover:bg-neutral-800 text-white"
               onClick={() => document.getElementById('file-upload')?.click()}
             >
-              Choose File
+              Choose Files
             </Button>
-            {selectedFile && (
+            {selectedFiles.length > 0 && (
               <Button
                 onClick={handleUpload}
                 disabled={uploading}
@@ -205,19 +222,26 @@ export default function Knowledge() {
                 {uploading ? (
                   <>
                     <Loader size="sm" className="mr-2" />
-                    Uploading...
+                    Uploading... ({uploadProgress}%)
                   </>
                 ) : (
                   <>
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload
+                    Upload {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
                   </>
                 )}
               </Button>
             )}
           </div>
-          {selectedFile && (
-            <p className="text-sm text-neutral-300">Selected: {selectedFile.name}</p>
+          {selectedFiles.length > 0 && (
+            <div className="text-sm text-neutral-300">
+              Selected {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}:
+              <ul className="mt-1">
+                {selectedFiles.map((file, index) => (
+                  <li key={index} className="text-xs text-neutral-400">• {file.name}</li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       </div>
