@@ -47,10 +47,7 @@ export default function Knowledge() {
         queryKey: [`/api/chatbots/${chatbotId}/documents`],
         exact: true 
       });
-      toast({
-        title: "Document uploaded",
-        description: "Your document has been uploaded and processed successfully.",
-      });
+      // Removed toast notification to prevent modal from closing
     },
     onError: (error) => {
       toast({
@@ -70,10 +67,7 @@ export default function Knowledge() {
         queryKey: [`/api/chatbots/${chatbotId}/documents`],
         exact: true 
       });
-      toast({
-        title: "Document deleted",
-        description: "The document has been removed from your chatbot.",
-      });
+      // Removed toast notification to prevent modal from closing
     },
     onError: (error) => {
       toast({
