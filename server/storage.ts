@@ -235,7 +235,16 @@ export class DatabaseStorage implements IStorage {
 
   // Chatbot operations
   async getChatbots(userId: number): Promise<Chatbot[]> {
-    return await db.select().from(chatbots).where(eq(chatbots.userId, userId));
+    // Get user to check their role
+    const user = await this.getUser(userId);
+    
+    if (user?.role === 'admin') {
+      // Admins can see all chatbots
+      return await db.select().from(chatbots).orderBy(desc(chatbots.createdAt));
+    } else {
+      // Non-admin users only see their own chatbots
+      return await db.select().from(chatbots).where(eq(chatbots.userId, userId));
+    }
   }
 
   async getAllChatbots(): Promise<Chatbot[]> {
@@ -291,17 +300,25 @@ export class DatabaseStorage implements IStorage {
 
   // Document operations
   async getAllDocuments(userId: number): Promise<Document[]> {
-    // First get all chatbots owned by this user
-    const userChatbots = await this.getChatbots(userId);
-    const chatbotIds = userChatbots.map(c => c.id);
+    // Get user to check their role
+    const user = await this.getUser(userId);
     
-    // Then get all documents from those chatbots
-    if (chatbotIds.length > 0) {
+    if (user?.role === 'admin') {
+      // Admins can see all documents from all chatbots
       return await db.select().from(documents)
-        .where(inArray(documents.chatbotId, chatbotIds))
         .orderBy(desc(documents.createdAt));
+    } else {
+      // Non-admin users only see documents from their own chatbots
+      const userChatbots = await this.getChatbots(userId);
+      const chatbotIds = userChatbots.map(c => c.id);
+      
+      if (chatbotIds.length > 0) {
+        return await db.select().from(documents)
+          .where(inArray(documents.chatbotId, chatbotIds))
+          .orderBy(desc(documents.createdAt));
+      }
+      return [];
     }
-    return [];
   }
   
   async getDocumentsByChatbotId(chatbotId: number): Promise<Document[]> {

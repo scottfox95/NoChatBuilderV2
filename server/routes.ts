@@ -318,7 +318,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "Chatbot not found" });
     }
     
-    if (chatbot.userId !== req.user.id) {
+    // Allow access if user owns the chatbot OR if user is an admin
+    if (chatbot.userId !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: "Not authorized to access this chatbot's documents" });
     }
     
@@ -336,7 +337,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Chatbot not found" });
       }
       
-      if (chatbot.userId !== req.user!.id) {
+      // Allow access if user owns the chatbot OR if user is an admin
+      if (chatbot.userId !== req.user!.id && req.user!.role !== 'admin') {
         return res.status(403).json({ message: "Not authorized to add documents to this chatbot" });
       }
 
@@ -448,7 +450,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const chatbot = await storage.getChatbot(document.chatbotId);
-      if (!chatbot || chatbot.userId !== req.user!.id) {
+      if (!chatbot) {
+        return res.status(404).json({ message: "Associated chatbot not found" });
+      }
+      
+      // Allow deletion if user owns the chatbot OR if user is an admin
+      if (chatbot.userId !== req.user!.id && req.user!.role !== 'admin') {
         return res.status(403).json({ message: "Not authorized to delete this document" });
       }
       
