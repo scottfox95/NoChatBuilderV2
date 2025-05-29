@@ -1,7 +1,6 @@
-import OpenAI from "openai";
+import { openai } from "./client";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
 
 // Function to verify if the OpenAI API key is valid
 export async function verifyApiKey(): Promise<{
@@ -118,50 +117,86 @@ export async function askLLM({
       { role: "user" as const, content: userMessage },
     ];
 
-    const completionParams: any = {
-      model: "gpt-4o-mini",
-      messages,
-      temperature,
-      max_tokens: maxTokens,
-      ...(chatbot?.vectorStoreId && {
+    if (chatbot?.vectorStoreId) {
+      // Use responses.create for vector store queries
+      const resp = await openai.responses.create({
+        model: "gpt-4o-mini",
+        input: userMessage,
         tools: [{
           type: "file_search",
           vector_store_ids: [chatbot.vectorStoreId],
-        }]
-      }),
-      ...(stream && { stream: true }),
-    };
-
-    const resp = await openai.chat.completions.create(completionParams);
-
-    if (!stream) {
-      const response = resp as any;
-      return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
-    }
-
-    const chunks: string[] = [];
-    let fullResponse = "";
-    
-    for await (const chunk of resp as any) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
-        chunks.push(content);
-        fullResponse += content;
-        onChunk?.(content);
+        }],
+        stream: stream,
+      });
+      
+      if (!stream) {
+        const response = resp as any;
+        return response.content || fallbackResponse || "I couldn't generate a response.";
       }
-      // DO NOT expose file_search_results
-    }
+      
+      const chunks: string[] = [];
+      let fullResponse = "";
+      
+      for await (const chunk of resp as any) {
+        const content = chunk.content || "";
+        if (content) {
+          chunks.push(content);
+          fullResponse += content;
+          onChunk?.(content);
+        }
+      }
+      
+      if (fullResponse.trim() === "" && fallbackResponse) {
+        fullResponse = fallbackResponse;
+        onChunk?.(fallbackResponse);
+      } else if (fullResponse.trim() === "") {
+        fullResponse = "I'm sorry, I couldn't generate a response.";
+        onChunk?.(fullResponse);
+      }
+      
+      onComplete?.(fullResponse);
+      return fullResponse;
+    } else {
+      // Use chat.completions for regular queries
+      const completionParams: any = {
+        model: "gpt-4o-mini",
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+        ...(stream && { stream: true }),
+      };
 
-    if (fullResponse.trim() === "" && fallbackResponse) {
-      fullResponse = fallbackResponse;
-      onChunk?.(fallbackResponse);
-    } else if (fullResponse.trim() === "") {
-      fullResponse = "I'm sorry, I couldn't generate a response.";
-      onChunk?.(fullResponse);
-    }
+      const resp = await openai.chat.completions.create(completionParams);
+      
+      if (!stream) {
+        const response = resp as any;
+        return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
+      }
 
-    onComplete?.(fullResponse);
-    return fullResponse;
+      const chunks: string[] = [];
+      let fullResponse = "";
+      
+      for await (const chunk of resp as any) {
+        const content = chunk.choices[0]?.delta?.content || "";
+        if (content) {
+          chunks.push(content);
+          fullResponse += content;
+          onChunk?.(content);
+        }
+        // DO NOT expose file_search_results
+      }
+
+      if (fullResponse.trim() === "" && fallbackResponse) {
+        fullResponse = fallbackResponse;
+        onChunk?.(fallbackResponse);
+      } else if (fullResponse.trim() === "") {
+        fullResponse = "I'm sorry, I couldn't generate a response.";
+        onChunk?.(fullResponse);
+      }
+
+      onComplete?.(fullResponse);
+      return fullResponse;
+    }
   } catch (error) {
     console.error("OpenAI completion error:", error);
     const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
