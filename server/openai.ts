@@ -354,11 +354,8 @@ export async function generateAssistantCompletion({
       max_tokens: maxTokens,
     };
 
-    // Add file_search tool if vector store is available
+    // Add tool_resources for vector store if available
     if (vectorStoreId) {
-      completionOptions.tools = [{
-        type: "file_search"
-      }];
       completionOptions.tool_resources = {
         file_search: {
           vector_store_ids: [vectorStoreId]
@@ -419,11 +416,8 @@ export async function generateStreamingAssistantCompletion({
       stream: true,
     };
 
-    // Add file_search tool if vector store is available
+    // Add tool_resources for vector store if available
     if (vectorStoreId) {
-      completionOptions.tools = [{
-        type: "file_search"
-      }];
       completionOptions.tool_resources = {
         file_search: {
           vector_store_ids: [vectorStoreId]
