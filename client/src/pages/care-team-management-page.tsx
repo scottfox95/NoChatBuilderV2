@@ -47,7 +47,13 @@ export default function CareTeamManagementPage() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedChatbots, setSelectedChatbots] = useState<number[]>([]);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("careteam");
+  const [activeTab, setActiveTab] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('careTeamManagementTab') || "careteam";
+    }
+    return "careteam";
+  });
 
   const form = useForm<CreateUserValues>({
     resolver: zodResolver(createUserSchema),
@@ -58,9 +64,12 @@ export default function CareTeamManagementPage() {
     },
   });
 
-  // Update form role when tab changes
+  // Update form role when tab changes and persist to localStorage
   useEffect(() => {
     form.setValue("role", activeTab as "careteam" | "admin");
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('careTeamManagementTab', activeTab);
+    }
   }, [activeTab, form]);
 
   // Fetch users by role
