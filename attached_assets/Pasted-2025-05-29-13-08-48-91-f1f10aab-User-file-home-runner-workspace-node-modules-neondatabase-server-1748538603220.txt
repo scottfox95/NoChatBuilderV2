@@ -1,0 +1,74 @@
+2025-05-29 13:08:48.91
+f1f10aab
+User
+file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:752
+2025-05-29 13:08:48.91
+f1f10aab
+User
+ssion");function nu(r,e){if(r.message!=="SASLResponse")throw new Error("SASL: La\
+2025-05-29 13:08:48.91
+f1f10aab
+User
+^
+2025-05-29 13:08:48.91
+f1f10aab
+User
+2025-05-29 13:08:48.91
+f1f10aab
+User
+Error: SASL: Last message was not SASLResponse
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at Object.finalizeSession (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:752:62)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at An._handleAuthSASLFinal (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1282:55)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at fn.emit (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1212:29
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at cn.parse (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1127:71)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at v. (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1190:16)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at v.emit (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:397:12)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at WebSocket. (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:987:80)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at callListener (/home/runner/workspace/node_modules/ws/lib/event-target.js:290:14)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+at WebSocket.onMessage (/home/runner/workspace/node_modules/ws/lib/event-target.js:209:9)
+2025-05-29 13:08:48.91
+f1f10aab
+User
+2025-05-29 13:08:48.91
+f1f10aab
+User
+Node.js v20.18.1
+2025-05-29 13:08:54.10
+a4f5f982
+User
+5:08:54 PM [express] GET /api/user 304 in 99ms :: {"id":10,"username":"EvanB","password":"a3af2b9e97…
+2025-05-29 13:08:54.11
+f1f10aab
+System
+command finished with error [npm run start]: exit status 1
