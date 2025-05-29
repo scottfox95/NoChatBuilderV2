@@ -79,10 +79,12 @@ export async function generateStreamingResponseCompletion({
     
     for await (const chunk of stream as any) {
       const ev = chunk.event ?? chunk.type ?? "";
+      console.log("CHUNK DEBUG:", JSON.stringify(chunk, null, 2));
 
       // incremental tokens
       if (ev === "response.output_text.delta") {
         const text = chunk.data as string;   // <-- token lives here
+        console.log("FOUND DELTA TEXT:", text);
         if (text) {
           onChunk(text);        // or push to the WebSocket
           fullResponse += text;
@@ -91,6 +93,7 @@ export async function generateStreamingResponseCompletion({
 
       // end‑of‑answer
       if (ev === "response.output_text.done" || ev === "response.completed") {
+        console.log("STREAM ENDING:", ev);
         break;
       }
     }
