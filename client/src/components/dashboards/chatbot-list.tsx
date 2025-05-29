@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, MessageSquare } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
 import { Button } from "@/components/ui/button";
 import { Chatbot } from "@shared/schema";
@@ -49,25 +49,19 @@ export default function ChatbotList() {
 
   return (
     <>
-      <div className="container mx-auto py-6 px-4 md:px-6">
-        {/* Tabbed Navigation for Main Content */}
-        <div className="mb-8">
-          <div className="border-b border-neutral-800">
-            <nav className="flex -mb-px space-x-8">
-              <a href="#" className="border-b-2 border-primary py-4 px-1 text-sm font-medium text-primary whitespace-nowrap">
-                My Care Aids
-              </a>
-              <a href="#" className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-neutral-400 hover:text-neutral-300 whitespace-nowrap" onClick={handleOpenCreateModal}>
-                Create New
-              </a>
-            </nav>
-          </div>
-        </div>
-
+      <div className="p-6 md:p-8">
         {/* Dashboard Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-bold text-primary mb-4 sm:mb-0">My Care Aids</h1>
-          <Button className="bg-primary hover:bg-primary-dark text-white" onClick={handleOpenCreateModal}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">My Care Aids</h1>
+            <p className="text-slate-600">
+              Manage and monitor your AI-powered healthcare assistants
+            </p>
+          </div>
+          <Button 
+            className="bg-primary hover:bg-primary/90 text-white font-medium shadow-sm mt-4 sm:mt-0" 
+            onClick={handleOpenCreateModal}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Create New Care Aid
           </Button>
@@ -75,7 +69,7 @@ export default function ChatbotList() {
         
         {/* Chatbot List Grid */}
         {chatbots && chatbots.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {chatbots.map((chatbot) => (
               <ChatbotCard 
                 key={chatbot.id} 
@@ -85,13 +79,19 @@ export default function ChatbotList() {
             ))}
           </div>
         ) : (
-          <div className="bg-background-light border border-neutral-800 rounded-lg p-8 text-center">
+          <div className="bg-white border border-slate-200 rounded-lg p-12 text-center shadow-sm">
             <div className="max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-white mb-2">No Care Aids Yet</h3>
-              <p className="text-neutral-400 mb-6">
-                Create your first Care Aid to start building conversational AI with document-based knowledge.
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Care Aids Yet</h3>
+              <p className="text-slate-600 mb-8 leading-relaxed">
+                Create your first Care Aid to start building conversational AI with document-based knowledge for your healthcare team.
               </p>
-              <Button className="bg-primary hover:bg-primary-dark text-white" onClick={handleOpenCreateModal}>
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-white font-medium shadow-sm" 
+                onClick={handleOpenCreateModal}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Care Aid
               </Button>
