@@ -6,6 +6,7 @@ import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { generateCompletion, generateStreamingCompletion, generateStreamingAssistantCompletion, processDocumentText, verifyApiKey, checkVectorStoreCapacity } from "./openai";
+import { generateStreamingResponseCompletion } from "./openai-responses";
 import OpenAI from "openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
@@ -667,14 +668,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Use vector store if available, otherwise fall back to traditional RAG
         if (chatbot.vectorStoreId) {
           // Stream the completion with vector store support
-          await generateStreamingAssistantCompletion({
-            model: chatbot.model,
-            systemPrompt: chatbot.systemPrompt,
+          await generateStreamingResponseCompletion({
             userMessage: latestUserMessage.content,
-            previousMessages: previousMessages as any[],
-            vectorStoreId: chatbot.vectorStoreId,
-            temperature: chatbot.temperature / 100,
-            maxTokens: chatbot.maxTokens,
+            chatbot: { vectorStoreId: chatbot.vectorStoreId },
             fallbackResponse: chatbot.fallbackResponse || undefined,
             onChunk: (chunk) => {
               // Send each chunk as it arrives
@@ -718,15 +714,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         });
       } else {
-        // Fall back to traditional RAG for chatbots without vector stores
-        await generateStreamingCompletion({
-            model: chatbot.model,
-            systemPrompt: chatbot.systemPrompt,
+        // Fall back to responses API for chatbots without vector stores
+        await generateStreamingResponseCompletion({
             userMessage: latestUserMessage.content,
-            previousMessages: previousMessages,
-            temperature: chatbot.temperature / 100,
-            maxTokens: chatbot.maxTokens,
-            documents,
             fallbackResponse: chatbot.fallbackResponse,
             onChunk: (chunk) => {
               sendEvent('chunk', { content: chunk });
