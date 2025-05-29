@@ -270,7 +270,7 @@ export default function BasicSetup() {
                 <optgroup label="GPT-4 Family">
                   <option value="gpt4">GPT-4 (Stable)</option>
                   <option value="gpt4-1-nano">GPT-4.1 Nano (Compact)</option>
-                  <option value="gpt4-mini">GPT-4.1 Mini (Balanced)</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini (Balanced)</option>
                 </optgroup>
                 <optgroup label="GPT-3 Family">
                   <option value="gpt35turbo">GPT-3.5 Turbo (Recommended)</option>
