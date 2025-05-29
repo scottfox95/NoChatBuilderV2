@@ -25,7 +25,6 @@ export default function Knowledge() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      setUploading(true);
       const formData = new FormData();
       formData.append("file", file);
       
@@ -43,7 +42,11 @@ export default function Knowledge() {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}/documents`] });
+      // Only invalidate document queries, not chatbot queries to avoid triggering form callbacks
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/chatbots/${chatbotId}/documents`],
+        exact: true 
+      });
       toast({
         title: "Document uploaded",
         description: "Your document has been uploaded and processed successfully.",
@@ -55,9 +58,6 @@ export default function Knowledge() {
         description: error.message,
         variant: "destructive",
       });
-    },
-    onSettled: () => {
-      setUploading(false);
     }
   });
 
@@ -66,7 +66,10 @@ export default function Knowledge() {
       await apiRequest("DELETE", `/api/documents/${documentId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/chatbots/${chatbotId}/documents`] });
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/chatbots/${chatbotId}/documents`],
+        exact: true 
+      });
       toast({
         title: "Document deleted",
         description: "The document has been removed from your chatbot.",

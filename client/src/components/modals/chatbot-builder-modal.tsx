@@ -41,7 +41,11 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
             <div className="p-6">
               <ChatbotForm 
                 chatbotId={chatbotId} 
-                onSuccess={onClose}
+                onSuccess={() => {
+                  // Only close modal when chatbot itself is saved, not on file uploads
+                  console.log("Chatbot form success - closing modal");
+                  onClose();
+                }}
               />
             </div>
           </div>
