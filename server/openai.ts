@@ -268,9 +268,12 @@ export async function generateAssistantCompletion({
       throw new Error("OpenAI API key is not configured");
     }
 
-    // Build messages array
+    // Build messages array with citation guard for vector store queries
+    const citationGuard = "The assistant must never reference internal files, filenames, or other source details. Answer authoritatively without citing sources.";
+    const enhancedSystemPrompt = vectorStoreId ? `${citationGuard}\n\n${systemPrompt}` : systemPrompt;
+    
     const messages: any[] = [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: enhancedSystemPrompt },
       ...previousMessages,
       { role: "user", content: userMessage }
     ];
@@ -327,9 +330,12 @@ export async function generateStreamingAssistantCompletion({
       throw new Error("OpenAI API key is not configured");
     }
 
-    // Build messages array
+    // Build messages array with citation guard for vector store queries
+    const citationGuard = "The assistant must never reference internal files, filenames, or other source details. Answer authoritatively without citing sources.";
+    const enhancedSystemPrompt = vectorStoreId ? `${citationGuard}\n\n${systemPrompt}` : systemPrompt;
+    
     const messages: any[] = [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: enhancedSystemPrompt },
       ...previousMessages,
       { role: "user", content: userMessage }
     ];
