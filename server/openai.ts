@@ -139,7 +139,7 @@ export async function askLLM({
     
     for await (const chunk of resp as any) {
       // Handle different chunk types from responses API
-      if (chunk.type === 'response.text.delta' && chunk.delta) {
+      if (chunk.type === 'response.output_text.delta' && chunk.delta) {
         const content = chunk.delta;
         chunks.push(content);
         fullResponse += content;
@@ -293,10 +293,18 @@ export async function generateStreamingCompletion({
     });
 
     for await (const chunk of stream) {
-      const content = chunk.output_text || "";
-      if (content) {
+      // Handle different chunk types from responses API
+      if (chunk.type === 'response.text.delta' && chunk.delta) {
+        const content = chunk.delta;
         fullResponse += content;
         onChunk(content);
+      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
+        // Final chunk with complete text
+        const content = chunk.response.output_text;
+        if (!fullResponse) {
+          fullResponse = content;
+          onChunk(content);
+        }
       }
     }
 
@@ -506,15 +514,33 @@ export async function generateStreamingAssistantCompletion({
     };
 
     const stream = await withExponentialBackoff(() => 
-      openai.chat.completions.create(completionOptions)
+      openai.responses.create({
+        model,
+        input: userMessage,
+        ...(vectorStoreId && {
+          tools: [{
+            type: "file_search",
+            vector_store_ids: [vectorStoreId],
+          }]
+        }),
+        stream: true,
+      })
     );
 
     let fullResponse = "";
     for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
+      // Handle different chunk types from responses API
+      if (chunk.type === 'response.text.delta' && chunk.delta) {
+        const content = chunk.delta;
         fullResponse += content;
         onChunk(content);
+      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
+        // Final chunk with complete text
+        const content = chunk.response.output_text;
+        if (!fullResponse) {
+          fullResponse = content;
+          onChunk(content);
+        }
       }
     }
 
