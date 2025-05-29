@@ -224,18 +224,18 @@ export async function generateStreamingCompletion({
     });
 
     for await (const chunk of stream as any) {
-      const ev = chunk.event ?? chunk.type ?? "";
+      const ev = chunk.type ?? chunk.event ?? "";
 
-      // incremental tokens
+      /* incremental tokens */
       if (ev === "response.output_text.delta") {
-        const text = chunk.data as string;   // <-- token lives here
-        if (text) {
-          onChunk(text);        // or push to the WebSocket
-          fullResponse += text;
+        const token = chunk.delta as string;     // ← token lives here
+        if (token) {
+          onChunk(token);           // or push to WebSocket
+          fullResponse += token;
         }
       }
 
-      // end‑of‑answer
+      /* end‑of‑answer */
       if (ev === "response.output_text.done" || ev === "response.completed") {
         break;
       }
@@ -462,18 +462,18 @@ export async function generateStreamingAssistantCompletion({
 
     let fullResponse = "";
     for await (const chunk of stream as any) {
-      const ev = chunk.event ?? chunk.type ?? "";
+      const ev = chunk.type ?? chunk.event ?? "";
 
-      // incremental tokens
+      /* incremental tokens */
       if (ev === "response.output_text.delta") {
-        const text = chunk.data as string;   // <-- token lives here
-        if (text) {
-          onChunk(text);        // or push to the WebSocket
-          fullResponse += text;
+        const token = chunk.delta as string;     // ← token lives here
+        if (token) {
+          onChunk(token);           // or push to WebSocket
+          fullResponse += token;
         }
       }
 
-      // end‑of‑answer
+      /* end‑of‑answer */
       if (ev === "response.output_text.done" || ev === "response.completed") {
         break;
       }
