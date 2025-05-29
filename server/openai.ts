@@ -117,38 +117,41 @@ export async function askLLM({
       { role: "user" as const, content: userMessage },
     ];
 
-    const completionParams: any = {
+    const resp = await openai.responses.create({
       model: "gpt-4o-mini",
-      messages,
-      temperature,
-      max_tokens: maxTokens,
+      input: userMessage,
       ...(chatbot?.vectorStoreId && {
         tools: [{
           type: "file_search",
           vector_store_ids: [chatbot.vectorStoreId],
         }]
       }),
-      ...(stream && { stream: true }),
-    };
-
-    const resp = await openai.chat.completions.create(completionParams);
+      stream: stream,
+    });
 
     if (!stream) {
       const response = resp as any;
-      return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
+      return response.output_text || fallbackResponse || "I couldn't generate a response.";
     }
 
     const chunks: string[] = [];
     let fullResponse = "";
     
     for await (const chunk of resp as any) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
+      // Handle different chunk types from responses API
+      if (chunk.type === 'response.text.delta' && chunk.delta) {
+        const content = chunk.delta;
         chunks.push(content);
         fullResponse += content;
         onChunk?.(content);
+      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
+        // Final chunk with complete text
+        const content = chunk.response.output_text;
+        if (!fullResponse) {
+          fullResponse = content;
+          onChunk?.(content);
+        }
       }
-      // DO NOT expose file_search_results
     }
 
     if (fullResponse.trim() === "" && fallbackResponse) {
@@ -219,14 +222,12 @@ export async function generateCompletion({
 
     const actualModel = modelMap[model] || "gpt-3.5-turbo";
 
-    const response = await openai.chat.completions.create({
+    const response = await openai.responses.create({
       model: actualModel,
-      messages,
-      temperature,
-      max_tokens: maxTokens,
+      input: userMessage,
     });
 
-    return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
+    return response.output_text || fallbackResponse || "I couldn't generate a response.";
   } catch (error) {
     console.error("OpenAI completion error:", error);
     return fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
@@ -292,7 +293,7 @@ export async function generateStreamingCompletion({
     });
 
     for await (const chunk of stream) {
-      const content = chunk.content || "";
+      const content = chunk.output_text || "";
       if (content) {
         fullResponse += content;
         onChunk(content);
@@ -452,11 +453,10 @@ export async function generateAssistantCompletion({
             vector_store_ids: [vectorStoreId],
           }]
         }),
-        stream: false,
       })
     );
     
-    const content = response.choices[0].message.content;
+    const content = response.output_text;
     
     if (!content && fallbackResponse) {
       return fallbackResponse;
