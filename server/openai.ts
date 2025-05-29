@@ -236,6 +236,75 @@ export async function processDocumentText(text: string, fileType: string): Promi
   return text;
 }
 
+// Exponential backoff utility for rate limiting
+async function withExponentialBackoff<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: any;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      
+      // Check if it's a rate limit error (429)
+      if (error.status === 429 && attempt < maxRetries) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        console.log(`Rate limited, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // For non-rate limit errors or max retries reached, throw immediately
+      throw error;
+    }
+  }
+  
+  throw lastError;
+}
+
+// Check vector store usage and limits
+export async function checkVectorStoreCapacity(vectorStoreId: string): Promise<{
+  canUpload: boolean;
+  usage?: {
+    fileCount: number;
+    totalBytes: number;
+  };
+  error?: string;
+}> {
+  try {
+    const vectorStore = await withExponentialBackoff(() => 
+      openai.vectorStores.retrieve(vectorStoreId)
+    );
+    
+    // OpenAI vector store limits (as of latest documentation)
+    const MAX_FILES = 500;
+    const MAX_BYTES = 100 * 1024 * 1024 * 1024; // 100GB
+    
+    const usage = {
+      fileCount: vectorStore.file_counts?.total || 0,
+      totalBytes: vectorStore.usage_bytes || 0
+    };
+    
+    const canUpload = usage.fileCount < MAX_FILES && usage.totalBytes < MAX_BYTES;
+    
+    return {
+      canUpload,
+      usage,
+      error: canUpload ? undefined : "Vector store capacity limit reached"
+    };
+  } catch (error: any) {
+    console.error("Error checking vector store capacity:", error);
+    return {
+      canUpload: false,
+      error: "Unable to check vector store capacity"
+    };
+  }
+}
+
 interface AssistantCompletionOptions {
   model: string;
   systemPrompt: string;
@@ -297,7 +366,9 @@ export async function generateAssistantCompletion({
       };
     }
 
-    const response = await openai.chat.completions.create(completionOptions);
+    const response = await withExponentialBackoff(() => 
+      openai.chat.completions.create(completionOptions)
+    );
     
     const content = response.choices[0].message.content;
     
@@ -360,7 +431,9 @@ export async function generateStreamingAssistantCompletion({
       };
     }
 
-    const stream = await openai.chat.completions.create(completionOptions);
+    const stream = await withExponentialBackoff(() => 
+      openai.chat.completions.create(completionOptions)
+    );
 
     let fullResponse = "";
     for await (const chunk of stream) {

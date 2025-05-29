@@ -5,7 +5,7 @@ import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { generateCompletion, generateStreamingCompletion, generateStreamingAssistantCompletion, processDocumentText, verifyApiKey } from "./openai";
+import { generateCompletion, generateStreamingCompletion, generateStreamingAssistantCompletion, processDocumentText, verifyApiKey, checkVectorStoreCapacity } from "./openai";
 import OpenAI from "openai";
 import { redactMessagesPII, redactPII } from "./redaction";
 import multer from "multer";
@@ -125,10 +125,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Return the updated chatbot with vector store ID
         const updatedChatbot = await storage.getChatbot(chatbot.id);
         res.status(201).json(updatedChatbot);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error creating vector store:", error);
+        
+        // Handle specific OpenAI errors
+        if (error.status === 429) {
+          return res.status(429).json({ 
+            message: "Rate limit exceeded while creating vector store. Please try again in a few moments.",
+            details: "OpenAI API rate limit reached"
+          });
+        }
+        
+        if (error.status === 403) {
+          return res.status(400).json({ 
+            message: "OpenAI API access denied. Please check your API key permissions.",
+            details: error.message
+          });
+        }
+        
+        if (error.status === 401) {
+          return res.status(400).json({ 
+            message: "OpenAI API authentication failed. Please verify your API key.",
+            details: error.message
+          });
+        }
+        
         // Even if vector store creation fails, we still return the chatbot
-        // The vector store can be created later
+        // The vector store can be created later or the bot can work without it
+        console.log("Returning chatbot without vector store due to creation failure");
         res.status(201).json(chatbot);
       }
     } catch (error) {
@@ -322,9 +346,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let openaiFileId = null;
       
-      // If chatbot has a vector store, upload to OpenAI
+      // If chatbot has a vector store, check capacity and upload to OpenAI
       if (chatbot.vectorStoreId) {
         try {
+          // Check vector store capacity before uploading
+          const capacityCheck = await checkVectorStoreCapacity(chatbot.vectorStoreId);
+          
+          if (!capacityCheck.canUpload) {
+            return res.status(400).json({ 
+              message: "Vector store capacity limit reached. Cannot upload more documents.",
+              details: {
+                error: capacityCheck.error,
+                usage: capacityCheck.usage
+              }
+            });
+          }
+          
           // 1. Upload raw file to OpenAI
           const uploadResponse = await openai.files.create({
             file: fs.createReadStream(file.path),
@@ -341,9 +378,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
           
           console.log("Added file to vector store:", chatbot.vectorStoreId);
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error uploading to OpenAI vector store:", error);
+          
+          // Handle specific OpenAI errors
+          if (error.status === 413 || error.message?.includes("size limit")) {
+            return res.status(400).json({ 
+              message: "File is too large for vector store upload.",
+              details: error.message
+            });
+          }
+          
+          if (error.status === 429) {
+            return res.status(429).json({ 
+              message: "Rate limit exceeded. Please try again in a few moments.",
+              details: "OpenAI API rate limit reached"
+            });
+          }
+          
           // Continue with local storage even if OpenAI upload fails
+          console.log("Continuing with local storage despite OpenAI upload failure");
         }
       }
       
