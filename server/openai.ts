@@ -389,7 +389,7 @@ export async function generateStreamingAssistantCompletion({
       throw new Error("OpenAI API key is not configured");
     }
 
-    // Build conversation history for context
+    // Build messages array with citation guard for vector store queries
     const citationGuard = "The assistant must never reference internal files, filenames, or other source details. Answer authoritatively without citing sources.";
     const enhancedSystemPrompt = vectorStoreId ? `${citationGuard}\n\n${systemPrompt}` : systemPrompt;
     
@@ -418,7 +418,6 @@ export async function generateStreamingAssistantCompletion({
         fullResponse += content;
         onChunk(content);
       }
-      // Ignore chunk.choices[0]?.delta?.file_search_results to keep citations hidden
     }
 
     if (fullResponse.trim() === "" && fallbackResponse) {
@@ -431,7 +430,7 @@ export async function generateStreamingAssistantCompletion({
 
     onComplete(fullResponse);
   } catch (error) {
-    console.error("OpenAI streaming responses completion error:", error);
+    console.error("OpenAI streaming assistant completion error:", error);
     const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
     onError(errorResponse);
   }
