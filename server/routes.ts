@@ -286,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/chatbots/:id/documents", upload.single("file"), async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    if (!(req as any).file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
       const chatbot = await storage.getChatbot(Number(req.params.id));
@@ -294,28 +294,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Chatbot not found" });
       }
       
-      if (chatbot.userId !== req.user.id) {
+      if (chatbot.userId !== req.user!.id) {
         return res.status(403).json({ message: "Not authorized to add documents to this chatbot" });
       }
 
-      // Get file type from the upload
-      const fileType = path.extname(req.file.originalname).substring(1).toLowerCase();
+      const file = (req as any).file;
       
-      // Read and process the file
-      const fileContent = await readFile(req.file.path, "utf8");
+      // Get file type from the upload
+      const fileType = path.extname(file.originalname).substring(1).toLowerCase();
+      
+      let openaiFileId = null;
+      
+      // If chatbot has a vector store, upload to OpenAI
+      if (chatbot.vectorStoreId) {
+        try {
+          // 1. Upload raw file to OpenAI
+          const uploadResponse = await openai.files.create({
+            file: fs.createReadStream(file.path),
+            purpose: "assistants",
+          });
+          
+          openaiFileId = uploadResponse.id;
+          console.log("Uploaded file to OpenAI:", openaiFileId);
+          
+          // 2. Add file to the chatbot's vector store
+          await openai.vectorStores.fileBatches.create(
+            chatbot.vectorStoreId,
+            { file_ids: [uploadResponse.id] }
+          );
+          
+          console.log("Added file to vector store:", chatbot.vectorStoreId);
+        } catch (error) {
+          console.error("Error uploading to OpenAI vector store:", error);
+          // Continue with local storage even if OpenAI upload fails
+        }
+      }
+      
+      // Read and process the file for local storage
+      const fileContent = await readFile(file.path, "utf8");
       const processedContent = await processDocumentText(fileContent, fileType);
       
-      // Create document record
+      // 3. Create document record with OpenAI file ID
       const document = await storage.createDocument({
         chatbotId: Number(req.params.id),
-        name: req.file.originalname,
+        name: file.originalname,
         type: fileType,
         content: processedContent,
-        size: req.file.size,
+        size: file.size,
+        openaiFileId: openaiFileId,
       });
       
-      // Clean up the file
-      await unlink(req.file.path);
+      // Clean up the local file
+      await unlink(file.path);
       
       res.status(201).json(document);
     } catch (error) {

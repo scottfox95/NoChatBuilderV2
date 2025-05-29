@@ -62,6 +62,7 @@ export const documents = pgTable("documents", {
   type: text("type").notNull(), // pdf, docx, txt
   content: text("content").notNull(),
   size: integer("size").notNull(), // in bytes
+  openaiFileId: text("openai_file_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
