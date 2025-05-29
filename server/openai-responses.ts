@@ -79,13 +79,17 @@ export async function generateStreamingResponseCompletion({
     
     for await (const chunk of stream as any) {
       // Handle streaming chunks from responses API
-      if (chunk.type === 'text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        fullResponse += content;
-        onChunk(content);
-      } else if (chunk.type === 'text.completed') {
-        // Handle completion event if needed
+      if (chunk.event === 'text.delta') {
+        const delta = chunk.choices?.[0]?.delta;
+        if (delta?.content) {
+          const content = delta.content;
+          fullResponse += content;
+          onChunk(content);
+        }
+      } else if (chunk.event === 'text.completed') {
+        // Handle completion event
         console.log("Stream completed");
+        break;
       }
     }
 

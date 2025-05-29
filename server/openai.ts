@@ -223,15 +223,19 @@ export async function generateStreamingCompletion({
       stream: true,
     });
 
-    for await (const chunk of stream) {
+    for await (const chunk of stream as any) {
       // Handle different chunk types from responses API
-      if (chunk.type === 'response.output_text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        fullResponse += content;
-        onChunk(content);
-      } else if (chunk.type === 'response.output_text.done') {
+      if (chunk.event === 'text.delta') {
+        const delta = chunk.choices?.[0]?.delta;
+        if (delta?.content) {
+          const content = delta.content;
+          fullResponse += content;
+          onChunk(content);
+        }
+      } else if (chunk.event === 'text.completed') {
         // Handle completion event
         console.log("Stream completed");
+        break;
       }
     }
 
@@ -455,15 +459,19 @@ export async function generateStreamingAssistantCompletion({
     );
 
     let fullResponse = "";
-    for await (const chunk of stream) {
+    for await (const chunk of stream as any) {
       // Handle different chunk types from responses API
-      if (chunk.type === 'text.delta' && chunk.delta) {
-        const content = chunk.delta;
-        fullResponse += content;
-        onChunk(content);
-      } else if (chunk.type === 'text.completed') {
+      if (chunk.event === 'text.delta') {
+        const delta = chunk.choices?.[0]?.delta;
+        if (delta?.content) {
+          const content = delta.content;
+          fullResponse += content;
+          onChunk(content);
+        }
+      } else if (chunk.event === 'text.completed') {
         // Handle completion event
         console.log("Stream completed");
+        break;
       }
     }
 
