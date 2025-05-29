@@ -117,86 +117,50 @@ export async function askLLM({
       { role: "user" as const, content: userMessage },
     ];
 
-    if (chatbot?.vectorStoreId) {
-      // Use responses.create for vector store queries
-      const resp = await openai.responses.create({
-        model: "gpt-4o-mini",
-        input: userMessage,
+    const completionParams: any = {
+      model: "gpt-4o-mini",
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+      ...(chatbot?.vectorStoreId && {
         tools: [{
           type: "file_search",
           vector_store_ids: [chatbot.vectorStoreId],
-        }],
-        stream: stream,
-      });
-      
-      if (!stream) {
-        const response = resp as any;
-        return response.content || fallbackResponse || "I couldn't generate a response.";
-      }
-      
-      const chunks: string[] = [];
-      let fullResponse = "";
-      
-      for await (const chunk of resp as any) {
-        const content = chunk.content || "";
-        if (content) {
-          chunks.push(content);
-          fullResponse += content;
-          onChunk?.(content);
-        }
-      }
-      
-      if (fullResponse.trim() === "" && fallbackResponse) {
-        fullResponse = fallbackResponse;
-        onChunk?.(fallbackResponse);
-      } else if (fullResponse.trim() === "") {
-        fullResponse = "I'm sorry, I couldn't generate a response.";
-        onChunk?.(fullResponse);
-      }
-      
-      onComplete?.(fullResponse);
-      return fullResponse;
-    } else {
-      // Use chat.completions for regular queries
-      const completionParams: any = {
-        model: "gpt-4o-mini",
-        messages,
-        temperature,
-        max_tokens: maxTokens,
-        ...(stream && { stream: true }),
-      };
+        }]
+      }),
+      ...(stream && { stream: true }),
+    };
 
-      const resp = await openai.chat.completions.create(completionParams);
-      
-      if (!stream) {
-        const response = resp as any;
-        return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
-      }
+    const resp = await openai.chat.completions.create(completionParams);
 
-      const chunks: string[] = [];
-      let fullResponse = "";
-      
-      for await (const chunk of resp as any) {
-        const content = chunk.choices[0]?.delta?.content || "";
-        if (content) {
-          chunks.push(content);
-          fullResponse += content;
-          onChunk?.(content);
-        }
-        // DO NOT expose file_search_results
-      }
-
-      if (fullResponse.trim() === "" && fallbackResponse) {
-        fullResponse = fallbackResponse;
-        onChunk?.(fallbackResponse);
-      } else if (fullResponse.trim() === "") {
-        fullResponse = "I'm sorry, I couldn't generate a response.";
-        onChunk?.(fullResponse);
-      }
-
-      onComplete?.(fullResponse);
-      return fullResponse;
+    if (!stream) {
+      const response = resp as any;
+      return response.choices[0].message.content || fallbackResponse || "I couldn't generate a response.";
     }
+
+    const chunks: string[] = [];
+    let fullResponse = "";
+    
+    for await (const chunk of resp as any) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        chunks.push(content);
+        fullResponse += content;
+        onChunk?.(content);
+      }
+      // DO NOT expose file_search_results
+    }
+
+    if (fullResponse.trim() === "" && fallbackResponse) {
+      fullResponse = fallbackResponse;
+      onChunk?.(fallbackResponse);
+    } else if (fullResponse.trim() === "") {
+      fullResponse = "I'm sorry, I couldn't generate a response.";
+      onChunk?.(fullResponse);
+    }
+
+    onComplete?.(fullResponse);
+    return fullResponse;
   } catch (error) {
     console.error("OpenAI completion error:", error);
     const errorResponse = fallbackResponse || "I'm sorry, I couldn't process your request at this time.";
