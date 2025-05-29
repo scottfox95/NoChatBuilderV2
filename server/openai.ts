@@ -229,7 +229,7 @@ export async function generateStreamingCompletion({
         const content = chunk.delta;
         fullResponse += content;
         onChunk(content);
-      } else if (chunk.type === 'text.completed') {
+      } else if (chunk.type === 'response.output_text.done') {
         // Handle completion event
         console.log("Stream completed");
       }
