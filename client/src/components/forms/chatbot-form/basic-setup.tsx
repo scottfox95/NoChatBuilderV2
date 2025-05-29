@@ -263,18 +263,15 @@ export default function BasicSetup() {
                 {...field}
               >
                 <optgroup label="Latest Models">
-                  <option value="gpt4o">GPT-4o (Latest & Most Capable)</option>
-                  <option value="gpt4-1">GPT-4.1 (Very Capable)</option>
-                  <option value="gpt4o-mini">GPT-4o Mini (Fast & Efficient)</option>
+                  <option value="gpt-4o">GPT-4o (Latest & Most Capable)</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini (Fast & Efficient)</option>
                 </optgroup>
                 <optgroup label="GPT-4 Family">
-                  <option value="gpt4">GPT-4 (Stable)</option>
-                  <option value="gpt4-1-nano">GPT-4.1 Nano (Compact)</option>
-                  <option value="gpt-4o-mini">GPT-4o Mini (Balanced)</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo (High Performance)</option>
+                  <option value="gpt-4">GPT-4 (Stable)</option>
                 </optgroup>
-                <optgroup label="GPT-3 Family">
-                  <option value="gpt35turbo">GPT-3.5 Turbo (Recommended)</option>
-                  <option value="gpt3-mini">GPT-3 Mini (Fastest)</option>
+                <optgroup label="GPT-3.5 Family">
+                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cost Effective)</option>
                 </optgroup>
               </select>
             </FormControl>

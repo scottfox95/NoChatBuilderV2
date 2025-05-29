@@ -43,7 +43,7 @@ export default function ChatbotForm({ chatbotId, onSuccess }: ChatbotFormProps) 
     description: "A helpful assistant for my users",
     slug: "my-chatbot-" + Date.now().toString().slice(-4), // Generate unique slug with timestamp
     systemPrompt: "You are a helpful AI assistant that provides accurate and concise information.",
-    model: "gpt35turbo",
+    model: "gpt-3.5-turbo",
     temperature: 70,
     maxTokens: 500,
     ragEnabled: true,
