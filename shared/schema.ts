@@ -43,6 +43,7 @@ export const chatbots = pgTable("chatbots", {
   welcomeMessages: jsonb("welcome_messages").default(["Hello! How can I assist you today?"]),
   suggestedQuestions: text("suggested_questions").array().default([]),
   views: integer("views").notNull().default(0),
+  vectorStoreId: text("vector_store_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
