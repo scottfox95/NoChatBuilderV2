@@ -350,9 +350,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(document);
     } catch (error) {
       // Clean up uploaded file if there was an error
-      if (req.file) {
+      if ((req as any).file) {
         try {
-          await unlink(req.file.path);
+          await unlink((req as any).file.path);
         } catch (unlinkError) {
           console.error("Error deleting file:", unlinkError);
         }
