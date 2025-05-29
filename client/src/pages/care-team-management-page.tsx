@@ -374,7 +374,7 @@ export default function CareTeamManagementPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium text-black">{user.username}</div>
+                                  <div className="font-medium text-white">{user.username}</div>
                                   <Badge variant="secondary" className="text-xs">
                                     Care Team
                                   </Badge>
@@ -606,7 +606,7 @@ export default function CareTeamManagementPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium text-black">{user.username}</div>
+                                  <div className="font-medium text-white">{user.username}</div>
                                 </div>
                               </div>
                             </TableCell>
