@@ -223,19 +223,19 @@ export async function generateStreamingCompletion({
       stream: true,
     });
 
-    for await (const chunk of stream as any) {
+    for await (const chunk of stream) {
       // Handle different chunk types from responses API
-      if (chunk.event === 'text.delta') {
-        const delta = chunk.choices?.[0]?.delta;
-        if (delta?.content) {
-          const content = delta.content;
-          fullResponse += content;
+      if (chunk.type === 'response.text.delta' && chunk.delta) {
+        const content = chunk.delta;
+        fullResponse += content;
+        onChunk(content);
+      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
+        // Final chunk with complete text
+        const content = chunk.response.output_text;
+        if (!fullResponse) {
+          fullResponse = content;
           onChunk(content);
         }
-      } else if (chunk.event === 'text.completed') {
-        // Handle completion event
-        console.log("Stream completed");
-        break;
       }
     }
 
@@ -459,19 +459,19 @@ export async function generateStreamingAssistantCompletion({
     );
 
     let fullResponse = "";
-    for await (const chunk of stream as any) {
+    for await (const chunk of stream) {
       // Handle different chunk types from responses API
-      if (chunk.event === 'text.delta') {
-        const delta = chunk.choices?.[0]?.delta;
-        if (delta?.content) {
-          const content = delta.content;
-          fullResponse += content;
+      if (chunk.type === 'response.text.delta' && chunk.delta) {
+        const content = chunk.delta;
+        fullResponse += content;
+        onChunk(content);
+      } else if (chunk.type === 'response.completed' && chunk.response?.output_text) {
+        // Final chunk with complete text
+        const content = chunk.response.output_text;
+        if (!fullResponse) {
+          fullResponse = content;
           onChunk(content);
         }
-      } else if (chunk.event === 'text.completed') {
-        // Handle completion event
-        console.log("Stream completed");
-        break;
       }
     }
 
