@@ -377,7 +377,7 @@ export default function CareTeamLogsPage() {
               />
               <Label htmlFor="redact-toggle" className="ml-2 flex items-center text-sm text-white">
                 <ShieldAlert className="h-4 w-4 mr-1 text-primary" />
-                Redact Patient Personal Information
+                Redact Personal Information in All Messages
               </Label>
             </div>
           </CardContent>

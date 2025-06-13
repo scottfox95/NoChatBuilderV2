@@ -389,14 +389,14 @@ export default function ChatLogsPage() {
               />
               <Label htmlFor="redact-pii" className="cursor-pointer flex items-center">
                 <ShieldAlert className="h-4 w-4 mr-2 text-orange-500" />
-                <span className="text-[#4277f6]">Redact Personal Information in User Messages</span>
+                <span className="text-[#4277f6]">Redact Personal Information in All Messages</span>
                 <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                   Using NER
                 </span>
               </Label>
               {logsData?.redactionEnabled && (
                 <span className="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
-                  Redacting user messages
+                  Redacting all messages
                 </span>
               )}
             </div>
