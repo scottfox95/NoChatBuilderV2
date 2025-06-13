@@ -59,7 +59,10 @@ export default function CareTeamDashboardPage() {
               >
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-semibold text-white mb-2">{chatbot.name}</h3>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-1">{chatbot.name}</h3>
+                      <p className="text-xs text-neutral-500 font-mono">ID: {chatbot.id}</p>
+                    </div>
                   </div>
                   <p className="text-neutral-400 text-sm mb-4 line-clamp-2">
                     {chatbot.description}
