@@ -79,7 +79,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
                   <Zap className="h-3 w-3 mr-1" />
                   {getModelDisplayName(chatbot.model)}
                 </Badge>
-                <Badge variant="outline" className="text-xs font-mono">
+                <Badge variant="secondary" className="text-xs font-medium">
                   ID: {chatbot.id}
                 </Badge>
               </div>
