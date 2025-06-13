@@ -530,6 +530,10 @@ export default function ChatLogsPage() {
                           setPage(pageToShow);
                         }}
                         isActive={page === pageToShow}
+                        className={page === pageToShow ? 
+                          "bg-primary text-primary-foreground hover:bg-primary/90" : 
+                          "bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
+                        }
                       >
                         {pageToShow}
                       </PaginationLink>
