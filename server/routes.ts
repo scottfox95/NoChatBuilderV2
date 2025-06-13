@@ -797,18 +797,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.params.sessionId
     );
     
-    // Apply redaction only to user messages if requested
+    // Apply redaction to all messages if requested
     if (redact) {
-      messages = messages.map(message => {
-        // Only redact user messages, not bot responses
-        if (message.isUser) {
-          return {
-            ...message,
-            content: redactPII(message.content)
-          };
-        }
-        return message;
-      });
+      messages = redactMessagesPII(messages);
     }
     
     res.json(messages);
