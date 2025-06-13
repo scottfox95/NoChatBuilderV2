@@ -864,18 +864,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }));
       
-      // Apply redaction if enabled (only to user messages)
+      // Apply redaction if enabled (to all messages)
       if (redact) {
-        processedLogs = processedLogs.map(log => {
-          // Only redact user messages, not bot responses
-          if (log.isUser) {
-            return {
-              ...log,
-              content: redactPII(log.content)
-            };
-          }
-          return log;
-        });
+        processedLogs = redactMessagesPII(processedLogs);
       }
       
       res.json({ 
