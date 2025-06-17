@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, RefreshCw } from "lucide-react";
+import { X } from "lucide-react";
 import ChatbotForm from "@/components/forms/chatbot-form";
-import ChatInterface from "@/components/chat/chat-interface";
+import ChatbotPreviewWrapper from "./chatbot-preview-wrapper";
 
 interface ChatbotBuilderModalProps {
   isOpen: boolean;
@@ -12,12 +12,7 @@ interface ChatbotBuilderModalProps {
 }
 
 export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: ChatbotBuilderModalProps) {
-  const [previewKey, setPreviewKey] = useState(0);
   const isEditMode = !!chatbotId;
-
-  const handleRefreshPreview = () => {
-    setPreviewKey(prev => prev + 1);
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -65,12 +60,8 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
             </div>
             
             {/* Chat Preview */}
-            <div className="flex-1 p-4 overflow-hidden" key={previewKey}>
-              <ChatInterface 
-                chatbotSlug="preview" 
-                isPreview={true}
-                previewSystemPrompt="You are a helpful AI assistant that responds to users in a friendly and informative way."
-              />
+            <div className="flex-1 overflow-hidden" key={previewKey}>
+              <ChatbotPreviewWrapper />
             </div>
           </div>
         </div>
