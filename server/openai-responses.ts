@@ -9,10 +9,12 @@ type Message = {
 export async function generateResponseCompletion({
   userMessage,
   chatbot,
+  systemPrompt,
   fallbackResponse = "I couldn't generate a response.",
 }: {
   userMessage: string;
   chatbot?: { vectorStoreId?: string };
+  systemPrompt?: string;
   fallbackResponse?: string;
 }): Promise<string> {
   try {
@@ -25,6 +27,7 @@ export async function generateResponseCompletion({
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
       input: userMessage,
+      ...(systemPrompt && { instructions: systemPrompt }),
       ...(chatbot?.vectorStoreId && {
         tools: [{
           type: "file_search",
@@ -46,6 +49,7 @@ export async function generateResponseCompletion({
 export async function generateStreamingResponseCompletion({
   userMessage,
   chatbot,
+  systemPrompt,
   onChunk,
   onComplete,
   onError,
@@ -53,6 +57,7 @@ export async function generateStreamingResponseCompletion({
 }: {
   userMessage: string;
   chatbot?: { vectorStoreId?: string };
+  systemPrompt?: string;
   onChunk: (chunk: string) => void;
   onComplete: (fullContent: string) => void;
   onError: (error: any) => void;
@@ -60,6 +65,7 @@ export async function generateStreamingResponseCompletion({
 }): Promise<void> {
   console.log("=== RESPONSES API CALLED ===");
   console.log("User message:", userMessage);
+  console.log("System prompt:", systemPrompt);
   console.log("Has vector store:", !!chatbot?.vectorStoreId);
   
   try {
@@ -67,6 +73,7 @@ export async function generateStreamingResponseCompletion({
       model: "gpt-4o-mini",
       input: userMessage,
       stream: true,
+      ...(systemPrompt && { instructions: systemPrompt }),
     };
 
     // Add vector store tools if available

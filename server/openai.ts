@@ -115,6 +115,7 @@ export async function askLLM({
     return await generateResponseCompletion({
       userMessage,
       chatbot,
+      systemPrompt,
       fallbackResponse: fallbackResponse || "I couldn't generate a response.",
     });
   }
@@ -122,6 +123,7 @@ export async function askLLM({
   await generateStreamingResponseCompletion({
     userMessage,
     chatbot,
+    systemPrompt,
     onChunk: onChunk || (() => {}),
     onComplete: onComplete || (() => {}),
     onError: onError || (() => {}),
