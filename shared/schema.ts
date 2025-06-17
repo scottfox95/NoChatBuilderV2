@@ -26,20 +26,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   role: true,
 });
 
-export const userSettings = pgTable("user_settings", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  commonWelcomeMessages: jsonb("common_welcome_messages").notNull().default('[]'),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
 export const chatbots = pgTable("chatbots", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -102,8 +88,6 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
-export type UserSettings = typeof userSettings.$inferSelect;
 export type InsertChatbot = z.infer<typeof insertChatbotSchema>;
 export type Chatbot = typeof chatbots.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;

@@ -10,11 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { PlusCircle, XCircle, X, Plus, Settings, Trash2 } from "lucide-react";
+import { PlusCircle, XCircle, X, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useWelcomeMessages } from "@/hooks/use-welcome-messages";
 
 export default function BasicSetup() {
   const form = useFormContext();
@@ -22,9 +19,6 @@ export default function BasicSetup() {
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
     form.getValues().suggestedQuestions || []
   );
-  const [newCustomMessage, setNewCustomMessage] = useState('');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { allMessages, customMessages, addCustomMessage, removeCustomMessage, isLoading } = useWelcomeMessages();
   
   // Initialize form values if they don't exist
   useEffect(() => {
@@ -125,117 +119,6 @@ export default function BasicSetup() {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-neutral-300">Welcome Messages</FormLabel>
-            
-            {/* Quick Add Dropdown with Settings */}
-            <div className="mb-3 flex gap-2">
-              <div className="flex-1">
-                <Select 
-                  onValueChange={(value) => {
-                    if (value === "custom") return;
-                    const currentMessages = Array.isArray(field.value) ? field.value : [];
-                    // Avoid duplicates
-                    if (!currentMessages.includes(value)) {
-                      field.onChange([...currentMessages, value]);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700">
-                    <SelectValue placeholder="Quick add common messages" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-neutral-800 border-neutral-700">
-                    {!isLoading && allMessages.map((message: string, index: number) => (
-                      <SelectItem 
-                        key={index} 
-                        value={message}
-                        className="text-neutral-300 hover:bg-neutral-700 focus:bg-neutral-700"
-                      >
-                        {message.length > 50 ? `${message.substring(0, 50)}...` : message}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Settings Button */}
-              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-neutral-900 border-neutral-700 text-white max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-white">Manage Welcome Messages</DialogTitle>
-                  </DialogHeader>
-                  
-                  <div className="space-y-4">
-                    {/* Add new custom message */}
-                    <div className="flex gap-2">
-                      <Input
-                        value={newCustomMessage}
-                        onChange={(e) => setNewCustomMessage(e.target.value)}
-                        placeholder="Add a new welcome message..."
-                        className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            if (newCustomMessage.trim()) {
-                              addCustomMessage(newCustomMessage.trim());
-                              setNewCustomMessage('');
-                            }
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          if (newCustomMessage.trim()) {
-                            addCustomMessage(newCustomMessage.trim());
-                            setNewCustomMessage('');
-                          }
-                        }}
-                        className="bg-primary hover:bg-primary/90"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    
-                    {/* Custom messages list */}
-                    {customMessages.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-neutral-300">Your Custom Messages</h4>
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                          {customMessages.map((message: string, index: number) => (
-                            <div key={index} className="flex items-center justify-between p-2 bg-neutral-800 rounded border border-neutral-700">
-                              <span className="text-sm text-neutral-300 flex-1">{message}</span>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeCustomMessage(message)}
-                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="text-xs text-neutral-500">
-                      Your custom messages are saved locally and will be available across all chatbots.
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-            
             <div className="space-y-2">
               {(Array.isArray(field.value) ? field.value : []).map((message: string, index: number) => (
                 <div key={index} className="flex items-center space-x-2">
@@ -281,12 +164,12 @@ export default function BasicSetup() {
                 }}
                 className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
               >
-                <PlusCircle className="mr-1 h-3 w-3" /> Add Custom Message
+                <PlusCircle className="mr-1 h-3 w-3" /> Add Welcome Message
               </Button>
             </div>
             <FormDescription className="text-neutral-500 text-xs">
-              Use the dropdown above to quickly add common welcome messages, or click "Add Custom Message" to write your own. 
-              Multiple messages add variety for returning users.
+              Add welcome messages that will be randomly shown when a user first opens the chat. 
+              Having multiple messages adds variety for returning users.
             </FormDescription>
             <FormMessage />
           </FormItem>
