@@ -5,6 +5,18 @@ import ChatPreview from "@/components/chat/chat-preview";
 export default function ChatbotPreviewWrapper() {
   const form = useFormContext();
   
+  // Return a fallback preview if form context is not available
+  if (!form) {
+    return (
+      <ChatPreview
+        name="My Chatbot"
+        description="A helpful assistant for my users"
+        welcomeMessages={["Hello! How can I assist you today?"]}
+        suggestedQuestions={[]}
+      />
+    );
+  }
+  
   // Watch form values for real-time updates
   const watchedValues = useWatch({
     control: form.control,
