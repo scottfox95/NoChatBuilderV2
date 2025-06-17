@@ -186,6 +186,26 @@ export class DatabaseStorage implements IStorage {
   async getUsersByRole(role: string): Promise<User[]> {
     return await db.select().from(users).where(eq(users.role, role));
   }
+
+  // User settings operations
+  async getUserSettings(userId: number): Promise<UserSettings | undefined> {
+    const [settings] = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+    return settings;
+  }
+
+  async createUserSettings(insertSettings: InsertUserSettings): Promise<UserSettings> {
+    const [settings] = await db.insert(userSettings).values(insertSettings).returning();
+    return settings;
+  }
+
+  async updateUserSettings(userId: number, partialSettings: Partial<InsertUserSettings>): Promise<UserSettings | undefined> {
+    const [settings] = await db
+      .update(userSettings)
+      .set({ ...partialSettings, updatedAt: new Date() })
+      .where(eq(userSettings.userId, userId))
+      .returning();
+    return settings;
+  }
   
   // Chatbot assignments operations
   async getAssignedChatbots(userId: number): Promise<Chatbot[]> {
