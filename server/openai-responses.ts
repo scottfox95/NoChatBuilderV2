@@ -5,7 +5,7 @@ type Message = {
   content: string;
 };
 
-// Simple responses API implementation for non-streaming
+// Responses API implementation for non-streaming
 export async function generateResponseCompletion({
   userMessage,
   chatbot,
@@ -21,13 +21,19 @@ export async function generateResponseCompletion({
     console.log("Making responses API call with:", { 
       model: "gpt-4o-mini", 
       input: userMessage,
-      hasVectorStore: !!chatbot?.vectorStoreId 
+      hasVectorStore: !!chatbot?.vectorStoreId,
+      hasSystemPrompt: !!systemPrompt
     });
+    
+    // Combine system prompt with user message for Responses API
+    let input = userMessage;
+    if (systemPrompt) {
+      input = `${systemPrompt}\n\nUser: ${userMessage}`;
+    }
     
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
-      input: userMessage,
-      ...(systemPrompt && { instructions: systemPrompt }),
+      input: input,
       ...(chatbot?.vectorStoreId && {
         tools: [{
           type: "file_search",
@@ -37,7 +43,7 @@ export async function generateResponseCompletion({
     });
 
     console.log("Responses API response:", JSON.stringify(response, null, 2));
-    return (response as any).output_text || fallbackResponse;
+    return (response as any).output || fallbackResponse;
   } catch (error) {
     console.error("OpenAI responses completion error:", error);
     console.error("Error details:", JSON.stringify(error, null, 2));
@@ -69,11 +75,16 @@ export async function generateStreamingResponseCompletion({
   console.log("Has vector store:", !!chatbot?.vectorStoreId);
   
   try {
+    // Combine system prompt with user message for Responses API
+    let input = userMessage;
+    if (systemPrompt) {
+      input = `${systemPrompt}\n\nUser: ${userMessage}`;
+    }
+
     const requestConfig: any = {
       model: "gpt-4o-mini",
-      input: userMessage,
+      input: input,
       stream: true,
-      ...(systemPrompt && { instructions: systemPrompt }),
     };
 
     // Add vector store tools if available
