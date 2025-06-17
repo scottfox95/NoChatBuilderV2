@@ -575,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Generate completion using OpenAI
           responseContent = await generateCompletion({
             model: chatbot.model,
-            systemPrompt: chatbot.systemPrompt,
+            systemPrompt: chatbot.systemPrompt || undefined,
             userMessage,
             previousMessages: previousMessages.map(msg => ({
               role: msg.isUser ? "user" : "assistant",
@@ -681,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await generateStreamingResponseCompletion({
             userMessage: latestUserMessage.content,
             chatbot: { vectorStoreId: chatbot.vectorStoreId },
-            systemPrompt: chatbot.systemPrompt,
+            systemPrompt: chatbot.systemPrompt || undefined,
             fallbackResponse: chatbot.fallbackResponse || undefined,
             onChunk: (chunk) => {
               // Send each chunk as it arrives
@@ -728,8 +728,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Fall back to responses API for chatbots without vector stores
         await generateStreamingResponseCompletion({
             userMessage: latestUserMessage.content,
-            systemPrompt: chatbot.systemPrompt,
-            fallbackResponse: chatbot.fallbackResponse,
+            systemPrompt: chatbot.systemPrompt || undefined,
+            fallbackResponse: chatbot.fallbackResponse || undefined,
             onChunk: (chunk) => {
               sendEvent('chunk', { content: chunk });
             },
