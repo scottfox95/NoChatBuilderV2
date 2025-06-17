@@ -47,20 +47,13 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
           
           {/* Preview Section */}
           <div className="w-full md:w-1/2 bg-background border-t md:border-t-0 md:border-l border-neutral-800 flex flex-col overflow-hidden">
-            <div className="p-4 border-b border-neutral-800 flex justify-between items-center">
+            <div className="p-4 border-b border-neutral-800">
               <h3 className="font-medium text-white">Live Preview</h3>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleRefreshPreview}
-                className="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-transparent"
-              >
-                <RefreshCw className="mr-1 h-3 w-3" /> Refresh
-              </Button>
+              <p className="text-xs text-neutral-400 mt-1">Preview updates automatically as you edit</p>
             </div>
             
             {/* Chat Preview */}
-            <div className="flex-1 overflow-hidden" key={previewKey}>
+            <div className="flex-1 overflow-hidden">
               <ChatbotPreviewWrapper />
             </div>
           </div>
