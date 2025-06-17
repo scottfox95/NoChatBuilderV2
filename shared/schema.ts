@@ -29,13 +29,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const userSettings = pgTable("user_settings", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
-  commonWelcomeMessages: jsonb("common_welcome_messages").notNull().default([
-    "Hello! How can I assist you today?",
-    "Welcome! I'm here to help you with any questions you may have.",
-    "Hi there! What can I help you with today?",
-    "Greetings! I'm your AI assistant. How may I be of service?",
-    "Welcome! Feel free to ask me anything."
-  ]),
+  commonWelcomeMessages: jsonb("common_welcome_messages").notNull().default('[]'),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
