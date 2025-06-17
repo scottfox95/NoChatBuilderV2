@@ -4,6 +4,7 @@ import {
   documents, 
   messages, 
   userChatbotAssignments,
+  userSettings,
   type User, 
   type InsertUser, 
   type Chatbot, 
@@ -13,7 +14,9 @@ import {
   type Message, 
   type InsertMessage,
   type UserChatbotAssignment,
-  type InsertUserChatbotAssignment
+  type InsertUserChatbotAssignment,
+  type UserSettings,
+  type InsertUserSettings
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -31,6 +34,11 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
+
+  // User settings operations
+  getUserSettings(userId: number): Promise<UserSettings | undefined>;
+  createUserSettings(settings: InsertUserSettings): Promise<UserSettings>;
+  updateUserSettings(userId: number, settings: Partial<InsertUserSettings>): Promise<UserSettings | undefined>;
 
   // Chatbot assignments operations
   getAssignedChatbots(userId: number): Promise<Chatbot[]>;

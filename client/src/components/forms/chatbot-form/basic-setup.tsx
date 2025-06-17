@@ -10,8 +10,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, XCircle, X, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PlusCircle, XCircle, X, Plus, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
+
+const COMMON_WELCOME_MESSAGES = [
+  "Hello! How can I assist you today?",
+  "Welcome! I'm here to help you with any questions you may have.",
+  "Hi there! What can I help you with today?",
+  "Greetings! I'm your AI assistant. How may I be of service?",
+  "Welcome! Feel free to ask me anything.",
+  "Hello! I'm here to provide you with information and support.",
+  "Hi! What would you like to know today?",
+  "Welcome! I'm ready to help with your questions.",
+  "Hello! How may I assist you this morning?",
+  "Hi there! I'm your virtual assistant. What can I do for you?",
+  "Welcome to our support! How can I help?",
+  "Hello! I'm here to make your experience easier. What do you need?",
+  "Hi! Ready to help with whatever you need today.",
+  "Welcome! Ask me anything and I'll do my best to help.",
+  "Hello! Your AI assistant is here and ready to help.",
+];
 
 export default function BasicSetup() {
   const form = useFormContext();
@@ -119,6 +138,36 @@ export default function BasicSetup() {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-neutral-300">Welcome Messages</FormLabel>
+            
+            {/* Quick Add Dropdown */}
+            <div className="mb-3">
+              <Select 
+                onValueChange={(value) => {
+                  if (value === "custom") return;
+                  const currentMessages = Array.isArray(field.value) ? field.value : [];
+                  // Avoid duplicates
+                  if (!currentMessages.includes(value)) {
+                    field.onChange([...currentMessages, value]);
+                  }
+                }}
+              >
+                <SelectTrigger className="bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700">
+                  <SelectValue placeholder="Quick add common messages" />
+                </SelectTrigger>
+                <SelectContent className="bg-neutral-800 border-neutral-700">
+                  {COMMON_WELCOME_MESSAGES.map((message, index) => (
+                    <SelectItem 
+                      key={index} 
+                      value={message}
+                      className="text-neutral-300 hover:bg-neutral-700 focus:bg-neutral-700"
+                    >
+                      {message.length > 50 ? `${message.substring(0, 50)}...` : message}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
             <div className="space-y-2">
               {(Array.isArray(field.value) ? field.value : []).map((message: string, index: number) => (
                 <div key={index} className="flex items-center space-x-2">
@@ -164,12 +213,12 @@ export default function BasicSetup() {
                 }}
                 className="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border-neutral-700"
               >
-                <PlusCircle className="mr-1 h-3 w-3" /> Add Welcome Message
+                <PlusCircle className="mr-1 h-3 w-3" /> Add Custom Message
               </Button>
             </div>
             <FormDescription className="text-neutral-500 text-xs">
-              Add welcome messages that will be randomly shown when a user first opens the chat. 
-              Having multiple messages adds variety for returning users.
+              Use the dropdown above to quickly add common welcome messages, or click "Add Custom Message" to write your own. 
+              Multiple messages add variety for returning users.
             </FormDescription>
             <FormMessage />
           </FormItem>
