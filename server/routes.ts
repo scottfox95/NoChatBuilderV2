@@ -660,7 +660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const latestBotMessage = botMessages[botMessages.length - 1];
       
       // Get only previous messages for context (excluding the latest pair)
-      const previousMessages = messages.slice(0, -2).map(msg => ({
+      const previousMessages: { role: "user" | "assistant"; content: string }[] = messages.slice(0, -2).map(msg => ({
         role: msg.isUser ? "user" : "assistant",
         content: msg.content,
       }));
@@ -682,6 +682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userMessage: latestUserMessage.content,
             chatbot: { vectorStoreId: chatbot.vectorStoreId },
             systemPrompt: chatbot.systemPrompt || undefined,
+            previousMessages,
             fallbackResponse: chatbot.fallbackResponse || undefined,
             onChunk: (chunk) => {
               // Send each chunk as it arrives
@@ -729,6 +730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await generateStreamingResponseCompletion({
             userMessage: latestUserMessage.content,
             systemPrompt: chatbot.systemPrompt || undefined,
+            previousMessages,
             fallbackResponse: chatbot.fallbackResponse || undefined,
             onChunk: (chunk) => {
               sendEvent('chunk', { content: chunk });

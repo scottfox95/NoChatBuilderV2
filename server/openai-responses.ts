@@ -10,11 +10,13 @@ export async function generateResponseCompletion({
   userMessage,
   chatbot,
   systemPrompt,
+  previousMessages = [],
   fallbackResponse = "I couldn't generate a response.",
 }: {
   userMessage: string;
   chatbot?: { vectorStoreId?: string };
   systemPrompt?: string;
+  previousMessages?: Message[];
   fallbackResponse?: string;
 }): Promise<string> {
   try {
@@ -22,14 +24,30 @@ export async function generateResponseCompletion({
       model: "gpt-4o-mini", 
       input: userMessage,
       hasVectorStore: !!chatbot?.vectorStoreId,
-      hasSystemPrompt: !!systemPrompt
+      hasSystemPrompt: !!systemPrompt,
+      conversationLength: previousMessages.length
     });
     
-    // Combine system prompt with user message for Responses API
-    let input = userMessage;
+    // Build full conversation context for Responses API
+    let input = "";
+    
+    // Add system prompt first
     if (systemPrompt) {
-      input = `${systemPrompt}\n\nUser: ${userMessage}`;
+      input += `${systemPrompt}\n\n`;
     }
+    
+    // Add conversation history
+    if (previousMessages.length > 0) {
+      input += "Conversation history:\n";
+      previousMessages.forEach(msg => {
+        const role = msg.role === "user" ? "User" : "Assistant";
+        input += `${role}: ${msg.content}\n`;
+      });
+      input += "\n";
+    }
+    
+    // Add current user message
+    input += `User: ${userMessage}`;
     
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
@@ -56,6 +74,7 @@ export async function generateStreamingResponseCompletion({
   userMessage,
   chatbot,
   systemPrompt,
+  previousMessages = [],
   onChunk,
   onComplete,
   onError,
@@ -64,6 +83,7 @@ export async function generateStreamingResponseCompletion({
   userMessage: string;
   chatbot?: { vectorStoreId?: string };
   systemPrompt?: string;
+  previousMessages?: Message[];
   onChunk: (chunk: string) => void;
   onComplete: (fullContent: string) => void;
   onError: (error: any) => void;
@@ -73,13 +93,29 @@ export async function generateStreamingResponseCompletion({
   console.log("User message:", userMessage);
   console.log("System prompt:", systemPrompt);
   console.log("Has vector store:", !!chatbot?.vectorStoreId);
+  console.log("Conversation length:", previousMessages.length);
   
   try {
-    // Combine system prompt with user message for Responses API
-    let input = userMessage;
+    // Build full conversation context for Responses API
+    let input = "";
+    
+    // Add system prompt first
     if (systemPrompt) {
-      input = `${systemPrompt}\n\nUser: ${userMessage}`;
+      input += `${systemPrompt}\n\n`;
     }
+    
+    // Add conversation history
+    if (previousMessages.length > 0) {
+      input += "Conversation history:\n";
+      previousMessages.forEach(msg => {
+        const role = msg.role === "user" ? "User" : "Assistant";
+        input += `${role}: ${msg.content}\n`;
+      });
+      input += "\n";
+    }
+    
+    // Add current user message
+    input += `User: ${userMessage}`;
 
     const requestConfig: any = {
       model: "gpt-4o-mini",
