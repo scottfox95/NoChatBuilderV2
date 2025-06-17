@@ -14,10 +14,22 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Create pool with better error handling
+// Create pool with better error handling and connection management
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: true
+  ssl: true,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
+
+// Add error handling for pool connections
+pool.on('error', (err) => {
+  console.error('Database pool error:', err);
+});
+
+pool.on('connect', () => {
+  console.log('Database pool connected successfully');
 });
 
 export const db = drizzle({ client: pool, schema });
