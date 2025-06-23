@@ -15,7 +15,7 @@ export default function ChatbotBuilderModal({ isOpen, onClose, chatbotId }: Chat
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0 overflow-hidden bg-background-light border-neutral-800">
+      <DialogContent className="max-w-6xl max-h-[90vh] p-0 overflow-hidden bg-background-light border-neutral-800 [&>button]:hidden">
         <DialogHeader className="p-6 border-b border-neutral-800">
           <div className="flex justify-between items-center">
             <DialogTitle className="text-xl font-semibold text-white">
