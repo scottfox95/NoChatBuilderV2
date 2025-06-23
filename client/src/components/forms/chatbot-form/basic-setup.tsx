@@ -136,7 +136,7 @@ export default function BasicSetup() {
                       // Save as common welcome message
                       if (user) {
                         try {
-                          await apiRequest('/api/common-messages', 'POST', {
+                          await apiRequest('POST', '/api/common-messages', {
                             userId: user.id,
                             kind: 'welcome',
                             text: messageText
@@ -207,7 +207,7 @@ export default function BasicSetup() {
                       // Save as common FAQ question
                       if (user) {
                         try {
-                          await apiRequest('/api/common-messages', 'POST', {
+                          await apiRequest('POST', '/api/common-messages', {
                             userId: user.id,
                             kind: 'faq',
                             text: questionText

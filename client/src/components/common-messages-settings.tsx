@@ -35,7 +35,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
   // Create mutation
   const createMutation = useMutation({
     mutationFn: (message: InsertCommonMessage) => 
-      apiRequest('/api/common-messages', 'POST', message),
+      apiRequest('POST', '/api/common-messages', message),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message saved successfully" });
@@ -48,7 +48,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, text }: { id: number; text: string }) => 
-      apiRequest(`/api/common-messages/${id}`, 'PUT', { text }),
+      apiRequest('PUT', `/api/common-messages/${id}`, { text }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message updated successfully" });
@@ -61,7 +61,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: (id: number) => 
-      apiRequest(`/api/common-messages/${id}`, 'DELETE'),
+      apiRequest('DELETE', `/api/common-messages/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message deleted successfully" });
