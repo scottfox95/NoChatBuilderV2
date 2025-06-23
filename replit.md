@@ -104,13 +104,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 23, 2025: Implemented Common Messages database-backed feature
+- June 23, 2025: Successfully implemented Common Messages database-backed feature
   - Added common_messages table to PostgreSQL schema with userId, kind (welcome/faq), and text fields
   - Created CRUD storage methods and API endpoints for managing common messages
   - Built CommonMessagesSettings component for Settings page with dark theme styling
   - Updated WelcomeInput and SuggestedQuestionInput to fetch from database instead of localStorage
   - Added save functionality in chatbot builder with proper API integration
-  - Fixed API endpoint URLs and imports for proper functionality
+  - Fixed API endpoint URLs, imports, and parameter order for apiRequest function
+  - Feature fully tested and working - users can create, edit, delete, and use common message templates
 
 ## Changelog
 
