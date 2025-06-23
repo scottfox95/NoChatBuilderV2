@@ -1,0 +1,186 @@
+Your task: implement reusable “Common Messages” (welcome & faq) without touching unrelated code or tables.
+
+===== 0. Repo assumptions =====
+- Frontend lives in /src.
+- Supabase client helper is in /src/utils/supabaseClient.ts.
+- Settings page file: /src/pages/settings.tsx
+- Care-Aid builder popup component: /src/components/CreateCareAidDialog.tsx
+Adjust paths if reality differs, but **change only the files named below**.
+
+────────────────────────────────────────────────────────
+1️⃣  Create migration file
+────────────────────────────────────────────────────────
+Add **/supabase/migrations/20250623_common_messages.sql** with the following DDL
+(and remind Scott to run it once in the Supabase SQL editor 💡):
+
+```sql
+-- enable uuid gen, safe if already on
+create extension if not exists "pgcrypto";
+
+create table if not exists public.common_messages (
+  id         uuid primary key default gen_random_uuid(),
+  owner_id   uuid references auth.users(id) on delete cascade,
+  kind       text not null check (kind in ('welcome','faq')),
+  text       text not null,
+  updated_at timestamptz not null default now()
+);
+────────────────────────────────────────────────────────
+2️⃣ New component: CommonMessagesSettings
+────────────────────────────────────────────────────────
+Create /src/components/CommonMessagesSettings.tsx
+
+tsx
+Copy
+Edit
+import { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+
+type Row = { id?: string; owner_id?: string; kind: 'welcome' | 'faq'; text: string };
+
+export default function CommonMessagesSettings({ userId }: { userId: string }) {
+  const [rows, setRows] = useState<Row[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { fetchRows(); }, []);
+
+  async function fetchRows() {
+    const { data, error } = await supabase
+      .from('common_messages')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('updated_at', { ascending: false });
+    if (!error) setRows(data as Row[]);
+  }
+
+  async function upsertRow(row: Row) {
+    setSaving(true);
+    await supabase.from('common_messages').upsert({ ...row, owner_id: userId });
+    setSaving(false);
+    fetchRows();
+  }
+
+  async function deleteRow(id: string) {
+    await supabase.from('common_messages').delete().eq('id', id);
+    fetchRows();
+  }
+
+  function addBlank() {
+    setRows([{ kind: 'welcome', text: '' }, ...rows]);
+  }
+
+  return (
+    <section className="space-y-4">
+      <h2 className="text-xl font-semibold">Common Messages</h2>
+      <button onClick={addBlank} className="border rounded px-2 py-1">＋ Add New</button>
+      {rows.map((r, i) => (
+        <div key={r.id ?? i} className="flex gap-2 items-start">
+          <select
+            value={r.kind}
+            onChange={e => upsertRow({ ...r, kind: e.target.value as Row['kind'] })}
+            className="border px-1"
+          >
+            <option value="welcome">welcome</option>
+            <option value="faq">faq</option>
+          </select>
+          <textarea
+            className="flex-1 border p-1"
+            value={r.text}
+            placeholder="Message text…"
+            onBlur={e => upsertRow({ ...r, text: e.target.value })}
+            onChange={e => setRows(rs => rs.map((row, idx) => idx === i ? { ...row, text: e.target.value } : row))}
+          />
+          {r.id && (
+            <button onClick={() => deleteRow(r.id)} title="Delete" className="text-red-600">🗑️</button>
+          )}
+        </div>
+      ))}
+      {saving && <p className="text-sm text-gray-500">Saving…</p>}
+    </section>
+  );
+}
+────────────────────────────────────────────────────────
+3️⃣ Mount it in /settings
+────────────────────────────────────────────────────────
+Edit /src/pages/settings.tsx
+
+diff
+Copy
+Edit
++ import CommonMessagesSettings from '../components/CommonMessagesSettings';
+…
+export default function SettingsPage() {
+  const { user } = useAuth(); // ← whatever hook you already use
+  if (!user) return null;
+
+  return (
+    <main className="space-y-8 p-6">
+      {/* existing settings stuff */}
++     <CommonMessagesSettings userId={user.id} />
+    </main>
+  );
+}
+────────────────────────────────────────────────────────
+4️⃣ Fetch & use in builder popup
+────────────────────────────────────────────────────────
+Edit /src/components/CreateCareAidDialog.tsx
+
+diff
+Copy
+Edit
++ const [templates, setTemplates] = useState<{welcome: string[]; faq: string[]}>({welcome:[], faq:[]});
+
+  useEffect(() => {
+    async function grab() {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from('common_messages')
+        .select('kind,text')
+        .eq('owner_id', user.id);
+      if (data) {
+        setTemplates({
+          welcome: data.filter(d=>d.kind==='welcome').map(d=>d.text),
+          faq:     data.filter(d=>d.kind==='faq').map(d=>d.text)
+        });
+      }
+    }
+    grab();
+  }, [user?.id]);
+Inside the JSX where the Welcome Message field lives:
+
+diff
+Copy
+Edit
+  <label>Welcome Message</label>
++ <select onChange={e => setWelcome(e.target.value)} className="border px-1 mb-1">
++   <option value="">— choose template —</option>
++   {templates.welcome.map(t => <option key={t}>{t}</option>)}
++ </select>
+  <textarea … value={welcome} onChange={…} />
+
++ <label className="flex items-center gap-1 mt-1">
++   <input type="checkbox" checked={saveWelcomeCommon}
++          onChange={e => setSaveWelcomeCommon(e.target.checked)} />
++   Save as common
++ </label>
+Do the mirror image for the Suggested Question section with templates.faq.
+
+In the handleSubmit (or equivalent) that creates the Care Aid:
+
+diff
+Copy
+Edit
+  if (saveWelcomeCommon) {
+    await supabase.from('common_messages').upsert({
+      owner_id: user.id, kind: 'welcome', text: welcome
+    });
+  }
+  if (saveFaqCommon) {
+    await supabase.from('common_messages').upsert({
+      owner_id: user.id, kind: 'faq', text: question
+    });
+  }
+────────────────────────────────────────────────────────
+5️⃣ Commit
+────────────────────────────────────────────────────────
+git add . && git commit -m "feat: common messages templates (settings + builder)"
+
