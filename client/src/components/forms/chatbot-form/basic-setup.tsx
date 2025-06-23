@@ -15,6 +15,7 @@ import { PlusCircle, XCircle, X, Plus, Expand } from "lucide-react";
 import { useState, useEffect } from "react";
 import WelcomeInput from "./WelcomeInput";
 import SuggestedQuestionInput from "./SuggestedQuestionInput";
+import useModels from "@/hooks/useModels";
 
 export default function BasicSetup() {
   const form = useFormContext();
@@ -344,18 +345,46 @@ export default function BasicSetup() {
               <select 
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 {...field}
+                disabled={modelsLoading}
               >
-                <optgroup label="Latest Models">
-                  <option value="gpt-4o">GPT-4o (Latest & Most Capable)</option>
-                  <option value="gpt-4o-mini">GPT-4o Mini (Fast & Efficient)</option>
-                </optgroup>
-                <optgroup label="GPT-4 Family">
-                  <option value="gpt-4-turbo">GPT-4 Turbo (High Performance)</option>
-                  <option value="gpt-4">GPT-4 (Stable)</option>
-                </optgroup>
-                <optgroup label="GPT-3.5 Family">
-                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cost Effective)</option>
-                </optgroup>
+                {modelsLoading ? (
+                  <option>Loading models...</option>
+                ) : (
+                  <>
+                    <optgroup label="Latest Models">
+                      {models.filter(m => m.includes('gpt-4o')).map(model => (
+                        <option key={model} value={model}>
+                          {model === 'gpt-4o' ? 'GPT-4o (Latest & Most Capable)' :
+                           model === 'gpt-4o-mini' ? 'GPT-4o Mini (Fast & Efficient)' :
+                           model}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="GPT-4 Family">
+                      {models.filter(m => m.includes('gpt-4') && !m.includes('gpt-4o')).map(model => (
+                        <option key={model} value={model}>
+                          {model === 'gpt-4-turbo' ? 'GPT-4 Turbo (High Performance)' :
+                           model === 'gpt-4' ? 'GPT-4 (Stable)' :
+                           model}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="GPT-3.5 Family">
+                      {models.filter(m => m.includes('gpt-3.5')).map(model => (
+                        <option key={model} value={model}>
+                          {model === 'gpt-3.5-turbo' ? 'GPT-3.5 Turbo (Cost Effective)' : model}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Other Models">
+                      {models.filter(m => !m.includes('gpt-4') && !m.includes('gpt-3.5')).map(model => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </>
+                )}
               </select>
             </FormControl>
             <FormDescription className="text-neutral-500 text-xs">

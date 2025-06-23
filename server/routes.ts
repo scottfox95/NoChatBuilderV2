@@ -1140,6 +1140,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // OpenAI models endpoint
+  app.get("/api/models", async (req, res) => {
+    try {
+      const models = await storage.getOpenaiModels();
+      res.json(models);
+    } catch (error) {
+      console.error("Error fetching OpenAI models:", error);
+      res.status(500).json({ message: "Failed to fetch models" });
+    }
+  });
+
   // Settings endpoints
   app.get("/api/settings/openai", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
