@@ -1041,6 +1041,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Settings routes
+  // Common Messages endpoints
+  app.get("/api/common-messages/:userId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const { userId } = req.params;
+      const { kind } = req.query;
+      
+      // Ensure user can only access their own messages
+      if (req.user.id !== parseInt(userId)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const messages = await storage.getCommonMessages(
+        parseInt(userId), 
+        kind as "welcome" | "faq" | undefined
+      );
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching common messages:", error);
+      res.status(500).json({ message: "Failed to fetch common messages" });
+    }
+  });
+
+  app.post("/api/common-messages", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const parsedData = insertCommonMessageSchema.parse(req.body);
+      
+      // Ensure user can only create messages for themselves
+      if (req.user.id !== parsedData.userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const message = await storage.createCommonMessage(parsedData);
+      res.status(201).json(message);
+    } catch (error) {
+      console.error("Error creating common message:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create common message" });
+    }
+  });
+
+  app.put("/api/common-messages/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const { id } = req.params;
+      const { text } = req.body;
+      
+      if (!text || typeof text !== 'string') {
+        return res.status(400).json({ message: "Text is required" });
+      }
+      
+      // Get the message first to verify ownership
+      const messages = await storage.getCommonMessages(req.user.id);
+      const messageExists = messages.find(m => m.id === parseInt(id));
+      
+      if (!messageExists) {
+        return res.status(404).json({ message: "Message not found or access denied" });
+      }
+      
+      const updated = await storage.updateCommonMessage(parseInt(id), text);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating common message:", error);
+      res.status(500).json({ message: "Failed to update common message" });
+    }
+  });
+
+  app.delete("/api/common-messages/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const { id } = req.params;
+      
+      // Get the message first to verify ownership
+      const messages = await storage.getCommonMessages(req.user.id);
+      const messageExists = messages.find(m => m.id === parseInt(id));
+      
+      if (!messageExists) {
+        return res.status(404).json({ message: "Message not found or access denied" });
+      }
+      
+      const deleted = await storage.deleteCommonMessage(parseInt(id));
+      if (deleted) {
+        res.json({ message: "Message deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Message not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting common message:", error);
+      res.status(500).json({ message: "Failed to delete common message" });
+    }
+  });
+
+  // Settings endpoints
   app.get("/api/settings/openai", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     

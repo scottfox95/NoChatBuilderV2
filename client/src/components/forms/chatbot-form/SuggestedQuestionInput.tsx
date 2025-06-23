@@ -3,9 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { CommonMessage } from "@shared/schema";
 
-type Props = { question: string; onChange: (v: string) => void };
+type Props = { 
+  question: string; 
+  onChange: (v: string) => void;
+  onSaveAsCommon?: (text: string) => void;
+};
 
-export default function SuggestedQuestionInput({ question, onChange }: Props) {
+export default function SuggestedQuestionInput({ question, onChange, onSaveAsCommon }: Props) {
   const [saveIt, setSaveIt] = useState(false);
   const { user } = useAuth();
 
@@ -25,7 +29,10 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
 
   const handleSaveToggle = (checked: boolean) => {
     setSaveIt(checked);
-    // Note: Actual saving will be handled in the parent form when chatbot is created/updated
+    if (checked && question.trim() && onSaveAsCommon) {
+      onSaveAsCommon(question.trim());
+      setSaveIt(false);
+    }
   };
 
   return (
@@ -47,7 +54,6 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
         className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 px-3 text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         value={question}
         onChange={(e) => onChange(e.target.value)}
-
         placeholder="Will I need to stay in the hospital?"
       />
 

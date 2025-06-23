@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { loadCommon, saveCommon } from "@/utils/commonPrompts";
 
-type Props = { value: string; onChange: (v: string) => void };
+type Props = { 
+  value: string; 
+  onChange: (v: string) => void;
+  onSaveAsCommon?: (text: string) => void;
+};
 
-export default function WelcomeInput({ value, onChange }: Props) {
+export default function WelcomeInput({ value, onChange, onSaveAsCommon }: Props) {
   const [saveIt, setSaveIt] = useState(false);
   const { user } = useAuth();
 
@@ -23,7 +27,10 @@ export default function WelcomeInput({ value, onChange }: Props) {
 
   const handleSaveToggle = (checked: boolean) => {
     setSaveIt(checked);
-    // Note: Actual saving will be handled in the parent form when chatbot is created/updated
+    if (checked && value.trim() && onSaveAsCommon) {
+      onSaveAsCommon(value.trim());
+      setSaveIt(false);
+    }
   };
 
   return (
@@ -46,7 +53,6 @@ export default function WelcomeInput({ value, onChange }: Props) {
         rows={3}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onBlur={handleBlur}
         placeholder="Hi there! I'm Dr. Bradley's ACL Reconstruction Care Aid…"
       />
 

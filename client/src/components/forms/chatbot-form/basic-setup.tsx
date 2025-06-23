@@ -132,6 +132,10 @@ export default function BasicSetup() {
                       newMessages[index] = newMessage;
                       field.onChange(newMessages);
                     }}
+                    onSaveAsCommon={(messageText) => {
+                      // This will be handled by a mutation when the user checks the save checkbox
+                      console.log('Save as common welcome message:', messageText);
+                    }}
                   />
                   {(Array.isArray(field.value) ? field.value.length : 0) > 1 && (
                     <Button
