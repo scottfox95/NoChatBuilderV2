@@ -5,6 +5,7 @@ import {
   messages, 
   userChatbotAssignments,
   commonMessages,
+  openaiModels,
   type User, 
   type InsertUser, 
   type Chatbot, 
@@ -16,7 +17,9 @@ import {
   type UserChatbotAssignment,
   type InsertUserChatbotAssignment,
   type CommonMessage,
-  type InsertCommonMessage
+  type InsertCommonMessage,
+  type OpenaiModel,
+  type InsertOpenaiModel
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -74,6 +77,10 @@ export interface IStorage {
   createCommonMessage(message: InsertCommonMessage): Promise<CommonMessage>;
   updateCommonMessage(id: number, text: string): Promise<CommonMessage | undefined>;
   deleteCommonMessage(id: number): Promise<boolean>;
+
+  // OpenAI models operations
+  getOpenaiModels(): Promise<OpenaiModel[]>;
+  upsertOpenaiModel(model: InsertOpenaiModel): Promise<OpenaiModel>;
 
   // Session store
   sessionStore: any;
@@ -489,6 +496,32 @@ export class DatabaseStorage implements IStorage {
   async deleteCommonMessage(id: number): Promise<boolean> {
     const result = await db.delete(commonMessages).where(eq(commonMessages.id, id));
     return result.rowCount > 0;
+  }
+
+  async getOpenaiModels(): Promise<OpenaiModel[]> {
+    try {
+      return await db.select().from(openaiModels).where(eq(openaiModels.isChat, true)).orderBy(openaiModels.id);
+    } catch (error) {
+      console.error("Error fetching OpenAI models:", error);
+      return [];
+    }
+  }
+
+  async upsertOpenaiModel(model: InsertOpenaiModel): Promise<OpenaiModel> {
+    const [result] = await db.insert(openaiModels)
+      .values(model)
+      .onConflictDoUpdate({
+        target: openaiModels.id,
+        set: {
+          created: model.created,
+          ownedBy: model.ownedBy,
+          object: model.object,
+          isChat: model.isChat,
+          updatedAt: model.updatedAt,
+        }
+      })
+      .returning();
+    return result;
   }
 }
 

@@ -130,8 +130,21 @@ export const behaviorRuleSchema = z.object({
   response: z.string(),
 });
 
+export const openaiModels = pgTable("openai_models", {
+  id: text("id").primaryKey(), // e.g. "gpt-4o-mini"
+  created: integer("created"),
+  ownedBy: text("owned_by"),
+  object: text("object"),
+  isChat: boolean("is_chat").default(false),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertOpenaiModelSchema = createInsertSchema(openaiModels);
+
 export type BehaviorRule = z.infer<typeof behaviorRuleSchema>;
 export type InsertUserChatbotAssignment = z.infer<typeof insertUserChatbotAssignmentSchema>;
 export type UserChatbotAssignment = typeof userChatbotAssignments.$inferSelect;
 export type InsertCommonMessage = z.infer<typeof insertCommonMessageSchema>;
 export type CommonMessage = typeof commonMessages.$inferSelect;
+export type InsertOpenaiModel = z.infer<typeof insertOpenaiModelSchema>;
+export type OpenaiModel = typeof openaiModels.$inferSelect;
