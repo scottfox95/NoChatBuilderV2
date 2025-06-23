@@ -4,10 +4,18 @@ import { loadCommon, saveCommon } from "@/utils/commonPrompts";
 type Props = { value: string; onChange: (v: string) => void };
 
 export default function WelcomeInput({ value, onChange }: Props) {
-  const [common, setCommon] = useState<string[]>([]);
   const [saveIt, setSaveIt] = useState(false);
+  const { user } = useAuth();
 
-  useEffect(() => setCommon(loadCommon("welcome")), []);
+  // Fetch common welcome messages
+  const { data: commonMessages = [] } = useQuery<CommonMessage[]>({
+    queryKey: ['/api/common-messages', user?.id],
+    enabled: !!user?.id,
+  });
+
+  const welcomeMessages = commonMessages
+    .filter(msg => msg.kind === 'welcome')
+    .map(msg => msg.text);
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) onChange(e.target.value);
@@ -15,18 +23,7 @@ export default function WelcomeInput({ value, onChange }: Props) {
 
   const handleSaveToggle = (checked: boolean) => {
     setSaveIt(checked);
-    if (checked && value.trim()) {
-      // Save immediately when checkbox is checked
-      setCommon(saveCommon("welcome", value));
-      setSaveIt(false);
-    }
-  };
-
-  const handleBlur = () => {
-    if (saveIt && value.trim()) {
-      setCommon(saveCommon("welcome", value));
-      setSaveIt(false);
-    }
+    // Note: Actual saving will be handled in the parent form when chatbot is created/updated
   };
 
   return (
@@ -37,7 +34,7 @@ export default function WelcomeInput({ value, onChange }: Props) {
         onChange={handleSelect}
       >
         <option value="">– choose common welcome message –</option>
-        {common.map((msg) => (
+        {welcomeMessages.map((msg) => (
           <option key={msg} value={msg}>
             {msg.slice(0, 60)}{msg.length > 60 ? '...' : ''}
           </option>

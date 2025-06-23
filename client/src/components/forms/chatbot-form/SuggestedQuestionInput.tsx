@@ -1,13 +1,23 @@
-import { useEffect, useState } from "react";
-import { loadCommon, saveCommon } from "@/utils/commonPrompts";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import { CommonMessage } from "@shared/schema";
 
 type Props = { question: string; onChange: (v: string) => void };
 
 export default function SuggestedQuestionInput({ question, onChange }: Props) {
-  const [common, setCommon] = useState<string[]>([]);
   const [saveIt, setSaveIt] = useState(false);
+  const { user } = useAuth();
 
-  useEffect(() => setCommon(loadCommon("question")), []);
+  // Fetch common FAQ messages
+  const { data: commonMessages = [] } = useQuery<CommonMessage[]>({
+    queryKey: ['/api/common-messages', user?.id],
+    enabled: !!user?.id,
+  });
+
+  const faqMessages = commonMessages
+    .filter(msg => msg.kind === 'faq')
+    .map(msg => msg.text);
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) onChange(e.target.value);
@@ -15,18 +25,7 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
 
   const handleSaveToggle = (checked: boolean) => {
     setSaveIt(checked);
-    if (checked && question.trim()) {
-      // Save immediately when checkbox is checked
-      setCommon(saveCommon("question", question));
-      setSaveIt(false);
-    }
-  };
-
-  const handleBlur = () => {
-    if (saveIt && question.trim()) {
-      setCommon(saveCommon("question", question));
-      setSaveIt(false);
-    }
+    // Note: Actual saving will be handled in the parent form when chatbot is created/updated
   };
 
   return (
@@ -37,7 +36,7 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
         onChange={handleSelect}
       >
         <option value="">– choose common question –</option>
-        {common.map((q) => (
+        {faqMessages.map((q) => (
           <option key={q} value={q}>
             {q.slice(0, 60)}{q.length > 60 ? '...' : ''}
           </option>
@@ -48,7 +47,7 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
         className="w-full bg-neutral-800 border border-neutral-700 rounded-md py-2 px-3 text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         value={question}
         onChange={(e) => onChange(e.target.value)}
-        onBlur={handleBlur}
+
         placeholder="Will I need to stay in the hospital?"
       />
 
