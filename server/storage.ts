@@ -4,6 +4,7 @@ import {
   documents, 
   messages, 
   userChatbotAssignments,
+  commonMessages,
   type User, 
   type InsertUser, 
   type Chatbot, 
@@ -13,7 +14,9 @@ import {
   type Message, 
   type InsertMessage,
   type UserChatbotAssignment,
-  type InsertUserChatbotAssignment
+  type InsertUserChatbotAssignment,
+  type CommonMessage,
+  type InsertCommonMessage
 } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -65,6 +68,12 @@ export interface IStorage {
   // Analytics operations
   getChatbotAnalytics(chatbotId: number, timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}>;
   getOverallAnalytics(chatbotIds: number[], timeFilter?: any): Promise<{totalSessions: number, totalQueries: number}>;
+
+  // Common messages operations
+  getCommonMessages(userId: number, kind?: "welcome" | "faq"): Promise<CommonMessage[]>;
+  createCommonMessage(message: InsertCommonMessage): Promise<CommonMessage>;
+  updateCommonMessage(id: number, text: string): Promise<CommonMessage | undefined>;
+  deleteCommonMessage(id: number): Promise<boolean>;
 
   // Session store
   sessionStore: any;
@@ -451,6 +460,35 @@ export class DatabaseStorage implements IStorage {
     const logs = await query;
     
     return { logs, totalCount };
+  }
+
+  async getCommonMessages(userId: number, kind?: "welcome" | "faq"): Promise<CommonMessage[]> {
+    let query = db.select().from(commonMessages).where(eq(commonMessages.userId, userId));
+    
+    if (kind) {
+      query = query.where(and(eq(commonMessages.userId, userId), eq(commonMessages.kind, kind)));
+    }
+    
+    return await query.orderBy(desc(commonMessages.updatedAt));
+  }
+
+  async createCommonMessage(insertMessage: InsertCommonMessage): Promise<CommonMessage> {
+    const [message] = await db.insert(commonMessages).values(insertMessage).returning();
+    return message;
+  }
+
+  async updateCommonMessage(id: number, text: string): Promise<CommonMessage | undefined> {
+    const [updated] = await db
+      .update(commonMessages)
+      .set({ text, updatedAt: new Date() })
+      .where(eq(commonMessages.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCommonMessage(id: number): Promise<boolean> {
+    const result = await db.delete(commonMessages).where(eq(commonMessages.id, id));
+    return result.rowCount > 0;
   }
 }
 

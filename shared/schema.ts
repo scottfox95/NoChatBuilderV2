@@ -105,9 +105,24 @@ export const userChatbotAssignments = pgTable("user_chatbot_assignments", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const commonMessages = pgTable("common_messages", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  kind: text("kind").notNull().$type<"welcome" | "faq">(),
+  text: text("text").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const insertUserChatbotAssignmentSchema = createInsertSchema(userChatbotAssignments).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertCommonMessageSchema = createInsertSchema(commonMessages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const behaviorRuleSchema = z.object({
@@ -118,3 +133,5 @@ export const behaviorRuleSchema = z.object({
 export type BehaviorRule = z.infer<typeof behaviorRuleSchema>;
 export type InsertUserChatbotAssignment = z.infer<typeof insertUserChatbotAssignmentSchema>;
 export type UserChatbotAssignment = typeof userChatbotAssignments.$inferSelect;
+export type InsertCommonMessage = z.infer<typeof insertCommonMessageSchema>;
+export type CommonMessage = typeof commonMessages.$inferSelect;

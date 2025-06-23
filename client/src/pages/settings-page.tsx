@@ -9,6 +9,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getQueryFn } from "@/lib/queryClient";
+import CommonMessagesSettings from "@/components/common-messages-settings";
+import { useAuth } from "@/hooks/use-auth";
 
 // Type for OpenAI API key status response
 interface ApiKeyStatus {
@@ -19,6 +21,7 @@ interface ApiKeyStatus {
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   
   // Query for OpenAI API key status
   const {
@@ -43,6 +46,8 @@ export default function SettingsPage() {
         <Separator />
         
         <div className="grid gap-6">
+          {user && <CommonMessagesSettings userId={user.id} />}
+          
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">

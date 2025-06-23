@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
-import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, users } from "@shared/schema";
+import { insertChatbotSchema, insertDocumentSchema, insertMessageSchema, behaviorRuleSchema, insertUserChatbotAssignmentSchema, insertUserSchema, insertCommonMessageSchema, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { generateCompletion, generateStreamingCompletion, generateStreamingAssistantCompletion, processDocumentText, verifyApiKey, checkVectorStoreCapacity } from "./openai";
 import { generateStreamingResponseCompletion } from "./openai-responses";
