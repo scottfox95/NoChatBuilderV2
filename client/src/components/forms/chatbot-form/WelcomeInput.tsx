@@ -13,8 +13,17 @@ export default function WelcomeInput({ value, onChange }: Props) {
     if (e.target.value) onChange(e.target.value);
   };
 
+  const handleSaveToggle = (checked: boolean) => {
+    setSaveIt(checked);
+    if (checked && value.trim()) {
+      // Save immediately when checkbox is checked
+      setCommon(saveCommon("welcome", value));
+      setSaveIt(false);
+    }
+  };
+
   const handleBlur = () => {
-    if (saveIt) {
+    if (saveIt && value.trim()) {
       setCommon(saveCommon("welcome", value));
       setSaveIt(false);
     }
@@ -48,7 +57,7 @@ export default function WelcomeInput({ value, onChange }: Props) {
         <input
           type="checkbox"
           checked={saveIt}
-          onChange={() => setSaveIt((s) => !s)}
+          onChange={(e) => handleSaveToggle(e.target.checked)}
           className="rounded border-neutral-600 bg-neutral-800 text-primary focus:ring-primary focus:ring-2"
         />
         Save this as a common welcome message

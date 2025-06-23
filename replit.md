@@ -102,6 +102,14 @@ Aidify is a comprehensive healthcare chat assistant platform that allows adminis
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- June 23, 2025: Added common prompts feature to chatbot builder
+  - Created localStorage persistence for reusable welcome messages and suggested questions
+  - Built WelcomeInput and SuggestedQuestionInput components with dropdown selection
+  - Integrated components into basic-setup form with immediate save functionality
+  - Fixed timing issue where prompts weren't saving before form submission
+
 ## Changelog
 
 Changelog:

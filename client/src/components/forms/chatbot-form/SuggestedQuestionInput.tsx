@@ -13,8 +13,17 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
     if (e.target.value) onChange(e.target.value);
   };
 
+  const handleSaveToggle = (checked: boolean) => {
+    setSaveIt(checked);
+    if (checked && question.trim()) {
+      // Save immediately when checkbox is checked
+      setCommon(saveCommon("question", question));
+      setSaveIt(false);
+    }
+  };
+
   const handleBlur = () => {
-    if (saveIt) {
+    if (saveIt && question.trim()) {
       setCommon(saveCommon("question", question));
       setSaveIt(false);
     }
@@ -47,7 +56,7 @@ export default function SuggestedQuestionInput({ question, onChange }: Props) {
         <input
           type="checkbox"
           checked={saveIt}
-          onChange={() => setSaveIt((s) => !s)}
+          onChange={(e) => handleSaveToggle(e.target.checked)}
           className="rounded border-neutral-600 bg-neutral-800 text-primary focus:ring-primary focus:ring-2"
         />
         Save this as a common question
