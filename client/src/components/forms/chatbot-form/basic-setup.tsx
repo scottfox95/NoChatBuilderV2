@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, XCircle, X, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import WelcomeInput from "./WelcomeInput";
+import SuggestedQuestionInput from "./SuggestedQuestionInput";
 
 export default function BasicSetup() {
   const form = useFormContext();
@@ -121,37 +123,32 @@ export default function BasicSetup() {
             <FormLabel className="text-neutral-300">Welcome Messages</FormLabel>
             <div className="space-y-2">
               {(Array.isArray(field.value) ? field.value : []).map((message: string, index: number) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Textarea
+                <div key={index} className="space-y-2">
+                  <WelcomeInput
                     value={message}
-                    onChange={(e) => {
+                    onChange={(newMessage) => {
                       const messages = Array.isArray(field.value) ? field.value : [];
                       const newMessages = [...messages];
-                      newMessages[index] = e.target.value;
+                      newMessages[index] = newMessage;
                       field.onChange(newMessages);
                     }}
-                    placeholder="Enter a welcome message"
-                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary resize-none"
-                    rows={2}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      // Don't allow removing the last message
-                      const messages = Array.isArray(field.value) ? field.value : [];
-                      if (messages.length <= 1) return;
-                      
-                      const newMessages = [...messages];
-                      newMessages.splice(index, 1);
-                      field.onChange(newMessages);
-                    }}
-                    className="h-8 w-8 text-neutral-400 hover:text-red-500"
-                    disabled={(Array.isArray(field.value) ? field.value.length : 0) <= 1}
-                  >
-                    <XCircle className="h-4 w-4" />
-                  </Button>
+                  {(Array.isArray(field.value) ? field.value.length : 0) > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const messages = Array.isArray(field.value) ? field.value : [];
+                        const newMessages = [...messages];
+                        newMessages.splice(index, 1);
+                        field.onChange(newMessages);
+                      }}
+                      className="text-xs text-neutral-400 hover:text-red-500"
+                    >
+                      <X className="mr-1 h-3 w-3" /> Remove Message
+                    </Button>
+                  )}
                 </div>
               ))}
               <Button
@@ -184,28 +181,27 @@ export default function BasicSetup() {
             <FormLabel className="text-neutral-300">Suggested Questions</FormLabel>
             <div className="space-y-2">
               {field.value.map((question: string, index: number) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    value={question}
-                    onChange={(e) => {
+                <div key={index} className="space-y-2">
+                  <SuggestedQuestionInput
+                    question={question}
+                    onChange={(newQuestion) => {
                       const newQuestions = [...field.value];
-                      newQuestions[index] = e.target.value;
+                      newQuestions[index] = newQuestion;
                       field.onChange(newQuestions);
                     }}
-                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary"
                   />
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     onClick={() => {
                       const newQuestions = [...field.value];
                       newQuestions.splice(index, 1);
                       field.onChange(newQuestions);
                     }}
-                    className="h-8 w-8 text-neutral-400 hover:text-red-500"
+                    className="text-xs text-neutral-400 hover:text-red-500"
                   >
-                    <XCircle className="h-4 w-4" />
+                    <X className="mr-1 h-3 w-3" /> Remove Question
                   </Button>
                 </div>
               ))}
