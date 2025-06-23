@@ -133,7 +133,7 @@ export default function ChatbotCard({ chatbot, onEdit }: ChatbotCardProps) {
               <span>{chatbot.views.toLocaleString()} views</span>
             </div>
             <Button 
-              className="bg-primary hover:bg-primary/90 text-white font-medium"
+              className="bg-primary hover:bg-primary/90 text-white font-medium opacity-100"
               onClick={() => window.open(`/care-aid/${chatbot.slug}`, '_blank')}
             >
               View Care Aid
