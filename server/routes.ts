@@ -1621,7 +1621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Hash the new password using the same method as registration
-      const { hashPassword } = require("./auth");
+      const { hashPassword } = await import("./auth");
       const hashedPassword = await hashPassword(password);
       
       // Update the user's password in the database
