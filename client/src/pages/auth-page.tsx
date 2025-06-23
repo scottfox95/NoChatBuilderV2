@@ -62,25 +62,6 @@ export default function AuthPage() {
     }
   };
 
-  const handleDevLogin = async () => {
-    const devUser = {
-      username: "dev",
-      password: "password"
-    };
-    
-    // Try to login first (reverses the previous approach)
-    try {
-      await loginMutation.mutateAsync(devUser);
-    } catch (error) {
-      // If login fails, try to register
-      try {
-        await registerMutation.mutateAsync(devUser);
-      } catch (innerError) {
-        console.error("Dev login/register failed", innerError);
-      }
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -195,17 +176,6 @@ export default function AuthPage() {
                         "Login"
                       )}
                     </Button>
-                    
-                    <div className="mt-4 pt-4 border-t border-neutral-600/20">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full border-neutral-600/30 text-neutral-300 hover:bg-white/5 transition-colors"
-                        onClick={handleDevLogin}
-                      >
-                        Quick Dev Login (username: dev)
-                      </Button>
-                    </div>
                   </form>
                 </Form>
               </div>
@@ -264,17 +234,6 @@ export default function AuthPage() {
                         "Create Account"
                       )}
                     </Button>
-
-                    <div className="mt-4 pt-4 border-t border-neutral-600/20">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full border-neutral-600/30 text-neutral-300 hover:bg-white/5 transition-colors"
-                        onClick={handleDevLogin}
-                      >
-                        Quick Dev Login (username: dev)
-                      </Button>
-                    </div>
                   </form>
                 </Form>
               </div>
