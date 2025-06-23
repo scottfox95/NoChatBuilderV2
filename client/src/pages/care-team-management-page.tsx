@@ -463,19 +463,20 @@ export default function CareTeamManagementPage() {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
-                                <Dialog open={isAssignDialogOpen && selectedUserId === user.id} onOpenChange={setIsAssignDialogOpen}>
-                                  <DialogTrigger asChild>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm"
-                                      onClick={() => {
-                                        setSelectedUserId(user.id);
-                                        setSelectedChatbots(getAssignedChatbotIds());
-                                      }}
-                                    >
-                                      <Settings className="h-4 w-4" />
-                                    </Button>
-                                  </DialogTrigger>
+                                {activeTab === "careteam" && (
+                                  <Dialog open={isAssignDialogOpen && selectedUserId === user.id} onOpenChange={setIsAssignDialogOpen}>
+                                    <DialogTrigger asChild>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedUserId(user.id);
+                                          setSelectedChatbots(getAssignedChatbotIds());
+                                        }}
+                                      >
+                                        <Settings className="h-4 w-4" />
+                                      </Button>
+                                    </DialogTrigger>
                                   <DialogContent className="max-w-md">
                                     <DialogHeader>
                                       <DialogTitle>Manage Care Aid Access</DialogTitle>
@@ -535,6 +536,78 @@ export default function CareTeamManagementPage() {
                                         </Button>
                                       </div>
                                     </div>
+                                  </DialogContent>
+                                </Dialog>
+                                )}
+
+                                {/* Reset Password Button */}
+                                <Dialog open={isResetPasswordDialogOpen && resetPasswordUserId === user.id} onOpenChange={setIsResetPasswordDialogOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => {
+                                        setResetPasswordUserId(user.id);
+                                        setIsResetPasswordDialogOpen(true);
+                                        resetPasswordForm.reset();
+                                      }}
+                                    >
+                                      <KeyRound className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-md">
+                                    <DialogHeader>
+                                      <DialogTitle>Reset Password</DialogTitle>
+                                      <DialogDescription>
+                                        Set a new password for {user.username}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <Form {...resetPasswordForm}>
+                                      <form onSubmit={resetPasswordForm.handleSubmit(onResetPasswordSubmit)} className="space-y-4">
+                                        <FormField
+                                          control={resetPasswordForm.control}
+                                          name="password"
+                                          render={({ field }) => (
+                                            <FormItem>
+                                              <FormLabel>New Password</FormLabel>
+                                              <FormControl>
+                                                <Input 
+                                                  type="password" 
+                                                  placeholder="Enter new password" 
+                                                  className="bg-[#f4f4f4]" 
+                                                  {...field} 
+                                                />
+                                              </FormControl>
+                                              <FormMessage />
+                                            </FormItem>
+                                          )}
+                                        />
+                                        <div className="flex justify-end space-x-2 pt-4">
+                                          <Button 
+                                            type="button"
+                                            variant="outline" 
+                                            onClick={() => {
+                                              setIsResetPasswordDialogOpen(false);
+                                              setResetPasswordUserId(null);
+                                              resetPasswordForm.reset();
+                                            }}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button 
+                                            type="submit"
+                                            disabled={resetPasswordMutation.isPending}
+                                          >
+                                            {resetPasswordMutation.isPending ? (
+                                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                            ) : (
+                                              <KeyRound className="h-4 w-4 mr-2" />
+                                            )}
+                                            Reset Password
+                                          </Button>
+                                        </div>
+                                      </form>
+                                    </Form>
                                   </DialogContent>
                                 </Dialog>
 
@@ -681,30 +754,103 @@ export default function CareTeamManagementPage() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Admin User</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete the admin user "{user.username}"? This action cannot be undone and will remove all administrative privileges.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => deleteUserMutation.mutate(user.id)}
-                                      className="bg-red-600 hover:bg-red-700"
+                              <div className="flex items-center justify-end space-x-2">
+                                {/* Reset Password Button for Admin Users */}
+                                <Dialog open={isResetPasswordDialogOpen && resetPasswordUserId === user.id} onOpenChange={setIsResetPasswordDialogOpen}>
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => {
+                                        setResetPasswordUserId(user.id);
+                                        setIsResetPasswordDialogOpen(true);
+                                        resetPasswordForm.reset();
+                                      }}
                                     >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                      <KeyRound className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-md">
+                                    <DialogHeader>
+                                      <DialogTitle>Reset Password</DialogTitle>
+                                      <DialogDescription>
+                                        Set a new password for {user.username}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <Form {...resetPasswordForm}>
+                                      <form onSubmit={resetPasswordForm.handleSubmit(onResetPasswordSubmit)} className="space-y-4">
+                                        <FormField
+                                          control={resetPasswordForm.control}
+                                          name="password"
+                                          render={({ field }) => (
+                                            <FormItem>
+                                              <FormLabel>New Password</FormLabel>
+                                              <FormControl>
+                                                <Input 
+                                                  type="password" 
+                                                  placeholder="Enter new password" 
+                                                  className="bg-[#f4f4f4]" 
+                                                  {...field} 
+                                                />
+                                              </FormControl>
+                                              <FormMessage />
+                                            </FormItem>
+                                          )}
+                                        />
+                                        <div className="flex justify-end space-x-2 pt-4">
+                                          <Button 
+                                            type="button"
+                                            variant="outline" 
+                                            onClick={() => {
+                                              setIsResetPasswordDialogOpen(false);
+                                              setResetPasswordUserId(null);
+                                              resetPasswordForm.reset();
+                                            }}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button 
+                                            type="submit"
+                                            disabled={resetPasswordMutation.isPending}
+                                          >
+                                            {resetPasswordMutation.isPending ? (
+                                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                            ) : (
+                                              <KeyRound className="h-4 w-4 mr-2" />
+                                            )}
+                                            Reset Password
+                                          </Button>
+                                        </div>
+                                      </form>
+                                    </Form>
+                                  </DialogContent>
+                                </Dialog>
+
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Admin User</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete the admin user "{user.username}"? This action cannot be undone and will remove all administrative privileges.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => deleteUserMutation.mutate(user.id)}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
