@@ -104,11 +104,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 23, 2025: Added common prompts feature to chatbot builder
-  - Created localStorage persistence for reusable welcome messages and suggested questions
-  - Built WelcomeInput and SuggestedQuestionInput components with dropdown selection
-  - Integrated components into basic-setup form with immediate save functionality
-  - Fixed timing issue where prompts weren't saving before form submission
+- June 23, 2025: Implemented Common Messages database-backed feature
+  - Added common_messages table to PostgreSQL schema with userId, kind (welcome/faq), and text fields
+  - Created CRUD storage methods and API endpoints for managing common messages
+  - Built CommonMessagesSettings component for Settings page with dark theme styling
+  - Updated WelcomeInput and SuggestedQuestionInput to fetch from database instead of localStorage
+  - Added save functionality in chatbot builder with proper API integration
+  - Fixed API endpoint URLs and imports for proper functionality
 
 ## Changelog
 

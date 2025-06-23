@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { loadCommon, saveCommon } from "@/utils/commonPrompts";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import { CommonMessage } from "@shared/schema";
 
 type Props = { 
   value: string; 
@@ -13,7 +15,7 @@ export default function WelcomeInput({ value, onChange, onSaveAsCommon }: Props)
 
   // Fetch common welcome messages
   const { data: commonMessages = [] } = useQuery<CommonMessage[]>({
-    queryKey: ['/api/common-messages', user?.id],
+    queryKey: [`/api/common-messages/${user?.id}`],
     enabled: !!user?.id,
   });
 

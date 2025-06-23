@@ -15,7 +15,7 @@ export default function SuggestedQuestionInput({ question, onChange, onSaveAsCom
 
   // Fetch common FAQ messages
   const { data: commonMessages = [] } = useQuery<CommonMessage[]>({
-    queryKey: ['/api/common-messages', user?.id],
+    queryKey: [`/api/common-messages/${user?.id}`],
     enabled: !!user?.id,
   });
 

@@ -28,7 +28,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
 
   // Fetch common messages
   const { data: commonMessages, isLoading } = useQuery<CommonMessage[]>({
-    queryKey: ['/api/common-messages', userId],
+    queryKey: [`/api/common-messages/${userId}`],
     enabled: !!userId,
   });
 
@@ -37,7 +37,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
     mutationFn: (message: InsertCommonMessage) => 
       apiRequest('/api/common-messages', 'POST', message),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/common-messages', userId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message saved successfully" });
     },
     onError: () => {
@@ -50,7 +50,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
     mutationFn: ({ id, text }: { id: number; text: string }) => 
       apiRequest(`/api/common-messages/${id}`, 'PUT', { text }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/common-messages', userId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message updated successfully" });
     },
     onError: () => {
@@ -63,7 +63,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
     mutationFn: (id: number) => 
       apiRequest(`/api/common-messages/${id}`, 'DELETE'),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/common-messages', userId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/common-messages/${userId}`] });
       toast({ title: "Message deleted successfully" });
     },
     onError: () => {
@@ -120,7 +120,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
           <CardTitle>Common Messages</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-neutral-400">Loading...</div>
+          <div className="text-sm text-neutral-500">Loading...</div>
         </CardContent>
       </Card>
     );
@@ -144,12 +144,12 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
           </div>
         ) : (
           rows.map((row, index) => (
-            <div key={row.id ?? `new-${index}`} className="flex gap-3 items-start p-4 border border-neutral-200 rounded-lg">
+            <div key={row.id ?? `new-${index}`} className="flex gap-3 items-start p-4 border border-neutral-700 rounded-lg bg-neutral-800">
               <Select
                 value={row.kind}
                 onValueChange={(value: 'welcome' | 'faq') => updateRow(index, { kind: value })}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32 bg-neutral-900 border-neutral-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -159,7 +159,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
               </Select>
               
               <Textarea
-                className="flex-1"
+                className="flex-1 bg-neutral-900 border-neutral-600 text-white placeholder:text-neutral-400"
                 value={row.text}
                 placeholder="Enter your message text..."
                 rows={3}
@@ -194,7 +194,7 @@ export default function CommonMessagesSettings({ userId }: CommonMessagesSetting
         )}
         
         {(createMutation.isPending || updateMutation.isPending || deleteMutation.isPending) && (
-          <div className="text-sm text-neutral-500">Saving...</div>
+          <div className="text-sm text-neutral-400">Saving...</div>
         )}
       </CardContent>
     </Card>
