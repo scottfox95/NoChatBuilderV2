@@ -238,34 +238,6 @@ export default function AuthPage() {
                 </Form>
               </div>
             </CardContent>
-            
-            <CardFooter className="flex justify-center border-t border-neutral-600/20 pt-4">
-              <p className="text-sm text-neutral-400">
-                {activeTab === "login" ? (
-                  <>
-                    Don't have an account?{" "}
-                    <Button
-                      variant="link"
-                      className="p-0 text-primary"
-                      onClick={() => setActiveTab("register")}
-                    >
-                      Sign up
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <Button
-                      variant="link"
-                      className="p-0 text-primary"
-                      onClick={() => setActiveTab("login")}
-                    >
-                      Log in
-                    </Button>
-                  </>
-                )}
-              </p>
-            </CardFooter>
           </Card>
         </div>
       </div>
