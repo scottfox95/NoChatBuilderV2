@@ -1,0 +1,164 @@
+Your job: implement a nightly-cached model list so the UI always offers every chat-capable OpenAI model without extra API calls at runtime.
+
+Repo assumptions
+────────────────
+- Front-end root: /src
+- Supabase helper: /src/utils/supabaseClient.ts
+- Care-Aid builder popup: /src/components/CreateCareAidDialog.tsx
+- Care-Aid “edit” dialog: /src/components/EditCareAidDialog.tsx  (if it exists; skip if not)
+Adjust paths if reality differs but **touch only the files named here**.
+
+════════════════════════════════════════════════════════════
+1️⃣  Migration: openai_models cache table
+════════════════════════════════════════════════════════════
+Create **/supabase/migrations/20250623_openai_models.sql**
+
+```sql
+create extension if not exists "pgcrypto";
+
+create table if not exists public.openai_models (
+  id          text primary key,              -- e.g. "gpt-4o-mini"
+  created     bigint,
+  owned_by    text,
+  object      text,
+  is_chat     boolean default false,         -- derived flag
+  updated_at  timestamptz default now()
+);
+
+-- Public read-only access (only if your project already exposes settings openly):
+alter table public.openai_models enable row level security;
+create policy "anyone can select" on public.openai_models for select using (true);
+Remind Scott to run this SQL once in Supabase.
+
+════════════════════════════════════════════════════════════
+2️⃣ Node script: fetch + upsert
+════════════════════════════════════════════════════════════
+Create /scripts/updateModels.ts
+
+ts
+Copy
+Edit
+import 'dotenv/config';
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!  // needs insert/update rights
+);
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+(async () => {
+  const list = await openai.models.list();
+  // Filter to chat-capable, non-fine-tuned models only
+  const rows = list.data
+    .filter(m => !m.id.startsWith('ft-') && (m.id.includes('gpt') || m.id.includes('chat')))
+    .map(m => ({
+      id: m.id,
+      created: m.created ?? 0,
+      owned_by: (m as any).owned_by ?? 'openai',
+      object: m.object,
+      is_chat: true,
+      updated_at: new Date().toISOString()
+    }));
+
+  const { error } = await supabase
+    .from('openai_models')
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) {
+    console.error('Supabase upsert error:', error);
+    process.exit(1);
+  } else {
+    console.log(`Upserted ${rows.length} models`);
+  }
+})();
+Add dev dependency:
+
+bash
+Copy
+Edit
+npm install openai --save
+════════════════════════════════════════════════════════════
+3️⃣ Package-json helper & Replit cron
+════════════════════════════════════════════════════════════
+In package.json add:
+
+json
+Copy
+Edit
+{
+  "scripts": {
+    "update:models": "tsx scripts/updateModels.ts"
+  }
+}
+Create .replit (or append to existing) cron block:
+
+bash
+Copy
+Edit
+# Runs daily at 03:00 AM US-Eastern (07:00 UTC)
+schedule:
+  - cron: "0 7 * * *"
+    command: "npm run update:models"
+(If .replit already has a schedule section, just append the new job.)
+
+════════════════════════════════════════════════════════════
+4️⃣ Front-end hook: useModels()
+════════════════════════════════════════════════════════════
+Create /src/hooks/useModels.ts
+
+ts
+Copy
+Edit
+import { useEffect, useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
+
+export default function useModels() {
+  const [models, setModels] = useState<string[]>([]);
+  useEffect(() => {
+    async function grab() {
+      const { data, error } = await supabase
+        .from('openai_models')
+        .select('id')
+        .eq('is_chat', true)
+        .order('id');
+      if (!error && data?.length) setModels(data.map(r => r.id));
+      else setModels(['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo']); // fallback
+    }
+    grab();
+  }, []);
+  return models;
+}
+════════════════════════════════════════════════════════════
+5️⃣ Inject into builder & editor dropdowns
+════════════════════════════════════════════════════════════
+Edit CreateCareAidDialog.tsx
+
+diff
+Copy
+Edit
+- const MODEL_OPTIONS = [...static list...];
++ import useModels from '../hooks/useModels';
++ const models = useModels();
+…
+  <label>OpenAI model</label>
+- <select value={model} onChange={e => setModel(e.target.value)}>
+-   {MODEL_OPTIONS.map(m => <option key={m}>{m}</option>)}
+- </select>
++ <select value={model} onChange={e => setModel(e.target.value)}>
++   {models.map(m => <option key={m}>{m}</option>)}
++ </select>
+Mirror the same change in EditCareAidDialog.tsx if that component exists.
+
+════════════════════════════════════════════════════════════
+6️⃣ Commit
+════════════════════════════════════════════════════════════
+
+bash
+Copy
+Edit
+git add .
+git commit -m "feat: nightly-cached OpenAI model list"
+Done.
