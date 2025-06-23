@@ -1,0 +1,201 @@
+You are modifying the Aidify front-end **only** (React/Vite/Tailwind).  
+Do **NOT** touch any database code, migrations, Drizzle models, server routes or package.json.  
+Goal: add reusable “common” welcome-messages and suggested-questions in the Care-Aid builder popup, stored in browser localStorage.
+
+────────────────────────
+1 ADD a tiny persistence helper
+────────────────────────
+Create **client/src/utils/commonPrompts.ts**:
+
+```ts
+const WELCOME_KEY = "aidify_common_welcome";
+const QUESTIONS_KEY = "aidify_common_questions";
+
+export function loadCommon(type: "welcome" | "question"): string[] {
+  const key = type === "welcome" ? WELCOME_KEY : QUESTIONS_KEY;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? Array.from(new Set(JSON.parse(raw))) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCommon(type: "welcome" | "question", text: string): string[] {
+  const list = loadCommon(type);
+  if (!text.trim() || list.includes(text)) return list;
+  const updated = [...list, text];
+  const key = type === "welcome" ? WELCOME_KEY : QUESTIONS_KEY;
+  localStorage.setItem(key, JSON.stringify(updated));
+  return updated;
+}
+────────────────────────
+2 CREATE a WelcomeInput component
+────────────────────────
+Create client/src/components/forms/chatbot-form/WelcomeInput.tsx:
+
+tsx
+Copy
+Edit
+import { useEffect, useState } from "react";
+import { loadCommon, saveCommon } from "@/utils/commonPrompts";
+
+type Props = { value: string; onChange: (v: string) => void };
+
+export default function WelcomeInput({ value, onChange }: Props) {
+  const [common, setCommon] = useState<string[]>([]);
+  const [saveIt, setSaveIt] = useState(false);
+
+  useEffect(() => setCommon(loadCommon("welcome")), []);
+
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value) onChange(e.target.value);
+  };
+
+  const handleBlur = () => {
+    if (saveIt) {
+      setCommon(saveCommon("welcome", value));
+      setSaveIt(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="font-medium">Welcome message</label>
+
+      <select
+        className="border rounded-md p-2 w-full"
+        defaultValue=""
+        onChange={handleSelect}
+      >
+        <option value="">– choose common –</option>
+        {common.map((msg) => (
+          <option key={msg} value={msg}>
+            {msg.slice(0, 60)}
+          </option>
+        ))}
+      </select>
+
+      <textarea
+        className="border rounded-md p-2 w-full"
+        rows={3}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="Hi there! I’m Dr. Bradley’s ACL Reconstruction Care Aid…"
+      />
+
+      <label className="inline-flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={saveIt}
+          onChange={() => setSaveIt((s) => !s)}
+        />
+        Save this as a common welcome
+      </label>
+    </div>
+  );
+}
+────────────────────────
+3 CREATE a SuggestedQuestionInput component
+────────────────────────
+Create client/src/components/forms/chatbot-form/SuggestedQuestionInput.tsx:
+
+tsx
+Copy
+Edit
+import { useEffect, useState } from "react";
+import { loadCommon, saveCommon } from "@/utils/commonPrompts";
+
+type Props = { question: string; onChange: (v: string) => void };
+
+export default function SuggestedQuestionInput({ question, onChange }: Props) {
+  const [common, setCommon] = useState<string[]>([]);
+  const [saveIt, setSaveIt] = useState(false);
+
+  useEffect(() => setCommon(loadCommon("question")), []);
+
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value) onChange(e.target.value);
+  };
+
+  const handleBlur = () => {
+    if (saveIt) {
+      setCommon(saveCommon("question", question));
+      setSaveIt(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="font-medium">Suggested question</label>
+
+      <select
+        className="border rounded-md p-2 w-full"
+        defaultValue=""
+        onChange={handleSelect}
+      >
+        <option value="">– choose common –</option>
+        {common.map((q) => (
+          <option key={q} value={q}>
+            {q.slice(0, 60)}
+          </option>
+        ))}
+      </select>
+
+      <input
+        className="border rounded-md p-2 w-full"
+        value={question}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="Will I need to stay in the hospital?"
+      />
+
+      <label className="inline-flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={saveIt}
+          onChange={() => setSaveIt((s) => !s)}
+        />
+        Save this as a common question
+      </label>
+    </div>
+  );
+}
+────────────────────────
+4 UPDATE the main builder form
+────────────────────────
+Edit client/src/components/forms/chatbot-form/ChatbotForm.tsx (or whatever file holds the builder).
+
+Import the new inputs at the top:
+
+tsx
+Copy
+Edit
+import WelcomeInput from "./WelcomeInput";
+import SuggestedQuestionInput from "./SuggestedQuestionInput";
+Replace the old inputs:
+
+tsx
+Copy
+Edit
+/* Welcome message field */
+<WelcomeInput value={welcome} onChange={setWelcome} />
+
+/* Suggested questions list (assuming array state) */
+{suggestedQuestions.map((q, i) => (
+  <SuggestedQuestionInput
+    key={i}
+    question={q}
+    onChange={(newQ) => updateQuestionAtIndex(i, newQ)}
+  />
+))}
+Do not change any other logic or server calls.
+
+────────────────────────
+5 NO DB OR SERVER CHANGES
+────────────────────────
+• Do NOT add migrations, tables, or API endpoints.
+• All data lives only in browser localStorage.
+
+After saving files, the Vite dev server will hot-reload; if not, run npm run dev again.
