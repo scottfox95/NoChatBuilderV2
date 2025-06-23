@@ -113,6 +113,15 @@ Preferred communication style: Simple, everyday language.
   - Fixed API endpoint URLs, imports, and parameter order for apiRequest function
   - Feature fully tested and working - users can create, edit, delete, and use common message templates
 
+- June 23, 2025: Implemented nightly-cached OpenAI model list system
+  - Added openai_models table to PostgreSQL schema to cache available chat models
+  - Created updateModels script that fetches models from OpenAI API and stores in database
+  - Built useModels hook for frontend to fetch cached models with fallback support
+  - Updated chatbot form to dynamically populate model dropdown from cached data
+  - Added API endpoint /api/models to serve cached model list
+  - Script successfully cached 46 chat-capable models including latest GPT-4o variants
+  - System now provides up-to-date model options without runtime API calls
+
 ## Changelog
 
 Changelog:

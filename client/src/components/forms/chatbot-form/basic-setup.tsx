@@ -19,6 +19,7 @@ import useModels from "@/hooks/useModels";
 
 export default function BasicSetup() {
   const form = useFormContext();
+  const { models, isLoading: modelsLoading } = useModels();
   const [newQuestion, setNewQuestion] = useState('');
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
     form.getValues().suggestedQuestions || []
