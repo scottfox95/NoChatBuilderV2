@@ -10,7 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, XCircle, X, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PlusCircle, XCircle, X, Plus, Expand } from "lucide-react";
 import { useState, useEffect } from "react";
 import WelcomeInput from "./WelcomeInput";
 import SuggestedQuestionInput from "./SuggestedQuestionInput";
@@ -21,6 +22,7 @@ export default function BasicSetup() {
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(
     form.getValues().suggestedQuestions || []
   );
+  const [expandedPrompt, setExpandedPrompt] = useState('');
   
   // Initialize form values if they don't exist
   useEffect(() => {
@@ -258,7 +260,64 @@ export default function BasicSetup() {
         name="systemPrompt"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-neutral-300">System Prompt</FormLabel>
+            <div className="flex items-center justify-between">
+              <FormLabel className="text-neutral-300">System Prompt</FormLabel>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-neutral-400 hover:text-white hover:bg-neutral-700"
+                    onClick={() => setExpandedPrompt(field.value || '')}
+                  >
+                    <Expand className="h-4 w-4 mr-1" />
+                    Expand
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl h-[80vh] bg-neutral-900 border-neutral-700">
+                  <DialogHeader>
+                    <DialogTitle className="text-white">System Prompt - Expanded View</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex flex-col h-full">
+                    <Textarea
+                      value={expandedPrompt}
+                      onChange={(e) => setExpandedPrompt(e.target.value)}
+                      placeholder="You are a helpful customer support assistant..."
+                      className="flex-1 bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-primary resize-none"
+                      rows={20}
+                    />
+                    <div className="flex justify-between items-center pt-4">
+                      <p className="text-neutral-500 text-xs">
+                        This is the instruction that guides how your chatbot behaves.
+                      </p>
+                      <div className="flex gap-2">
+                        <DialogTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700"
+                          >
+                            Cancel
+                          </Button>
+                        </DialogTrigger>
+                        <DialogTrigger asChild>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              field.onChange(expandedPrompt);
+                            }}
+                            className="bg-primary hover:bg-primary/90"
+                          >
+                            Save Changes
+                          </Button>
+                        </DialogTrigger>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
             <FormControl>
               <Textarea 
                 placeholder="You are a helpful customer support assistant..." 
