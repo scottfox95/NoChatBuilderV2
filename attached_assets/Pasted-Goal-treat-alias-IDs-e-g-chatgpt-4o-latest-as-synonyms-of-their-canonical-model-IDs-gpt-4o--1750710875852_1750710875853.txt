@@ -1,0 +1,81 @@
+Goal: treat alias IDs (e.g. “chatgpt-4o-latest”) as synonyms of their canonical model IDs (“gpt-4o”).  
+End-result: dropdown shows each model **once**.
+
+Repo paths used below match the previous task; adjust only if needed.
+
+════════════════════════════════════════════════════════════
+1️⃣  Alias map in the updater script
+════════════════════════════════════════════════════════════
+Edit **/scripts/updateModels.ts**
+
+```diff
++ // Step 0: alias map (expandable)
++ const ALIAS: Record<string, string> = {
++   'chatgpt-4o-latest': 'gpt-4o',
++   // add future aliases here, e.g. 'gpt-4o-latest': 'gpt-4o'
++ };
+
+@@ (inside async IIFE)
+- const rows = list.data
+-   .filter(m => !m.id.startsWith('ft-') && (m.id.includes('gpt') || m.id.includes('chat')))
+-   .map(m => ({
+-     id: m.id,
++ // Deduplicate using a Map keyed by canonical ID
++ const modelMap = new Map<string, any>();
++
++ list.data
++   .filter(m => !m.id.startsWith('ft-') && (m.id.includes('gpt') || m.id.includes('chat')))
++   .forEach(m => {
++     const canonical = ALIAS[m.id] ?? m.id;
++     // keep first-seen row (usually canonical) and ignore alias duplicates
++     if (!modelMap.has(canonical)) {
++       modelMap.set(canonical, {
++         id: canonical,
+          created: m.created ?? 0,
+          owned_by: (m as any).owned_by ?? 'openai',
+          object: m.object,
+          is_chat: true,
+          updated_at: new Date().toISOString()
+-   }));
++       });
++     }
++   });
++
++ const rows = Array.from(modelMap.values());
+No other changes needed here—supabase.upsert(rows …) stays the same.
+
+════════════════════════════════════════════════════════════
+2️⃣ Slimmer fallback logic in the hook
+════════════════════════════════════════════════════════════
+Edit /src/hooks/useModels.ts
+
+diff
+Copy
+Edit
+-  useEffect(() => {
+-    async function grab() {
+-      const { data, error } = await supabase
+-        .from('openai_models')
+-        .select('id')
+-        .eq('is_chat', true)
+-        .order('id');
+-      if (!error && data?.length) setModels(data.map(r => r.id));
+-      else setModels(['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo']); // fallback
+-    }
+-    grab();
+-  }, []);
++  useEffect(() => {
++    (async () => {
++      const { data } = await supabase
++        .from('openai_models')
++        .select('id')
++        .eq('is_chat', true)
++        .order('id');
++      setModels(
++        data && data.length
++          ? data.map(r => r.id)                       // use cache
++          : ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo'] // tiny fallback only if cache empty
++      );
++    })();
++  }, []);
+The dropdown components already consume this hook, so no further UI edits.

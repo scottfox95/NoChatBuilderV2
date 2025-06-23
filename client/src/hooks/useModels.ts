@@ -8,9 +8,9 @@ export default function useModels() {
   });
 
   // Extract just the model IDs and provide fallback
-  const modelIds = models.length > 0 
-    ? models.map(m => m.id).sort()
-    : ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo']; // fallback
+  const modelIds = models && models.length
+    ? models.map(m => m.id).sort()                       // use cache
+    : ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo']; // tiny fallback only if cache empty
 
   return {
     models: modelIds,
