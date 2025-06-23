@@ -132,9 +132,19 @@ export default function BasicSetup() {
                       newMessages[index] = newMessage;
                       field.onChange(newMessages);
                     }}
-                    onSaveAsCommon={(messageText) => {
-                      // This will be handled by a mutation when the user checks the save checkbox
-                      console.log('Save as common welcome message:', messageText);
+                    onSaveAsCommon={async (messageText) => {
+                      // Save as common welcome message
+                      if (user) {
+                        try {
+                          await apiRequest('/api/common-messages', 'POST', {
+                            userId: user.id,
+                            kind: 'welcome',
+                            text: messageText
+                          });
+                        } catch (error) {
+                          console.error('Failed to save common welcome message:', error);
+                        }
+                      }
                     }}
                   />
                   {(Array.isArray(field.value) ? field.value.length : 0) > 1 && (
@@ -192,6 +202,20 @@ export default function BasicSetup() {
                       const newQuestions = [...field.value];
                       newQuestions[index] = newQuestion;
                       field.onChange(newQuestions);
+                    }}
+                    onSaveAsCommon={async (questionText) => {
+                      // Save as common FAQ question
+                      if (user) {
+                        try {
+                          await apiRequest('/api/common-messages', 'POST', {
+                            userId: user.id,
+                            kind: 'faq',
+                            text: questionText
+                          });
+                        } catch (error) {
+                          console.error('Failed to save common FAQ question:', error);
+                        }
+                      }
                     }}
                   />
                   <Button
