@@ -10,18 +10,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 const loginFormSchema = loginSchema;
-const registerFormSchema = loginSchema;
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
-type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation, isLoading } = useAuth();
+  const { user, loginMutation, isLoading } = useAuth();
   const [, navigate] = useLocation();
-  const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginFormValues>({
@@ -32,13 +29,7 @@ export default function AuthPage() {
     },
   });
 
-  const registerForm = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerFormSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-  });
+
 
   useEffect(() => {
     if (user) {
@@ -54,13 +45,7 @@ export default function AuthPage() {
     }
   };
 
-  const onRegisterSubmit = async (data: RegisterFormValues) => {
-    try {
-      await registerMutation.mutateAsync(data);
-    } catch (error) {
-      // Error is handled in the mutation
-    }
-  };
+
 
   if (isLoading) {
     return (
@@ -84,30 +69,13 @@ export default function AuthPage() {
 
           <Card className="border border-neutral-200/10 bg-white/5 shadow-lg backdrop-blur-sm">
             <CardHeader>
-              <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid grid-cols-2 bg-black/20">
-                  <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">Login</TabsTrigger>
-                  <TabsTrigger value="register" className="data-[state=active]:bg-primary data-[state=active]:text-white">Register</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login">
-                  <CardTitle className="text-xl text-white">Welcome back</CardTitle>
-                  <CardDescription className="text-neutral-300">
-                    Login to access your chatbots
-                  </CardDescription>
-                </TabsContent>
-                
-                <TabsContent value="register">
-                  <CardTitle className="text-xl text-white">Create an account</CardTitle>
-                  <CardDescription className="text-neutral-300">
-                    Sign up to start building AI chatbots
-                  </CardDescription>
-                </TabsContent>
-              </Tabs>
+              <CardTitle className="text-xl text-white">Welcome back</CardTitle>
+              <CardDescription className="text-neutral-300">
+                Login to access your chatbots
+              </CardDescription>
             </CardHeader>
             
             <CardContent>
-              <div className={activeTab === "login" ? "block" : "hidden"}>
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <FormField
@@ -178,65 +146,6 @@ export default function AuthPage() {
                     </Button>
                   </form>
                 </Form>
-              </div>
-              
-              <div className={activeTab === "register" ? "block" : "hidden"}>
-                <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-neutral-300">Username</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Choose a username"
-                              className="bg-white/10 border-neutral-600/30 text-white placeholder:text-neutral-400"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={registerForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-neutral-300">Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Create a password"
-                              className="bg-white/10 border-neutral-600/30 text-white placeholder:text-neutral-400"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <Button
-                      type="submit"
-                      className="w-full bg-primary hover:opacity-90 text-white shadow-md"
-                      disabled={registerMutation.isPending}
-                    >
-                      {registerMutation.isPending ? (
-                        <>
-                          <Loader size="sm" className="mr-2" />
-                          Creating account...
-                        </>
-                      ) : (
-                        "Create Account"
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </div>
             </CardContent>
           </Card>
         </div>
