@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Settings, Trash2, Users, Shield } from "lucide-react";
+import { Loader2, UserPlus, Settings, Trash2, Users, Shield, KeyRound } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import DashboardLayout from "@/components/layouts/dashboard-layout";
@@ -28,7 +28,12 @@ const createUserSchema = z.object({
   role: z.enum(["careteam", "admin"])
 });
 
+const resetPasswordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 type CreateUserValues = z.infer<typeof createUserSchema>;
+type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
 interface User {
   id: number;
@@ -47,6 +52,8 @@ export default function CareTeamManagementPage() {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedChatbots, setSelectedChatbots] = useState<number[]>([]);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
+  const [resetPasswordUserId, setResetPasswordUserId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState(() => {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
@@ -61,6 +68,13 @@ export default function CareTeamManagementPage() {
       username: "",
       password: "",
       role: activeTab as "careteam" | "admin"
+    },
+  });
+
+  const resetPasswordForm = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
     },
   });
 
@@ -123,6 +137,38 @@ export default function CareTeamManagementPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to create user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: number; password: string }) => {
+      const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to reset password");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      resetPasswordForm.reset();
+      setIsResetPasswordDialogOpen(false);
+      setResetPasswordUserId(null);
+      toast({
+        title: "Success",
+        description: "Password reset successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset password",
         variant: "destructive",
       });
     },
@@ -217,6 +263,15 @@ export default function CareTeamManagementPage() {
 
   const onSubmit = (values: CreateUserValues) => {
     createUserMutation.mutate(values);
+  };
+
+  const onResetPasswordSubmit = (values: ResetPasswordValues) => {
+    if (resetPasswordUserId) {
+      resetPasswordMutation.mutate({ 
+        userId: resetPasswordUserId, 
+        password: values.password 
+      });
+    }
   };
 
   // Get assigned chatbot IDs

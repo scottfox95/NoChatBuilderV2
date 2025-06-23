@@ -1597,6 +1597,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset user password (admin only)
+  app.post("/api/admin/users/:userId/reset-password", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const userId = parseInt(req.params.userId);
+      const { password } = req.body;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      if (!password || password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+      
+      // Verify the user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Hash the new password using the same method as registration
+      const { hashPassword } = require("./auth");
+      const hashedPassword = await hashPassword(password);
+      
+      // Update the user's password in the database
+      const result = await storage.updateUserPassword(userId, hashedPassword);
+      
+      if (result) {
+        res.json({ message: "Password reset successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to reset password" });
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  // Delete user (admin only)
+  app.delete("/api/admin/users/:userId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (req.user.role !== "admin") return res.sendStatus(403);
+    
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      // Verify the user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Prevent deleting yourself
+      if (userId === req.user.id) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
+      const result = await storage.deleteUser(userId);
+      
+      if (result) {
+        res.json({ message: "User deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete user" });
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
 
 
   // Create a new user (admin or care team)

@@ -31,6 +31,8 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
+  updateUserPassword(id: number, hashedPassword: string): Promise<boolean>;
+  deleteUser(id: number): Promise<boolean>;
 
   // Chatbot assignments operations
   getAssignedChatbots(userId: number): Promise<Chatbot[]>;
@@ -177,6 +179,32 @@ export class DatabaseStorage implements IStorage {
   
   async getUsersByRole(role: string): Promise<User[]> {
     return await db.select().from(users).where(eq(users.role, role));
+  }
+
+  async updateUserPassword(id: number, hashedPassword: string): Promise<boolean> {
+    try {
+      const result = await db.update(users)
+        .set({ password: hashedPassword })
+        .where(eq(users.id, id));
+      return true;
+    } catch (error) {
+      console.error("Error updating user password:", error);
+      return false;
+    }
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      // First, remove all chatbot assignments for this user
+      await db.delete(userChatbotAssignments).where(eq(userChatbotAssignments.userId, id));
+      
+      // Then delete the user
+      await db.delete(users).where(eq(users.id, id));
+      return true;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return false;
+    }
   }
   
   // Chatbot assignments operations
